@@ -1,4 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg">
   <circle r=${radius} fill=${fill}
           stroke=${strokeColor} stroke-width=${strokeWidth} />
+  <text x="100" y="100" font-family="Arial" font-size="65" fill="black" text-anchor="middle" dominant-baseline="central">
+    TEXT
+  </text>
 </svg>
