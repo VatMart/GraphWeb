@@ -17,4 +17,7 @@ export class Graph {
     this.edges = new Map<EdgeIndex, Edge>();
   }
 
+  getNodes(): Map<number, Node> {
+    return this.nodes;
+  }
 }

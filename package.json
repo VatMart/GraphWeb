@@ -23,6 +23,7 @@
     "@clr/icons": "^13.0.2",
     "@clr/ui": "^17.0.1",
     "@webcomponents/custom-elements": "^1.6.0",
+    "bootstrap": "^5.3.3",
     "pixi.js": "^8.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
