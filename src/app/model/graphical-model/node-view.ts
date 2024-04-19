@@ -29,7 +29,7 @@ export class NodeView extends Graphics { // TODO extends Sprite instead of Conta
   /**
    * Create instance of NodeGraphical
    */
-  public static create(http: HttpClient, node: Node, coordinates: Point, radius: number) {
+  public static create(node: Node, coordinates: Point, radius: number) {
     let nodeGraphical = new NodeView(node, coordinates, radius);
     nodeGraphical.interactive = true;
     nodeGraphical.draw();

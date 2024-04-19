@@ -1,14 +1,33 @@
 import {ModeBehavior} from "./mode-manager.service";
 import * as PIXI from "pixi.js";
+import {FederatedPointerEvent} from "pixi.js";
 import {PixiService} from "../pixi.service";
 import {NodeView} from "../../model/graphical-model/node-view";
-import {FederatedPointerEvent, Graphics} from "pixi.js";
 import {GraphViewService} from "../graph-view.service";
+import {EventBusService, HandlerNames} from "./event-bus.service";
 
+/**
+ * Default mode for the application
+ */
 export class DefaultMode implements ModeBehavior {
 
+  private onDragStartBound: (event: FederatedPointerEvent) => void;
+  private onDragMoveBound: (event: FederatedPointerEvent) => void;
+  private onDragEndBound: () => void;
+
+  private dragTarget: NodeView | null = null;
+  private dragOffset: PIXI.Point = new PIXI.Point();
+
   constructor(private pixiService: PixiService,
+              private eventBus: EventBusService,
               private graphViewService: GraphViewService) {
+    this.onDragStartBound = this.onDragStart.bind(this);
+    this.onDragMoveBound = this.onDragMove.bind(this);
+    this.onDragEndBound = this.onDragEnd.bind(this);
+    // Register event handlers
+    this.eventBus.registerHandler(HandlerNames.NODE_DRAG_START, this.onDragStartBound);
+    this.eventBus.registerHandler(HandlerNames.NODE_DRAG_MOVE, this.onDragMoveBound);
+    this.eventBus.registerHandler(HandlerNames.NODE_DRAG_END, this.onDragEndBound);
     console.log("DefaultMode constructor"); // TODO REMOVE
   }
 
@@ -49,50 +68,42 @@ export class DefaultMode implements ModeBehavior {
    * Remove listeners for moving nodes of particular node
    */
   public moveableNodeOn(nodeView: NodeView) {
-
-    let dragTarget: NodeView | null = null;
-
-    const onDragStart = (event: any, nodeGraphical: NodeView): void => {
-      const dragObject = event.currentTarget as Graphics;
-      const offset = new PIXI.Point();
-      offset.x = event.data.global.x - dragObject.x;
-      offset.y = event.data.global.y - dragObject.y;
-      dragObject.alpha = 0.5;
-      dragTarget = nodeGraphical;
-      this.pixiService.getApp().stage.on('pointermove', (event: FederatedPointerEvent) =>
-        onDragMove(event, offset.x, offset.y));
-      this.pixiService.getApp().stage.on('pointerup', onDragEnd.bind(this));
-      this.pixiService.getApp().stage.on('pointerupoutside', onDragEnd.bind(this));
-    }
-
-    const onDragMove = (event: FederatedPointerEvent, offsetX: number, offsetY: number): void => {
-      if (dragTarget) {
-        const newPosition = event.getLocalPosition(this.pixiService.getApp().stage);
-        dragTarget.coordinates = {x: (event.global.x - offsetX), y: (event.global.y - offsetY)};
-        // TODO TEST
-        // this.calculateRepulsiveForces();
-        // this.updatePositions(0.1);  // Update positions immediately while dragging
-      }
-    }
-
-    const onDragEnd = (): void => {
-      if (dragTarget) {
-        dragTarget.alpha = 1;
-        this.pixiService.getApp().stage.off('pointerup', onDragEnd.bind(this));
-        this.pixiService.getApp().stage.off('pointerupoutside', onDragEnd.bind(this));
-        dragTarget = null;
-      }
-    }
-
-    nodeView.on('pointerdown', (event) =>
-      onDragStart(event, nodeView), nodeView);
+    this.eventBus.registerPixiEvent(nodeView, 'pointerdown', HandlerNames.NODE_DRAG_START);
   }
 
   /**
    * Remove listeners for moving node of particular node
    */
   public moveableNodeOff(nodeView: NodeView) {
-    nodeView.off('pointerdown');
+    this.eventBus.unregisterPixiEvent(nodeView, 'pointerdown', HandlerNames.NODE_DRAG_START);
+  }
+
+  private onDragStart(event: FederatedPointerEvent): void {
+    const dragObject = event.currentTarget as NodeView;
+    this.dragOffset.x = event.global.x - dragObject.x;
+    this.dragOffset.y = event.global.y - dragObject.y;
+    dragObject.alpha = 0.5;
+    this.dragTarget = dragObject;  // Store the target being dragged
+
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerup', HandlerNames.NODE_DRAG_END);
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
+  }
+
+  private onDragMove(event: FederatedPointerEvent): void {
+    if (this.dragTarget) {
+      const newPosition = event.getLocalPosition(this.pixiService.getApp().stage);
+      this.dragTarget.coordinates = {x: newPosition.x - this.dragOffset.x, y: newPosition.y - this.dragOffset.y};
+    }
+  }
+
+  private onDragEnd(): void {
+    if (this.dragTarget) {
+      this.dragTarget.alpha = 1;  // Reset the alpha to fully opaque
+      this.dragTarget = null;  // Clear the drag target
+    }
+    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerup', HandlerNames.NODE_DRAG_END);
+    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
   }
 
   // TEST

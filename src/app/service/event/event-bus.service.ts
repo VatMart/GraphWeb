@@ -1,33 +1,137 @@
 import { Injectable } from '@angular/core';
-import {Subject} from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import * as PIXI from 'pixi.js';
 
+/**
+ * Service that provides a way to manage events in the application.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class EventBusService {
   private eventSubjects = new Map<string, Subject<any>>();
+  private eventSubscriptions = new Map<string, Map<any, Subscription>>();
+  private handlers = new Map<string, any>(); // Handlers storage of the application
 
   constructor() { }
 
-  public registerPixiEvent(target: PIXI.EventEmitter, event: string, handler: any) {
-    target.on(event, handler);
-    this.getEventSubject(event).subscribe(handler);
+  /**
+   * Registers an event on the specified PIXI.EventEmitter and subscribes it
+   * to a corresponding Subject to manage through the EventBus.
+   */
+  public registerPixiEvent(target: PIXI.EventEmitter, event: string, handlerName: string, handler?: any) {
+    if (!handler) {
+      if (!this.hasHandler(handlerName)) {
+        console.log(`Can't register handler. Handler: ${handlerName} is not registered.`); // TODO throw exception
+        return;
+      } else {
+        handler = this.getHandler(handlerName); // Get the handler from the map
+      }
+    } else if (!this.hasHandler(handlerName)) {
+      this.registerHandler(handlerName, handler);
+    }
+    target.on(event, handler);  // Attach handler to the PIXI object
+    let sub = this.getEventSubject(event).subscribe(handler);  // Subscribe handler to the Subject
+    if (!this.eventSubscriptions.has(event)) {
+      this.eventSubscriptions.set(event, new Map<any, Subscription>());
+    }
+    this.eventSubscriptions.get(event)?.set(handler, sub);  // Store the subscription
   }
 
-  public unregisterPixiEvent(target: PIXI.EventEmitter, event: string, handler: any) {
-    target.off(event, handler);
-    this.getEventSubject(event).unsubscribe();
+  /**
+   * Unregisters an event from the specified PIXI.EventEmitter and unsubscribes
+   * it from the corresponding Subject.
+   */
+  public unregisterPixiEvent(target: PIXI.EventEmitter, event: string, handler: any | string) {
+    let handlerFunction;
+    if (typeof handler === 'string' && this.hasHandler(handler)) {
+      handlerFunction = this.getHandler(handler);
+    } else {
+      handlerFunction = handler;
+    }
+    target.off(event, handlerFunction);  // Detach handler from the PIXI object
+    let subs = this.eventSubscriptions.get(event);
+    if (subs?.has(handlerFunction)) {
+      subs.get(handlerFunction)?.unsubscribe();  // Unsubscribe the handler
+      subs.delete(handlerFunction);  // Remove the handler from the map
+      if (subs.size === 0) {
+        this.eventSubjects.get(event)?.complete();  // Complete the subject if no more subscribers
+        this.eventSubjects.delete(event);
+        this.eventSubscriptions.delete(event);
+      }
+    }
   }
 
+  /**
+   * Emits data to all subscribers of the specified event.
+   */
   public emit(event: string, data: any) {
     this.getEventSubject(event).next(data);
   }
 
+  /**
+   * Retrieves or creates a new Subject for the specified event.
+   */
   private getEventSubject(event: string): Subject<any> {
     if (!this.eventSubjects.has(event)) {
       this.eventSubjects.set(event, new Subject<any>());
     }
     return this.eventSubjects.get(event)!;
   }
+
+  // Handlers management
+
+  /**
+   * Registers a handler in the handlers map.
+   */
+  public registerHandler(handlerName: string, handler: any): void {
+    if (this.handlers.has(handlerName)) {
+      console.log(`Can't register handler. Handler: ${handler}  already registered.`);
+      return;
+    }
+    this.handlers.set(handlerName, handler);
+  }
+
+  /**
+   * Retrieves a handler from the handlers map.
+   */
+  public getHandler(name: string): any {
+    if (!this.handlers.has(name)) {
+      console.log(`Can't get handler. Handler: ${name} is not registered.`);
+      throw new Error("Handler not found");
+    }
+    return this.handlers.get(name);
+  }
+
+  /**
+   * Checks if a handler is registered.
+   */
+  public hasHandler(name: string): boolean {
+    return this.handlers.has(name);
+  }
+
+  /**
+   * Removes a handler from the handlers map.
+   * It is not recommended to remove handlers that are used in the application. Otherwise, the application
+   * may not work correctly.
+   */
+  public removeHandler(name: string): boolean {
+    if (!this.handlers.has(name)) {
+      console.log(`Can't remove handler. Handler: ${name} is not registered.`);
+    }
+    return this.handlers.delete(name);
+  }
+}
+
+/**
+ * Names of the handlers used in the application.
+ */
+export const HandlerNames = {
+  // Node handlers
+  NODE_DRAG_START: 'nodeDragStart', // Handler for the node drag start event
+  NODE_DRAG_END: 'nodeDragEnd', // Handler for the node drag end event
+  NODE_DRAG_MOVE: 'nodeDragMove', // Handler for the node drag move event
+  NODE_ADD_REMOVE: 'nodeAddRemove', // Handler for the node add/remove for click on canvas/node
+  // Canvas handlers
+  CANVAS_CURSOR_MOVE: 'canvasCursorMove', // Handler for the canvas cursor move
 }

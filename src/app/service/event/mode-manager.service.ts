@@ -23,9 +23,9 @@ export class ModeManagerService {
               private graphViewService: GraphViewService) {
 
     this.modeStateActions = {
-      'default': new DefaultMode(pixiService, graphViewService ),
-      'AddRemoveVertex': new AddRemoveVertexMode(pixiService, graphViewService),
-      'AddRemoveEdge': new AddRemoveEdgeMode(pixiService, graphViewService)
+      'default': new DefaultMode(pixiService, eventBus, graphViewService),
+      'AddRemoveVertex': new AddRemoveVertexMode(pixiService, eventBus, graphViewService),
+      'AddRemoveEdge': new AddRemoveEdgeMode(pixiService, eventBus, graphViewService)
     };
 
     // Subscribe to the currentMode$ mode state
