@@ -10,11 +10,11 @@ import {Graph} from "../model/graph";
 })
 export class NodeViewFabricService {
 
-  constructor(private http: HttpClient, private graphModelService: GraphModelService) {
+  constructor(private graphModelService: GraphModelService) {
   }
 
   public createDefaultNodeViewWithCoordinates(graph: Graph, x: number, y: number): NodeView {
     let index = this.graphModelService.calculateNewNodeIndex(graph);
-    return NodeView.create(this.http, new Node(index), {x: x, y: y}, NodeView.DEFAULT_RADIUS);
+    return NodeView.create(new Node(index), {x: x, y: y}, NodeView.DEFAULT_RADIUS);
   }
 }
