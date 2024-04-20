@@ -4,6 +4,7 @@ import {ClarityModule} from "@clr/angular";
 import {NgIf} from "@angular/common";
 import {StateService} from "../../service/state.service";
 import {EnvironmentService} from "../../service/environment.service";
+import {HistoryService} from "../../service/history.service";
 
 @Component({
   selector: 'app-tool-bar',
@@ -18,11 +19,17 @@ export class ToolBarComponent implements OnInit {
   // Modes buttons
   isAddVertexButtonActive: boolean = false;
 
+  // Undo/Redo buttons
+  canUndo: boolean = false;
+  canRedo: boolean = false;
+
   // Cursor coordinates on canvas
   xCursor: number = 0;
   yCursor: number = 0;
 
-  constructor(private stateService: StateService, private environmentService: EnvironmentService) {
+  constructor(private stateService: StateService,
+              private environmentService: EnvironmentService,
+              private historyService: HistoryService) {
     this.isMobileDevice = this.environmentService.isMobile();
   }
 
@@ -40,6 +47,20 @@ export class ToolBarComponent implements OnInit {
       this.yCursor = state;
       //console.log(this.isAddVertexModeActive);
     });
+    this.stateService.canUndo$.subscribe(state => {
+      this.canUndo = state;
+    });
+    this.stateService.canRedo$.subscribe(state => {
+      this.canRedo = state;
+    });
+  }
+
+  undoAction() {
+    this.historyService.undo();
+  }
+
+  redoAction() {
+    this.historyService.redo()
   }
 
 
