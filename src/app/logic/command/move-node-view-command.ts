@@ -14,13 +14,13 @@ export class MoveNodeViewCommand implements Command {
 
   execute(): void {
     if (this.newPosition !== undefined) {
-      this.nodeView.moveNodeView(this.newPosition.x, this.newPosition.y);
+      this.nodeView.coordinates = this.newPosition;
     }
   }
 
   undo(): void {
     if (this.oldPosition !== undefined) {
-      this.nodeView.moveNodeView(this.oldPosition.x, this.oldPosition.y);
+      this.nodeView.coordinates = this.oldPosition;
     }
   }
 

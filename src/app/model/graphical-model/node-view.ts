@@ -1,88 +1,58 @@
-import {Container, Graphics, Text, Sprite} from "pixi.js";
 import * as PIXI from "pixi.js";
+import {Graphics, Sprite, Text, Texture} from "pixi.js";
 import {Point} from "../../utils/graphical-utils";
 import {Node} from "../node";
-import {HttpClient} from '@angular/common/http';
-import {firstValueFrom} from 'rxjs';
 
-export class NodeView extends Graphics { // TODO extends Sprite instead of Container, wrap text and graphics to sprite
-  private svgTemplate: string | undefined;
-
+export class NodeView extends Sprite { // TODO extends Sprite instead of Container, wrap text and graphics to sprite
   // Math model
   private _node: Node;
 
   // Coordinates of node center
   private _coordinates: Point;
   private _radius: number;
+  private _text: Text;
+
   // TEST
   vx: number = 0;
   vy: number = 0;
 
-  // properties of svg node template
-  private _label: string;
-  private fillNode: string = '#FFFFFF';
-  private strokeColor: string = '#000000';
-  private strokeWidth: number = 5;
+  // Properties of circle of vertex
+  private nodeStyle: NodeStyle = DEFAULT_NODE_STYLE;
+  // Properties for label
+  private _labelText: string;
+  private labelStyle: NodeLabelStyle = DEFAULT_NODE_LABEL_STYLE;
 
-  public static readonly DEFAULT_RADIUS = 50; // TODO move to constants
+  public static readonly DEFAULT_RADIUS = 30; // TODO move to constants
 
-  /**
-   * Create instance of NodeGraphical
-   */
-  public static create(node: Node, coordinates: Point, radius: number) {
-    let nodeGraphical = new NodeView(node, coordinates, radius);
+  public static createFromTexture(node: Node, coordinates: Point, radius: number, texture: Texture) {
+    let nodeGraphical = new NodeView(node, coordinates, radius, texture);
     nodeGraphical.interactive = true;
+    nodeGraphical.addChild(nodeGraphical.text); // Add text to node
     nodeGraphical.draw();
     return nodeGraphical;
   }
 
-  private constructor(node: Node, coordinates: Point, radius: number) {
-    super();
+  private constructor(node: Node, coordinates: Point, radius: number, texture: Texture) {
+    super(texture);
+    this.hitArea = new PIXI.Circle(this.width / 2, this.height / 2, NodeView.DEFAULT_RADIUS);
     this._node = node;
     this._coordinates = coordinates;
-    this._label = node.index.toString();
+    this._labelText = node.index.toString();
+    this._text = new Text();
     this._radius = radius;
   }
 
-  // This method should be called after changing any graphical property in Node
-  public redraw(): void {
-    this.clear();
-    this.draw();
-  }
-
-  // deprecated
-  public async loadSvgTemplate(http: HttpClient) {
-    this.svgTemplate = await firstValueFrom(http.get('assets/node.svg-template',
-      {responseType: 'text'}));
-  }
-
-  // deprecated
-  private templateToSvg() {
-    if (!this.svgTemplate) {
-      throw new Error('SVG template not loaded');
-    }
-
-    // Replace placeholders in the SVG template with the actual values
-    let svgString = this.svgTemplate;
-    svgString = svgString.replace('${radius}', this._radius.toString());
-    svgString = svgString.replace('${fill}', this.fillNode);
-    svgString = svgString.replace('${strokeColor}', this.strokeColor);
-    svgString = svgString.replace('${strokeWidth}', this.strokeWidth.toString());
-    svgString = svgString.replace('${label}', this._label);
-    console.log(`SvgString: ${svgString}`)
-    return svgString;
-  }
-
   private draw(): void {
-    this.circle(this.coordinates.x, this.coordinates.y, this.radius).
-    fill(this.fillNode).
-    stroke({color: this.strokeColor, width: this.strokeWidth});
-  }
-
-  public moveNodeView(x: number, y: number) {
-    this.coordinates = {x: x, y: y};
-    this.x = x;
-    this.y = y;
+    this._text.text = this._labelText;
+    this._text.style = new PIXI.TextStyle({
+      fill: this.labelStyle.labelColor,
+      fontSize: this.labelStyle.labelFontSize,
+      fontFamily: this.labelStyle.labelFontFamily,
+      fontWeight: 'bold'
+    });
+    //this.tint = 'white';
+    this._text.anchor.set(0.5);
+    this.coordinates = this._coordinates;
   }
 
   get node(): Node {
@@ -97,6 +67,10 @@ export class NodeView extends Graphics { // TODO extends Sprite instead of Conta
     this._radius = value;
   }
 
+  get text(): Text {
+    return this._text;
+  }
+
   get coordinates(): Point {
     return this._coordinates;
   }
@@ -105,7 +79,35 @@ export class NodeView extends Graphics { // TODO extends Sprite instead of Conta
     this._coordinates = value;
     this.x = value.x;
     this.y = value.y;
+    this._text.x = this.width / 2;
+    this._text.y = this.height / 2;
   }
+}
+
+export const DEFAULT_NODE_STYLE: NodeStyle = {
+  fillNode: '#FFFFFF',
+  strokeColor: '#000000',
+  strokeWidth: 3
+};
+
+export const DEFAULT_NODE_LABEL_STYLE: NodeLabelStyle = {
+  labelColor: '#000000',
+  labelFontSize: 24,
+  labelFontFamily: 'Calibri', // Calibri bold
+  labelFontWeight: 'bold'
+};
+
+export interface NodeStyle {
+  fillNode: string;
+  strokeColor: string;
+  strokeWidth: number;
+}
+
+export interface NodeLabelStyle {
+  labelColor: string;
+  labelFontSize: number;
+  labelFontFamily: string;
+  labelFontWeight: string;
 }
 
 export class NodeGraphics extends Graphics {

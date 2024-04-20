@@ -7,6 +7,7 @@ import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
 import {Graph} from "../../model/graph";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 
 @Component({
   selector: 'app-canvas',
@@ -26,6 +27,7 @@ export class CanvasComponent implements OnInit {
   constructor(private pixiService: PixiService,
               private stateService: StateService,
               private eventBus: EventBusService,
+              private nodeFabric: NodeViewFabricService,
               private graphViewService: GraphViewService) {
     this.boundHandleCursorMoving = this.handlePointerDown.bind(this);
     // Registering event handlers
@@ -46,9 +48,8 @@ export class CanvasComponent implements OnInit {
     let graph: Graph = new Graph(); // TODO create graph via graph model service
     this.graphViewService.currentGraph = graph; // TODO Change creating graph behaviour
 
-    let nodeGraphical = NodeView.create(new Node(1),
-      {x: 200, y: 200}, 100); // TODO move creation of node
-    this.graphViewService.addNodeToGraphView(graph, nodeGraphical);
+    //let nodeGraphical = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: 200, y: 200}); // TODO move creation of node
+    //this.graphViewService.addNodeToGraphView(graph, nodeGraphical);
   }
 
   private setDefaultListeners()  {

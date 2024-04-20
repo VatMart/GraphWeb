@@ -40,7 +40,8 @@ export class AddRemoveVertexMode implements ModeBehavior {
     console.log(event.target.constructor.name)
     if (event.target === stage) {
       let newNodeView: NodeView = this.nodeFabric
-        .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph, event.globalX, event.globalY);
+        .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph,
+          {x: event.globalX - NodeView.DEFAULT_RADIUS, y: event.globalY - NodeView.DEFAULT_RADIUS});
       let command = new AddNodeViewCommand(newNodeView, this.graphViewService);
       this.historyService.execute(command);
       //this.graphViewService.addNodeToCurrentGraphView(event.globalX, event.globalY);
