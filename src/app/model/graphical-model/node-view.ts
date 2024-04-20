@@ -79,6 +79,12 @@ export class NodeView extends Graphics { // TODO extends Sprite instead of Conta
     stroke({color: this.strokeColor, width: this.strokeWidth});
   }
 
+  public moveNodeView(x: number, y: number) {
+    this.coordinates = {x: x, y: y};
+    this.x = x;
+    this.y = y;
+  }
+
   get node(): Node {
     return this._node;
   }

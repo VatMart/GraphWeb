@@ -63,4 +63,10 @@
       <a href="#" class="dropdown-item">25%</a>
     </clr-dropdown-menu>
   </clr-dropdown>
+  <button class="btn btn-outline-secondary" (click)="undoAction()" [disabled]="!canUndo">
+    Undo
+  </button>
+  <button class="btn btn-outline-secondary" (click)="redoAction()" [disabled]="!canRedo">
+    Redo
+  </button>
 </div>

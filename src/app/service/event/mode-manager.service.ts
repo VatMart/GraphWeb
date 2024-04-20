@@ -1,12 +1,14 @@
 import {Injectable} from '@angular/core';
 import {NodeView} from "../../model/graphical-model/node-view";
 import {StateService} from "../state.service";
-import {DefaultMode} from "./default-mode";
-import {AddRemoveVertexMode} from "./add-remove-vertex-mode";
-import {AddRemoveEdgeMode} from "./add-remove-edge-mode";
+import {DefaultMode} from "../../logic/event/default-mode";
+import {AddRemoveVertexMode} from "../../logic/event/add-remove-vertex-mode";
+import {AddRemoveEdgeMode} from "../../logic/event/add-remove-edge-mode";
 import {PixiService} from "../pixi.service";
 import {GraphViewService} from "../graph-view.service";
 import {EventBusService} from "./event-bus.service";
+import {NodeViewFabricService} from "../node-view-fabric.service";
+import {HistoryService} from "../history.service";
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +22,14 @@ export class ModeManagerService {
   constructor(private stateService: StateService,
               private eventBus: EventBusService,
               private pixiService: PixiService,
+              private nodeViewFabricService: NodeViewFabricService,
+              private historyService: HistoryService,
               private graphViewService: GraphViewService) {
 
     this.modeStateActions = {
-      'default': new DefaultMode(pixiService, eventBus, graphViewService),
-      'AddRemoveVertex': new AddRemoveVertexMode(pixiService, eventBus, graphViewService),
+      'default': new DefaultMode(pixiService, eventBus, historyService, graphViewService),
+      'AddRemoveVertex': new AddRemoveVertexMode(pixiService, eventBus, nodeViewFabricService, historyService,
+        graphViewService),
       'AddRemoveEdge': new AddRemoveEdgeMode(pixiService, eventBus, graphViewService)
     };
 

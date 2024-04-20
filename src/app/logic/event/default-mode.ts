@@ -1,10 +1,13 @@
-import {ModeBehavior} from "./mode-manager.service";
+import {ModeBehavior} from "../../service/event/mode-manager.service";
 import * as PIXI from "pixi.js";
 import {FederatedPointerEvent} from "pixi.js";
-import {PixiService} from "../pixi.service";
+import {PixiService} from "../../service/pixi.service";
 import {NodeView} from "../../model/graphical-model/node-view";
-import {GraphViewService} from "../graph-view.service";
-import {EventBusService, HandlerNames} from "./event-bus.service";
+import {Point} from "../../utils/graphical-utils";
+import {GraphViewService} from "../../service/graph-view.service";
+import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {MoveNodeViewCommand} from "../command/move-node-view-command";
+import {HistoryService} from "../../service/history.service";
 
 /**
  * Default mode for the application
@@ -17,9 +20,12 @@ export class DefaultMode implements ModeBehavior {
 
   private dragTarget: NodeView | null = null;
   private dragOffset: PIXI.Point = new PIXI.Point();
+  private dragStartPoint: Point = {x: 0, y: 0};
+  private moveCommand: MoveNodeViewCommand | null = null;
 
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
+              private historyService: HistoryService,
               private graphViewService: GraphViewService) {
     this.onDragStartBound = this.onDragStart.bind(this);
     this.onDragMoveBound = this.onDragMove.bind(this);
@@ -80,6 +86,12 @@ export class DefaultMode implements ModeBehavior {
 
   private onDragStart(event: FederatedPointerEvent): void {
     const dragObject = event.currentTarget as NodeView;
+
+    // Store the starting position of the drag
+    this.dragStartPoint = {x: dragObject.x, y: dragObject.y};
+    this.moveCommand = new MoveNodeViewCommand(dragObject, this.graphViewService);
+    this.moveCommand.oldPosition = {x: dragObject.x, y: dragObject.y};
+
     this.dragOffset.x = event.global.x - dragObject.x;
     this.dragOffset.y = event.global.y - dragObject.y;
     dragObject.alpha = 0.5;
@@ -99,6 +111,10 @@ export class DefaultMode implements ModeBehavior {
 
   private onDragEnd(): void {
     if (this.dragTarget) {
+      if (this.moveCommand) {
+        this.moveCommand.newPosition = this.dragTarget.coordinates;
+        this.historyService.execute(this.moveCommand); // Execute the move command
+      }
       this.dragTarget.alpha = 1;  // Reset the alpha to fully opaque
       this.dragTarget = null;  // Clear the drag target
     }

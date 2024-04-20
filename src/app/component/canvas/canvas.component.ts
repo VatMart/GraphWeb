@@ -1,9 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import * as PIXI from "pixi.js";
-import {Container, FederatedPointerEvent, Graphics} from "pixi.js";
+import {FederatedPointerEvent} from "pixi.js";
 import {NodeView} from "../../model/graphical-model/node-view";
 import {Node} from "../../model/node";
-import {HttpClient} from "@angular/common/http";
 import {StateService} from "../../service/state.service";
 import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
@@ -39,7 +37,7 @@ export class CanvasComponent implements OnInit {
     let someElement = document.getElementById('testId');
     // document.documentElement.clientHeight
     await this.pixiService.getApp().init({antialias: true, background: '#e0e0e0', width: window.innerWidth,
-      height: window.innerHeight});
+      height: window.innerHeight - 200});
     document.body.appendChild(this.pixiService.getApp().canvas);
     // TODO move to Pixi service
     this.pixiService.getApp().stage.eventMode = 'dynamic';
