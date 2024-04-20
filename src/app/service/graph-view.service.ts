@@ -33,7 +33,7 @@ export class GraphViewService extends GraphModelService {
   public addNodeToGraphView(graph: Graph, nodeView: NodeView) {
     super.addNodeToGraph(graph, nodeView.node);
     this._map.set(nodeView.node, nodeView);
-    this.pixiService.getApp().stage.addChild(nodeView); // Add container, not the node itself
+    this.pixiService.getApp().stage.addChild(nodeView); // TODO Add container, not the node itself
     this.appState.addedNode(nodeView); // Notify state service
     console.log("Added node to graph: " + nodeView.node.index);
   }
@@ -54,7 +54,8 @@ export class GraphViewService extends GraphModelService {
    */
   public addNodeToCurrentGraphView(x: number, y: number) {
     if (this.currentGraph) {
-      let nodeView: NodeView = this.nodeViewFabricService.createDefaultNodeViewWithCoordinates(this.currentGraph, x, y);
+      let nodeView: NodeView = this.nodeViewFabricService.createDefaultNodeViewWithCoordinates(this.currentGraph,
+        {x: x, y: y});
       this.addNodeToGraphView(this.currentGraph, nodeView);
     } else {
       console.error("No current graph set"); // TODO throw exception
