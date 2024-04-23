@@ -21,6 +21,8 @@ export class StateService {
   // All modes
   private stateAddVertexSource = new BehaviorSubject<boolean>(false);
   currentAddVertexState = this.stateAddVertexSource.asObservable();
+  private stateAddEdgesSource = new BehaviorSubject<boolean>(false);
+  currentAddEdgesState = this.stateAddEdgesSource.asObservable();
 
   // Canvas cursor coordinates
   private cursorXSource = new BehaviorSubject<number>(0);
@@ -75,6 +77,13 @@ export class StateService {
    */
   changeAddVertexModeState(state: boolean) {
     this.stateAddVertexSource.next(state);
+  }
+
+  /**
+   * Change the add edges mode state.
+   */
+  changeAddEdgesModeState(state: boolean) {
+    this.stateAddEdgesSource.next(state);
   }
 
   /**

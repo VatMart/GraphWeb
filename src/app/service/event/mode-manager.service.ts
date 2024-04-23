@@ -48,6 +48,11 @@ export class ModeManagerService {
       this.stateService.changeMode(newState);
     });
 
+    this.stateService.currentAddEdgesState.subscribe(state => {
+      const newState: ModeState = state ? 'AddRemoveEdge' : 'default';
+      this.stateService.changeMode(newState);
+    });
+
     this.stateService.nodeAdded$.subscribe(nodeView => {
       if (nodeView) {
         this.onAddedNode(nodeView);
