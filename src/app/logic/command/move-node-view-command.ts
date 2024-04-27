@@ -1,46 +1,49 @@
-import {GraphViewService} from "../../service/graph-view.service";
 import {Point} from "../../utils/graphical-utils";
 import {Command} from "./command";
 import {NodeView} from "../../model/graphical-model/node-view";
 
 export class MoveNodeViewCommand implements Command {
 
-  private _oldPosition: Point | undefined;
-  private _newPosition: Point | undefined;
-
-  constructor(private nodeView: NodeView,
-              private graphViewService: GraphViewService) {
+  constructor(private selectedNodes: NodeMove[]) {
   }
 
   execute(): void {
-    if (this.newPosition !== undefined) {
-      this.nodeView.coordinates = this.newPosition;
-    }
+    this.selectedNodes.forEach(nodeMove => {
+      if (nodeMove.newPosition) {
+        nodeMove.node.coordinates = nodeMove.newPosition;
+      }
+    });
   }
 
   undo(): void {
-    if (this.oldPosition !== undefined) {
-      this.nodeView.coordinates = this.oldPosition;
-    }
+    this.selectedNodes.forEach(nodeMove => {
+      nodeMove.node.coordinates = nodeMove.oldPosition;
+    });
   }
 
   redo(): void {
     this.execute();
   }
+}
 
-  get oldPosition(): Point {
-    return <Point>this._oldPosition;
+export class NodeMove {
+  node: NodeView;
+  oldPosition: Point;
+  offset: Point;
+
+  private _newPosition: Point | undefined;
+
+  constructor(node: NodeView, oldPosition: Point, offset: Point) {
+    this.node = node;
+    this.oldPosition = oldPosition;
+    this.offset = offset;
   }
 
-  set oldPosition(value: Point) {
-    this._oldPosition = value;
-  }
-
-  get newPosition(): Point {
-    return <Point>this._newPosition;
-  }
-
-  set newPosition(value: Point) {
+  set newPosition(value: Point | undefined) {
     this._newPosition = value;
+  }
+
+  get newPosition(): Point | undefined {
+    return <Point>this._newPosition;
   }
 }

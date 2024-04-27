@@ -1,13 +1,12 @@
 import {ModeBehavior} from "../../service/event/mode-manager.service";
-import * as PIXI from "pixi.js";
 import {FederatedPointerEvent} from "pixi.js";
 import {PixiService} from "../../service/pixi.service";
 import {NodeView} from "../../model/graphical-model/node-view";
-import {Point} from "../../utils/graphical-utils";
 import {GraphViewService} from "../../service/graph-view.service";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
-import {MoveNodeViewCommand} from "../command/move-node-view-command";
+import {MoveNodeViewCommand, NodeMove} from "../command/move-node-view-command";
 import {HistoryService} from "../../service/history.service";
+import {EdgeView} from "../../model/graphical-model/edge-view";
 
 /**
  * Default mode for the application
@@ -17,10 +16,12 @@ export class DefaultMode implements ModeBehavior {
   private onDragStartBound: (event: FederatedPointerEvent) => void;
   private onDragMoveBound: (event: FederatedPointerEvent) => void;
   private onDragEndBound: () => void;
+  private onSelectionElementBound: (event: FederatedPointerEvent) => void;
 
-  private dragTarget: NodeView | null = null;
-  private dragOffset: PIXI.Point = new PIXI.Point();
-  private dragStartPoint: Point = {x: 0, y: 0};
+  // Dragging
+  private dragTarget: NodeMove[] | null = null;
+  private isDragging = false;
+  private dragThreshold = 2; // Pixels the mouse must move to start drag
   private moveCommand: MoveNodeViewCommand | null = null;
 
   constructor(private pixiService: PixiService,
@@ -30,7 +31,9 @@ export class DefaultMode implements ModeBehavior {
     this.onDragStartBound = this.onDragStart.bind(this);
     this.onDragMoveBound = this.onDragMove.bind(this);
     this.onDragEndBound = this.onDragEnd.bind(this);
+    this.onSelectionElementBound = this.onSelectElement.bind(this);
     // Register event handlers
+    this.eventBus.registerHandler(HandlerNames.ELEMENT_SELECT, this.onSelectionElementBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_START, this.onDragStartBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_MOVE, this.onDragMoveBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_END, this.onDragEndBound);
@@ -39,11 +42,13 @@ export class DefaultMode implements ModeBehavior {
 
   modeOn(): void {
     console.log("DefaultMode ON");
+    this.selectableModeOn();
     this.moveableNodesOn();
   }
 
   modeOff(): void {
     console.log("DefaultMode OFF");
+    this.selectableModeOff();
     this.moveableNodesOff();
   }
 
@@ -84,18 +89,38 @@ export class DefaultMode implements ModeBehavior {
     this.eventBus.unregisterPixiEvent(nodeView, 'pointerdown', HandlerNames.NODE_DRAG_START);
   }
 
+  private selectableModeOn() {
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
+      HandlerNames.ELEMENT_SELECT);
+  }
+
+  private selectableModeOff() {
+    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
+      HandlerNames.ELEMENT_SELECT);
+  }
+
   private onDragStart(event: FederatedPointerEvent): void {
-    const dragObject = event.currentTarget as NodeView;
+    const dragObject = event.target as NodeView;
 
     // Store the starting position of the drag
-    this.dragStartPoint = {x: dragObject.x, y: dragObject.y};
-    this.moveCommand = new MoveNodeViewCommand(dragObject, this.graphViewService);
-    this.moveCommand.oldPosition = {x: dragObject.x, y: dragObject.y};
+    let nodesMove: NodeMove[] = [...this.graphViewService.selectedElements]
+      .filter(el => el instanceof NodeView)
+      .map(el => {
+        let element = el as NodeView;
+        return new NodeMove(element,
+          {x: element.x, y: element.y},
+          {x: event.global.x - element.x, y: event.global.y - element.y});
+      });
+    // If the node being dragged is not already in the list of nodes to move, add it
+    if (!nodesMove.some(nm => nm.node === dragObject)) {
+      nodesMove.push(new NodeMove(dragObject,
+        {x: dragObject.x, y: dragObject.y},
+        {x: event.global.x - dragObject.x, y: event.global.y - dragObject.y}));
+    }
+    this.moveCommand = new MoveNodeViewCommand(nodesMove);
 
-    this.dragOffset.x = event.global.x - dragObject.x;
-    this.dragOffset.y = event.global.y - dragObject.y;
-    dragObject.alpha = 0.5;
-    this.dragTarget = dragObject;  // Store the target being dragged
+    this.dragTarget = nodesMove;  // Store the targets being dragged
+    this.isDragging = false;
 
     this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);
     this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerup', HandlerNames.NODE_DRAG_END);
@@ -105,21 +130,82 @@ export class DefaultMode implements ModeBehavior {
   private onDragMove(event: FederatedPointerEvent): void {
     if (this.dragTarget) {
       const newPosition = event.getLocalPosition(this.pixiService.getApp().stage);
-      this.dragTarget.coordinates = {x: newPosition.x - this.dragOffset.x, y: newPosition.y - this.dragOffset.y};
+      // Check if the drag has moved beyond the threshold
+      if (!this.isDragging) {
+        let nodeMove = this.dragTarget[0]
+        const dx = Math.abs((newPosition.x - nodeMove.offset.x) - nodeMove.oldPosition.x);
+        const dy = Math.abs((newPosition.y - nodeMove.offset.y) - nodeMove.oldPosition.y);
+        if (dx > this.dragThreshold || dy > this.dragThreshold) {
+          this.isDragging = true; // Start dragging if moved beyond threshold
+        }
+      }
+      // Move the nodes if dragging
+      if (this.isDragging) {
+        // Check selected elements to remove from drag target (bug fix for multiple selection drag
+        if (this.graphViewService.selectedElements.size !== this.dragTarget.length) {
+          this.dragTarget = this.dragTarget
+            .filter(nm => this.graphViewService.selectedElements.has(nm.node));
+        }
+        // Move the nodes to the new position
+        this.dragTarget.forEach(element => {
+          element.node.alpha = 0.5;
+          element.node.coordinates = {x: newPosition.x - element.offset.x, y: newPosition.y - element.offset.y};
+        });
+      }
     }
   }
 
   private onDragEnd(): void {
     if (this.dragTarget) {
-      if (this.moveCommand) {
-        this.moveCommand.newPosition = this.dragTarget.coordinates;
-        this.historyService.execute(this.moveCommand); // Execute the move command
+      if (this.moveCommand && this.isDragging) {
+        this.dragTarget.forEach(element => {
+          element.newPosition = element.node.coordinates;
+        });
+        // Execute the move command
+        this.historyService.execute(this.moveCommand);
       }
-      this.dragTarget.alpha = 1;  // Reset the alpha to fully opaque
-      this.dragTarget = null;  // Clear the drag target
+      // Reset the alpha of the nodes being dragged
+      this.dragTarget.forEach(element => {
+        element.node.alpha = 1;
+      });
+      // Clear the drag target
+      this.dragTarget = null;
+      this.isDragging = false;
     }
     this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerup', HandlerNames.NODE_DRAG_END);
     this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
+  }
+
+  private onSelectElement(event: FederatedPointerEvent): void {
+    event.stopImmediatePropagation();
+    const selectedElement = event.target instanceof NodeView
+      ? event.target as NodeView
+      : event.target instanceof EdgeView
+        ? event.target as EdgeView
+        : null;
+
+    if (!selectedElement) { // Canvas selected
+      this.graphViewService.clearSelection();
+      return;
+    }
+
+    if (!event.ctrlKey) { // Single selection
+      if (this.graphViewService.isElementSelected(selectedElement)) {
+        return;
+      }
+      if (!this.graphViewService.isSelectionEmpty()) {
+        this.graphViewService.clearSelection();
+        this.graphViewService.selectElement(selectedElement);
+        return;
+      }
+      this.graphViewService.selectElement(selectedElement);
+    } else { // Multiple selection
+      if (this.graphViewService.isElementSelected(selectedElement)) {
+        this.graphViewService.unselectElement(selectedElement);
+      } else {
+        this.graphViewService.selectElement(selectedElement);
+      }
+    }
   }
 
   // TEST
