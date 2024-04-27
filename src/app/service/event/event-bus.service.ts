@@ -132,6 +132,8 @@ export const HandlerNames = {
   NODE_DRAG_END: 'nodeDragEnd', // Handler for the node drag end event
   NODE_DRAG_MOVE: 'nodeDragMove', // Handler for the node drag move event
   NODE_ADD_REMOVE: 'nodeAddRemove', // Handler for the node add/remove for click on canvas/node
+
+  ELEMENT_SELECT: 'elementSelect', // Handler for the element select event
   // Canvas handlers
   CANVAS_CURSOR_MOVE: 'canvasCursorMove', // Handler for the canvas cursor move
 }

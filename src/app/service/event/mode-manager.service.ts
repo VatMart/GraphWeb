@@ -38,6 +38,7 @@ export class ModeManagerService {
       console.log("ModeManagerService: mode: " + mode);
       console.log("ModeManagerService: currentMode: " + this.currentModeState);
       if (this.currentModeState !== mode) {
+        this.graphViewService.clearSelection();
         this.updateModeState(mode);
       }
     });

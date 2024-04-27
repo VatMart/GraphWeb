@@ -13,6 +13,8 @@ export class Edge {
 
   private _secondNode: Node;
 
+  private _edgeIndex: EdgeIndex;
+
   // If you use oriented edge, remember that order of nodes is important.
   // First node is always one which initiate direction: firstNode -> secondNode
   private orientation: EdgeOrientation;
@@ -23,10 +25,10 @@ export class Edge {
   constructor(firstNode: Node, secondNode: Node) {
     this._firstNode = firstNode;
     this._secondNode = secondNode;
+    this._edgeIndex = EdgeIndex.fromNodes(firstNode, secondNode);
     this.weight = 1.0; // default value
     this.orientation = EdgeOrientation.NON_ORIENTED; // default value
   }
-
 
   get firstNode(): Node {
     return this._firstNode;
@@ -35,17 +37,21 @@ export class Edge {
   get secondNode(): Node {
     return this._secondNode;
   }
+
+  get edgeIndex(): EdgeIndex {
+    return this._edgeIndex;
+  }
 }
 
 /**
  * Represent edge index as string
  */
 export class EdgeIndex {
-  private readonly _index: string;
+  private readonly _value: string;
 
   constructor(from: number, to: number) {
     // Create a unique index by concatenating the node indexes
-    this._index = `${from}-${to}`;
+    this._value = `${from}-${to}`;
   }
 
   /**
@@ -64,8 +70,7 @@ export class EdgeIndex {
     return new this(edge.firstNode.index, edge.secondNode.index)
   }
 
-
-  get index(): string {
-    return this._index;
+  get value(): string {
+    return this._value;
   }
 }
