@@ -133,7 +133,10 @@ export const HandlerNames = {
   NODE_DRAG_MOVE: 'nodeDragMove', // Handler for the node drag move event
   NODE_ADD_REMOVE: 'nodeAddRemove', // Handler for the node add/remove for click on canvas/node
 
+  // Selection handlers
   ELEMENT_SELECT: 'elementSelect', // Handler for the element select event
+  RECTANGLE_SELECTION_MOVE: 'rectangleSelectionMove', // Handler for the rectangle selection start event
+  RECTANGLE_SELECTION_END: 'rectangleSelectionEnd', // Handler for the rectangle selection end event
   // Canvas handlers
   CANVAS_CURSOR_MOVE: 'canvasCursorMove', // Handler for the canvas cursor move
 }

@@ -30,7 +30,8 @@ export class NodeViewFabricService {
       const totalRadius = radius + nodeStyle.strokeWidth;
       graphics.circle(totalRadius, totalRadius, radius).
       fill(nodeStyle.fillNode).
-      stroke({color: nodeStyle.strokeColor, alignment: 0.5, width: nodeStyle.strokeWidth, cap: 'round', join: 'round'});
+      stroke({color: nodeStyle.strokeColor, alignment: 0.5, width: nodeStyle.strokeWidth,
+        cap: 'round', join: 'round'});
 
       const texture = RenderTexture.create({width: 2 * totalRadius, height: 2 * totalRadius, antialias: true,
         resolution: Math.max(2, window.devicePixelRatio)});
@@ -55,7 +56,7 @@ export class NodeViewFabricService {
     let selectedNodeStyle: NodeStyle = {
       fillNode: nodeView.nodeStyle.fillNode,
       strokeColor: SELECTED_NODE_STYLE.strokeColor,
-      strokeWidth: nodeView.nodeStyle.strokeWidth + 2
+      strokeWidth: nodeView.nodeStyle.strokeWidth + 1
     };
     this.switchNodeStyle(nodeView, selectedNodeStyle);
     nodeView.hitArea = new PIXI.Circle(nodeView.width / 2, nodeView.height / 2, nodeView.radius);
