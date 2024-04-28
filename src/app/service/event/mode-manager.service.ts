@@ -17,7 +17,7 @@ export class ModeManagerService {
 
   private modeStateActions: { [key in ModeState]: ModeBehavior };
 
-  private currentModeState: ModeState = 'default';
+  private currentModeState: ModeState;
 
   constructor(private stateService: StateService,
               private eventBus: EventBusService,
@@ -59,6 +59,7 @@ export class ModeManagerService {
         this.onAddedNode(nodeView);
       }
     });
+    this.currentModeState = 'default';
   }
 
   updateModeState(newState: ModeState) {

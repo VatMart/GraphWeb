@@ -7,6 +7,8 @@ import {EventBusService, HandlerNames} from "../../service/event/event-bus.servi
 import {MoveNodeViewCommand, NodeMove} from "../command/move-node-view-command";
 import {HistoryService} from "../../service/history.service";
 import {EdgeView} from "../../model/graphical-model/edge-view";
+import {GraphicalUtils, Point, Rectangle} from "../../utils/graphical-utils";
+import {SelectRectangle} from "../../model/graphical-model/select-rectangle";
 
 /**
  * Default mode for the application
@@ -16,13 +18,22 @@ export class DefaultMode implements ModeBehavior {
   private onDragStartBound: (event: FederatedPointerEvent) => void;
   private onDragMoveBound: (event: FederatedPointerEvent) => void;
   private onDragEndBound: () => void;
+
   private onSelectionElementBound: (event: FederatedPointerEvent) => void;
+  private onRectangleSelectionMoveBound: (event: FederatedPointerEvent) => void;
+  private onRectangleSelectionEndBound: (event: FederatedPointerEvent) => void;
 
   // Dragging
   private dragTarget: NodeMove[] | null = null;
   private isDragging = false;
   private dragThreshold = 2; // Pixels the mouse must move to start drag
   private moveCommand: MoveNodeViewCommand | null = null;
+
+  // Selecting
+  private isRectangleSelection = false;
+  private rectangleSelection: SelectRectangle | null = null;
+  private rectangleSelectionStart: Point | null = null;
+  private rectangleSelectionThreshold = 2; // Pixels the mouse must move to start rectangle selection
 
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
@@ -32,11 +43,15 @@ export class DefaultMode implements ModeBehavior {
     this.onDragMoveBound = this.onDragMove.bind(this);
     this.onDragEndBound = this.onDragEnd.bind(this);
     this.onSelectionElementBound = this.onSelectElement.bind(this);
+    this.onRectangleSelectionMoveBound = this.onRectangleSelectionMove.bind(this);
+    this.onRectangleSelectionEndBound = this.onRectangleSelectionEnd.bind(this);
     // Register event handlers
     this.eventBus.registerHandler(HandlerNames.ELEMENT_SELECT, this.onSelectionElementBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_START, this.onDragStartBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_MOVE, this.onDragMoveBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_END, this.onDragEndBound);
+    this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_MOVE, this.onRectangleSelectionMoveBound);
+    this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_END, this.onRectangleSelectionEndBound);
     console.log("DefaultMode constructor"); // TODO REMOVE
   }
 
@@ -177,16 +192,16 @@ export class DefaultMode implements ModeBehavior {
   }
 
   private onSelectElement(event: FederatedPointerEvent): void {
-    event.stopImmediatePropagation();
     const selectedElement = event.target instanceof NodeView
       ? event.target as NodeView
       : event.target instanceof EdgeView
         ? event.target as EdgeView
         : null;
 
-    if (!selectedElement) { // Canvas selected
-      this.graphViewService.clearSelection();
-      return;
+    if (!selectedElement) { // Canvas clicked (no selection before - clear selection, else - rectangle selection)
+      // Rectangle selection
+      this.onRectangleSelectionStart(event);
+      return; // No element selected
     }
 
     if (!event.ctrlKey) { // Single selection
@@ -206,6 +221,66 @@ export class DefaultMode implements ModeBehavior {
         this.graphViewService.selectElement(selectedElement);
       }
     }
+  }
+
+  private onRectangleSelectionStart(event: FederatedPointerEvent): void {
+    this.rectangleSelectionStart = {x: event.global.x, y: event.global.y};
+    this.rectangleSelection = new SelectRectangle();
+    if (!this.pixiService.getApp().stage.children.some(ch => ch == this.rectangleSelection)) {
+      this.pixiService.getApp().stage.addChild(this.rectangleSelection);
+    }
+    this.isRectangleSelection = false;
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+      'pointermove', HandlerNames.RECTANGLE_SELECTION_MOVE);
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+      'pointerup', HandlerNames.RECTANGLE_SELECTION_END);
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+      'pointerupoutside', HandlerNames.RECTANGLE_SELECTION_END);
+  }
+
+  private onRectangleSelectionMove(event: FederatedPointerEvent): void {
+    const newPosition = event.getLocalPosition(this.pixiService.getApp().stage);
+    if (this.rectangleSelectionStart) {
+      // Check if the drag has moved beyond the threshold
+      if (!this.isRectangleSelection) {
+        const dx = Math.abs((newPosition.x) - this.rectangleSelectionStart.x);
+        const dy = Math.abs((newPosition.y) - this.rectangleSelectionStart.y);
+        if (dx > this.rectangleSelectionThreshold || dy > this.rectangleSelectionThreshold) {
+          this.isRectangleSelection = true; // Start dragging if moved beyond threshold
+        }
+      }
+    }
+
+    if (this.isRectangleSelection && this.rectangleSelectionStart && this.rectangleSelection) {
+      let rectangle: Rectangle = this.rectangleSelection.toRectangle();
+      this.rectangleSelection.updatePosition(this.rectangleSelectionStart, newPosition);
+      this.graphViewService.map.forEach((nodeView: NodeView) => { // TODO optimize by using canvas with grid
+        if (GraphicalUtils.rectanglesIntersect(rectangle, GraphicalUtils.nodeViewToRectangle(nodeView))) {
+          if (!this.graphViewService.selectedElements.has(nodeView)) {
+            this.graphViewService.selectElement(nodeView);
+          }
+        } else if (!event.ctrlKey && this.graphViewService.selectedElements.has(nodeView)) {
+            this.graphViewService.unselectElement(nodeView);
+          }
+      });
+    }
+  }
+
+  private onRectangleSelectionEnd(event: FederatedPointerEvent): void {
+    if (this.rectangleSelection) {
+      if (this.pixiService.getApp().stage.children.some(ch => ch == this.rectangleSelection)) {
+        this.pixiService.getApp().stage.removeChild(this.rectangleSelection);
+      }
+    }
+    if (!this.isRectangleSelection) {
+      this.graphViewService.clearSelection();
+    }
+    this.rectangleSelectionStart = null;
+    this.isRectangleSelection = false;
+    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage,
+      'pointerup', HandlerNames.RECTANGLE_SELECTION_END);
+    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage,
+      'pointerupoutside', HandlerNames.RECTANGLE_SELECTION_END);
   }
 
   // TEST
