@@ -31,6 +31,7 @@ export class ModeManagerService {
       'AddRemoveVertex': new AddRemoveVertexMode(pixiService, eventBus, nodeViewFabricService, historyService,
         graphViewService),
       'AddRemoveEdge': new AddRemoveEdgeMode(pixiService, eventBus, graphViewService)
+      // TODO Add selection mode for mobile devices (for multiple selection)
     };
 
     // Subscribe to the currentMode$ mode state

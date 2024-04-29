@@ -214,7 +214,7 @@ export class DefaultMode implements ModeBehavior {
         return;
       }
       this.graphViewService.selectElement(selectedElement);
-    } else { // Multiple selection
+    } else { // Multiple selection (ctrl pressed)
       if (this.graphViewService.isElementSelected(selectedElement)) {
         this.graphViewService.unselectElement(selectedElement);
       } else {
@@ -228,6 +228,7 @@ export class DefaultMode implements ModeBehavior {
     this.rectangleSelection = new SelectRectangle();
     if (!this.pixiService.getApp().stage.children.some(ch => ch == this.rectangleSelection)) {
       this.pixiService.getApp().stage.addChild(this.rectangleSelection);
+      this.rectangleSelection.visible = false;
     }
     this.isRectangleSelection = false;
     this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
@@ -236,6 +237,8 @@ export class DefaultMode implements ModeBehavior {
       'pointerup', HandlerNames.RECTANGLE_SELECTION_END);
     this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
       'pointerupoutside', HandlerNames.RECTANGLE_SELECTION_END);
+    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+      'rightdown', HandlerNames.RECTANGLE_SELECTION_END);
   }
 
   private onRectangleSelectionMove(event: FederatedPointerEvent): void {
@@ -247,6 +250,9 @@ export class DefaultMode implements ModeBehavior {
         const dy = Math.abs((newPosition.y) - this.rectangleSelectionStart.y);
         if (dx > this.rectangleSelectionThreshold || dy > this.rectangleSelectionThreshold) {
           this.isRectangleSelection = true; // Start dragging if moved beyond threshold
+          if (this.rectangleSelection){
+            this.rectangleSelection.visible = true;
+          }
         }
       }
     }
