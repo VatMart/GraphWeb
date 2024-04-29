@@ -139,4 +139,5 @@ export const HandlerNames = {
   RECTANGLE_SELECTION_END: 'rectangleSelectionEnd', // Handler for the rectangle selection end event
   // Canvas handlers
   CANVAS_CURSOR_MOVE: 'canvasCursorMove', // Handler for the canvas cursor move
+  CANVAS_CONTEXT_MENU: 'canvasContextMenu', // Handler for the canvas context menu
 }

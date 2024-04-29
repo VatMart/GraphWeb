@@ -4,9 +4,7 @@ import {Point, Rectangle} from "../../utils/graphical-utils";
 export class SelectRectangle extends Graphics {
 
   private fillColor: string = '#FFC618';  // Convert hex string to number if needed
-  private fillAlpha: number = 0.1;
-  private strokeColor: string = '#FFC618';  // Convert hex string to number if needed
-  private strokeWidth: number = 2;
+  private fillAlpha: number = 0.3;
 
   private xRect: number = 0;
   private yRect: number = 0;
@@ -15,10 +13,21 @@ export class SelectRectangle extends Graphics {
 
   constructor() {
     super();
+    this.rect(0, 0, 4, 4)
+      .fill({color: this.fillColor, alpha: this.fillAlpha});
   }
 
   public updatePosition(startPoint: Point, endPoint: Point): void {
-    this.clear();
+    this.pivot = endPoint.x < startPoint.x && endPoint.y < startPoint.y ? {x: 1, y: 1} :
+      endPoint.x > startPoint.x && endPoint.y > startPoint.y ? {x: -1, y: -1} :
+        endPoint.x < startPoint.x && endPoint.y > startPoint.y ? {x: 1, y: -1} : {x: -1, y: 1};
+    this.scale.x = Math.abs(endPoint.x - startPoint.x)/4;
+    this.scale.y = Math.abs(endPoint.y - startPoint.y)/4;
+
+    // Position the rectangle based on the smaller of the start or end points
+    this.x = (endPoint.x > startPoint.x ? startPoint.x - this.scale.x : startPoint.x - this.scale.x*3);
+    this.y = (endPoint.y > startPoint.y ? startPoint.y - this.scale.y : startPoint.y - this.scale.y*3);
+
     let newStartX = endPoint.x < startPoint.x ? endPoint.x : startPoint.x;
     let newStartY = endPoint.y < startPoint.y ? endPoint.y : startPoint.y;
     let width = Math.abs(endPoint.x - startPoint.x);
@@ -27,9 +36,6 @@ export class SelectRectangle extends Graphics {
     this.yRect = newStartY;
     this.widthRect = width;
     this.heightRect = height;
-    this.rect(newStartX, newStartY, width, height)
-      .fill({color: this.fillColor, alpha: this.fillAlpha})
-      .stroke({color: this.strokeColor, width: this.strokeWidth});
   }
 
   public toRectangle(): Rectangle {
