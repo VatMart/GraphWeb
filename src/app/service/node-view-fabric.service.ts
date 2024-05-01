@@ -7,19 +7,24 @@ import {Graphics, RenderTexture, Texture} from "pixi.js";
 import * as PIXI from "pixi.js";
 import {PixiService} from "./pixi.service";
 import {Point} from "../utils/graphical-utils";
+import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";
 
+/**
+ * Fabric for creating node views.
+ */
 @Injectable({
   providedIn: 'root'
 })
-export class NodeViewFabricService {
+export class NodeViewFabricService extends AbstractGraphElementFabric {
 
   // Key in textureCache: 'radius_fillNode_strokeColor_strokeWidth'
   private textureCache: Map<string, Texture> = new Map();
 
-  private selectedCache: Map<number, string> = new Map(); // key: node index, value: key in textureCache
+  private styleCache: Map<number, string> = new Map(); // key: node index, value: key in textureCache
 
   constructor(private pixiService: PixiService,
               private graphModelService: GraphModelService) {
+    super();
   }
 
   private getOrCreateTexture(point: Point, radius: number, nodeStyle: NodeStyle): Texture {
@@ -30,7 +35,7 @@ export class NodeViewFabricService {
       const totalRadius = radius + nodeStyle.strokeWidth;
       graphics.circle(totalRadius, totalRadius, radius).
       fill(nodeStyle.fillNode).
-      stroke({color: nodeStyle.strokeColor, alignment: 0.5, width: nodeStyle.strokeWidth,
+      stroke({color: nodeStyle.strokeColor, alignment: 0, width: nodeStyle.strokeWidth,
         cap: 'round', join: 'round'});
 
       const texture = RenderTexture.create({width: 2 * totalRadius, height: 2 * totalRadius, antialias: true,
@@ -48,24 +53,25 @@ export class NodeViewFabricService {
     return NodeView.createFromTexture(new Node(index), point, NodeView.DEFAULT_RADIUS, texture);
   }
 
-  public changeToSelectedStyle(nodeView: NodeView) {
+  public changeToStyle(nodeView: NodeView, nodeStyle: NodeStyle) {
     // Save current key of texture in cache
     const textureKey = `${nodeView.radius}_${nodeView.nodeStyle.fillNode}_${nodeView.nodeStyle.strokeColor}_${nodeView.nodeStyle.strokeWidth}`;
-    this.selectedCache.set(nodeView.node.index, textureKey);
+    this.styleCache.set(nodeView.node.index, textureKey);
     // Build selected style
-    let selectedNodeStyle: NodeStyle = {
-      fillNode: nodeView.nodeStyle.fillNode,
-      strokeColor: SELECTED_NODE_STYLE.strokeColor,
-      strokeWidth: nodeView.nodeStyle.strokeWidth + 1
+    let toNodeStyle: NodeStyle = {
+      fillNode: nodeStyle.fillNode,
+      strokeColor: nodeStyle.strokeColor,
+      strokeWidth: nodeStyle.strokeWidth
     };
-    this.switchNodeStyle(nodeView, selectedNodeStyle);
+    this.switchNodeStyle(nodeView, toNodeStyle);
     nodeView.hitArea = new PIXI.Circle(nodeView.width / 2, nodeView.height / 2, nodeView.radius);
     nodeView.move(); // adjust position
   }
 
-  public changeToDefaultStyle(nodeView: NodeView) {
-    if (this.selectedCache.has(nodeView.node.index)) {
-      let textureKey = this.selectedCache.get(nodeView.node.index);
+  public changeToPreviousStyle(nodeView: NodeView) {
+    if (this.styleCache.has(nodeView.node.index)) {
+      let textureKey = this.styleCache.get(nodeView.node.index);
+      this.styleCache.delete(nodeView.node.index);
       let nodeStyle = this.textureCacheKeyToNodeStyle(textureKey);
       this.switchNodeStyle(nodeView, nodeStyle);
       nodeView.hitArea = new PIXI.Circle(nodeView.width / 2, nodeView.height / 2, nodeView.radius);

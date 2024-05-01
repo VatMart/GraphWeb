@@ -131,13 +131,17 @@ export const HandlerNames = {
   NODE_DRAG_START: 'nodeDragStart', // Handler for the node drag start event
   NODE_DRAG_END: 'nodeDragEnd', // Handler for the node drag end event
   NODE_DRAG_MOVE: 'nodeDragMove', // Handler for the node drag move event
-  NODE_ADD_REMOVE: 'nodeAddRemove', // Handler for the node add/remove for click on canvas/node
+
+  // Edge handlers
 
   // Selection handlers
   ELEMENT_SELECT: 'elementSelect', // Handler for the element select event
   RECTANGLE_SELECTION_MOVE: 'rectangleSelectionMove', // Handler for the rectangle selection start event
   RECTANGLE_SELECTION_END: 'rectangleSelectionEnd', // Handler for the rectangle selection end event
+
   // Canvas handlers
   CANVAS_CURSOR_MOVE: 'canvasCursorMove', // Handler for the canvas cursor move
   CANVAS_CONTEXT_MENU: 'canvasContextMenu', // Handler for the canvas context menu
+  CANVAS_ADD_REMOVE_NODE: 'canvasAddRemoveNode', // Handler for the node add/remove for click on canvas/node
+  CANVAS_ADD_REMOVE_EDGE: 'canvasAddRemoveEdge', // Handler for the node add edge event
 }

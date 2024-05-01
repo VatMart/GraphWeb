@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {ModeState} from "./event/mode-manager.service";
 import {NodeView} from "../model/graphical-model/node-view";
+import {EdgeView} from "../model/graphical-model/edge-view";
 
+/**
+ * Service for managing the state of the application.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -13,6 +17,12 @@ export class StateService {
   public canUndo$ = this.canUndoSource.asObservable();
   private canRedoSource = new BehaviorSubject<boolean>(false);
   public canRedo$ = this.canRedoSource.asObservable();
+
+  private undoInvokedSource = new BehaviorSubject<boolean>(false);
+  public undoInvoked$ = this.undoInvokedSource.asObservable();
+
+  private redoInvokedSource = new BehaviorSubject<boolean>(false);
+  public redoInvoked$ = this.redoInvokedSource.asObservable();
 
   // Current mode
   private modeStateSource = new BehaviorSubject<ModeState>('default');
@@ -37,6 +47,15 @@ export class StateService {
   private nodeDeletedSource = new BehaviorSubject<NodeView | null>(null);
   public nodeDeleted$ = this.nodeDeletedSource.asObservable();
 
+  // Edge related events
+  private edgeAddedSource = new BehaviorSubject<EdgeView | null>(null);
+  public edgeAdded$ = this.edgeAddedSource.asObservable();
+
+  private edgeDeletedSource = new BehaviorSubject<EdgeView | null>(null);
+  public edgeDeleted$ = this.edgeDeletedSource.asObservable();
+
+  constructor() { }
+
   /**
    * Change the undo state.
    */
@@ -49,6 +68,20 @@ export class StateService {
    */
   setCanRedo(state: boolean) {
     this.canRedoSource.next(state);
+  }
+
+  /**
+   * Notify that undo has been invoked.
+   */
+  undoInvoked() {
+    this.undoInvokedSource.next(true);
+  }
+
+  /**
+   * Notify that redo has been invoked.
+   */
+  redoInvoked() {
+    this.redoInvokedSource.next(true);
   }
 
   /**
@@ -100,5 +133,17 @@ export class StateService {
     this.nodeDeletedSource.next(nodeView);
   }
 
-  constructor() { }
+  /**
+   * Notify that an edge has been added.
+   */
+  addedEdge(edgeView: EdgeView) {
+    this.edgeAddedSource.next(edgeView);
+  }
+
+  /**
+   * Notify that an edge has been deleted.
+   */
+  deletedEdge(edgeView: EdgeView) {
+    this.edgeDeletedSource.next(edgeView);
+  }
 }

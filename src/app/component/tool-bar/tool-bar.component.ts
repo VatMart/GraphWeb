@@ -102,10 +102,12 @@ export class ToolBarComponent implements OnInit, OnDestroy {
 
   undoAction() {
     this.historyService.undo();
+    this.stateService.undoInvoked();
   }
 
   redoAction() {
     this.historyService.redo()
+    this.stateService.redoInvoked();
   }
 
   buttonAddVertexMouseLeave() {

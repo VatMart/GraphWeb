@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Graph} from "../model/graph";
 import {Node} from "../model/node";
+import {Edge, EdgeIndex} from "../model/edge";
 
 /**
  * Service for handling the model of the graph.
@@ -11,8 +12,13 @@ import {Node} from "../model/node";
 })
 export class GraphModelService {
 
-  constructor() { }
+  constructor() {
+  }
 
+  /**
+   * Adds a node to the graph.
+   * All other methods for adding nodes should call this method.
+   */
   protected addNodeToGraph(graph: Graph, nodeOrIndex: Node | number) {
     let node: Node;
     if (typeof nodeOrIndex === "number") {
@@ -24,14 +30,48 @@ export class GraphModelService {
       : graph.getNodes().set(node.index, node);
   }
 
+  /**
+   * Removes a node from the graph.
+   * All other methods for removing nodes should call this method.
+   */
   protected removeNodeFromGraph(graph: Graph, node: Node | number): boolean {
-    let index: number;
+    let toNode;
     if (typeof node === "number") {
-      index = node;
+      toNode = graph.getNodes().get(node);
     } else {
-      index = node.index;
+      toNode = node;
     }
-    return graph.getNodes().delete(index);
+    if (toNode) {
+      this.getAdjacentEdges(graph, toNode).forEach((edge: Edge) => {
+        this.removeEdgeFromGraph(graph, edge);
+      });
+      return graph.getNodes().delete(toNode.index);
+    }
+    console.error("Node not found in graph") // TODO throw exception
+    return false;
+  }
+
+  /**
+   * Adds an edge to the graph.
+   * All other methods for adding edges should call this method.
+   */
+  protected addEdgeToGraph(graph: Graph, edge: Edge) {
+    if (!graph.getEdges().has(edge.edgeIndex.value)) {
+      edge.firstNode.addEdge(edge.edgeIndex);
+      edge.secondNode.addEdge(edge.edgeIndex);
+      graph.getEdges().set(edge.edgeIndex.value, edge);
+    } else {
+      console.error("Edge already exists in graph") // TODO throw exception
+    }
+  }
+
+  /**
+   * Removes an edge from the graph.
+   * All other methods for removing edges should call this method.
+   */
+  protected removeEdgeFromGraph(graph: Graph, edge: Edge): boolean {
+    this.removeAdjacentEdgeOfNodes(edge);
+    return graph.getEdges().delete(edge.edgeIndex.value);
   }
 
   public calculateNewNodeIndex(graph: Graph): number {
@@ -41,5 +81,24 @@ export class GraphModelService {
       }
     }
     return graph.getNodes().size + 1;
+  }
+
+  /**
+   * Returns all edges that are adjacent to the given node.
+   */
+  public getAdjacentEdges(graph: Graph, node: Node): Edge[] {
+    let edges: Edge[] = [];
+    node.getAdjacentEdges().forEach((edgeIndex: string) => {
+      const edge = graph.getEdges().get(edgeIndex);
+      if (edge) {
+        edges.push(edge);
+      }
+    });
+    return edges;
+  }
+
+  private removeAdjacentEdgeOfNodes(edge: Edge) {
+    edge.firstNode.removeEdge(edge.edgeIndex);
+    edge.secondNode.removeEdge(edge.edgeIndex);
   }
 }

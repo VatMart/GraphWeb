@@ -8,7 +8,11 @@ import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 import {AddNodeViewCommand} from "../command/add-node-view-command";
 import {HistoryService} from "../../service/history.service";
 import {RemoveNodeViewCommand} from "../command/remove-node-view-command";
+import {EdgeView} from "../../model/graphical-model/edge-view";
 
+/**
+ * Mode to add or remove vertices from the graph.
+ */
 export class AddRemoveVertexMode implements ModeBehavior {
   private boundHandlePointerDown: (event: FederatedPointerEvent) => void;
 
@@ -19,23 +23,42 @@ export class AddRemoveVertexMode implements ModeBehavior {
               private graphViewService: GraphViewService) {
     this.boundHandlePointerDown = this.handlePointerDown.bind(this);
     // Register event handlers
-    this.eventBus.registerHandler(HandlerNames.NODE_ADD_REMOVE, this.boundHandlePointerDown);
+    this.eventBus.registerHandler(HandlerNames.CANVAS_ADD_REMOVE_NODE, this.boundHandlePointerDown);
   }
 
   modeOn(): void {
     console.log("AddRemoveVertexMode ON");
     const stage = this.pixiService.getApp().stage;
     this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
-      HandlerNames.NODE_ADD_REMOVE);
+      HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }
 
   modeOff(): void {
     console.log("AddRemoveVertexMode OFF");
     this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
-      HandlerNames.NODE_ADD_REMOVE);
+      HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }
 
-  handlePointerDown(event: FederatedPointerEvent): void {
+  onAddedNode(nodeView: NodeView): void {
+    // Do nothing
+  }
+
+  onAddedEdge(edgeView: EdgeView): void {
+  }
+
+  onRemovedNode(nodeView: NodeView): void {
+  }
+
+  onRemovedEdge(edgeView: EdgeView): void {
+  }
+
+  onUndoInvoked(): void {
+  }
+
+  onRedoInvoked(): void {
+  }
+
+  private handlePointerDown(event: FederatedPointerEvent): void {
     const stage: Container = this.pixiService.getApp().stage;
     console.log(event.target.constructor.name)
     if (event.target === stage) {
@@ -51,9 +74,5 @@ export class AddRemoveVertexMode implements ModeBehavior {
       this.historyService.execute(command);
       //this.graphViewService.removeNodeFromCurrentGraphView(nodeView);
     }
-  }
-
-  onAddedNode(nodeView: NodeView): void {
-    // Do nothing
   }
 }

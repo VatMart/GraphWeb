@@ -1,14 +1,14 @@
 import {Injectable} from '@angular/core';
 import {Graph} from "../model/graph";
-import {Node} from "../model/node";
 import {PixiService} from "./pixi.service";
 import {GraphModelService} from "./graph-model.service";
-import {NodeView} from "../model/graphical-model/node-view";
+import {NodeView, SELECTED_NODE_STYLE} from "../model/graphical-model/node-view";
 import {NodeViewFabricService} from "./node-view-fabric.service";
 import {StateService} from "./state.service";
 import {GraphElement} from "../model/graphical-model/graph-element";
-import {EdgeView} from "../model/graphical-model/edge-view";
+import {EdgeView, SELECTED_EDGE_STYLE} from "../model/graphical-model/edge-view";
 import {EdgeViewFabricService} from "./edge-view-fabric.service";
+import {Point} from "../utils/graphical-utils";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -18,11 +18,14 @@ import {EdgeViewFabricService} from "./edge-view-fabric.service";
 })
 export class GraphViewService extends GraphModelService {
 
-  private _map: Map<Node, NodeView> = new Map<Node, NodeView>();
+  // TODO Create separate class for storing graph elements
+  private _nodeViews: Map<number, NodeView> = new Map<number, NodeView>(); // key is the node index
+
+  private _edgeViews: Map<string, EdgeView> = new Map<string, EdgeView>(); // key is the edge index
 
   private _currentGraph: Graph | undefined;
 
-  private _selectedElements: Set<GraphElement> = new Set<GraphElement>();
+  private _selectedElements: GraphElement[] = [];
 
   constructor(private pixiService: PixiService,
               private nodeViewFabricService: NodeViewFabricService,
@@ -37,7 +40,7 @@ export class GraphViewService extends GraphModelService {
    */
   public addNodeToGraphView(graph: Graph, nodeView: NodeView) {
     super.addNodeToGraph(graph, nodeView.node);
-    this._map.set(nodeView.node, nodeView);
+    this._nodeViews.set(nodeView.node.index, nodeView);
     this.pixiService.getApp().stage.addChild(nodeView); // TODO Add container, not the node itself
     this.appState.addedNode(nodeView); // Notify state service
     console.log("Added node to graph: " + nodeView.node.index); // TODO remove
@@ -48,13 +51,63 @@ export class GraphViewService extends GraphModelService {
    * All other methods for removing nodes should call this method.
    */
   public removeNodeFromGraphView(graph: Graph, nodeView: NodeView) {
-    if (this._selectedElements.has(nodeView)) { // remove from selected elements
+    if (this._selectedElements.includes(nodeView)) { // remove from selected elements
       this.unselectElement(nodeView);
     }
-    super.removeNodeFromGraph(graph, nodeView.node);
-    this._map.delete(nodeView.node);
+    // Remove adjacent edges
+    this.removeAdjacentEdges(graph, nodeView);
+    this._nodeViews.delete(nodeView.node.index);
     this.pixiService.getApp().stage.removeChild(nodeView);
+    super.removeNodeFromGraph(graph, nodeView.node); // Should be called after removing from view
+    this.appState.deletedNode(nodeView); // Notify state service
     console.log("Removed node from graph: " + nodeView.node.index); // TODO remove
+  }
+
+  /**
+   * Adds an edge to the graph and the graph view.
+   * All other methods for adding edges should call this method.
+   */
+  public addEdgeToGraphView(graph: Graph, edgeView: EdgeView) {
+    super.addEdgeToGraph(graph, edgeView.edge);
+    this._edgeViews.set(edgeView.edge.edgeIndex.value, edgeView);
+    this.pixiService.getApp().stage.addChild(edgeView); // TODO Add container, not the edge itself
+    this.appState.addedEdge(edgeView); // Notify state service
+    console.log("Added edge to graph: " + edgeView.edge.edgeIndex.value); // TODO remove
+  }
+
+  /**
+   * Removes an edge from the graph and the graph view.
+   * All other methods for removing edges should call this method.
+   */
+  public removeEdgeFromGraphView(graph: Graph, edgeView: EdgeView) {
+    if (this.isElementSelected(edgeView)) { // remove from selected elements
+      this.unselectElement(edgeView);
+    }
+    this._edgeViews.delete(edgeView.edge.edgeIndex.value);
+    this.pixiService.getApp().stage.removeChild(edgeView);
+    super.removeEdgeFromGraph(graph, edgeView.edge); // Should be called after removing from view
+    this.appState.deletedEdge(edgeView); // Notify state service
+    console.log("Removed edge from graph: " + edgeView.edge.edgeIndex.value); // TODO remove
+  }
+
+  public moveNodeView(nodeView: NodeView, point: Point) {
+    nodeView.coordinates = point; // Move node (called move() inside setter)
+    // Move adjacent edges
+    let adjacentEdges: EdgeView[] = this.getAdjacentEdgeViews(this.currentGraph, nodeView);
+    adjacentEdges.forEach((edgeView: EdgeView) => {
+      edgeView.move(); // Move edge
+    });
+  }
+
+  public getAdjacentEdgeViews(graph: Graph, nodeView: NodeView): EdgeView[] {
+    let edges: EdgeView[] = [];
+    nodeView.node.getAdjacentEdges().forEach((edgeIndex: string) => {
+      const edgeView = this._edgeViews.get(edgeIndex);
+      if (edgeView) {
+        edges.push(edgeView);
+      }
+    })
+    return edges;
   }
 
   /**
@@ -79,43 +132,73 @@ export class GraphViewService extends GraphModelService {
   }
 
   public isElementSelected(element: GraphElement): boolean {
-    return this._selectedElements.has(element);
+    return this._selectedElements.includes(element);
   }
 
   public selectElement(element: GraphElement) {
-    this._selectedElements.add(element);
+    if (!this.isElementSelected(element)) {
+      this._selectedElements.push(element);
+    } else {
+      return; // Element already selected
+    }
     if (element instanceof NodeView) {
-      this.nodeViewFabricService.changeToSelectedStyle(element);
+      this.nodeViewFabricService.changeToStyle(element, SELECTED_NODE_STYLE);
     } else if (element instanceof EdgeView) {
+      this.edgeViewFabricService.changeToStyle(element, SELECTED_EDGE_STYLE);
+      console.log("Edge selected. Index: " + element.edge.edgeIndex.value); // TODO remove
       // TODO implement
     }
   }
 
   public unselectElement(element: GraphElement) {
-    this._selectedElements.delete(element);
+    const index = this._selectedElements.indexOf(element);
+    if (index !== -1) {
+      this._selectedElements.splice(index, 1);
+    } else {
+      console.error("Element not found in selected elements"); // TODO throw exception
+      return;
+    }
     if (element instanceof NodeView) {
-      this.nodeViewFabricService.changeToDefaultStyle(element);
+      this.nodeViewFabricService.changeToPreviousStyle(element);
     } else if (element instanceof EdgeView) {
       // TODO implement
     }
   }
 
   public clearSelection() {
+    console.log(`size selection before clear: ${this._selectedElements.length}`); // TODO remove
     this._selectedElements.forEach((element: GraphElement) => {
-      this.unselectElement(element);
+      if (element instanceof NodeView) {
+        this.nodeViewFabricService.changeToPreviousStyle(element);
+      } else if (element instanceof EdgeView) {
+        // TODO implement
+      }
     });
+    this._selectedElements = [];
+    console.log(`size selection after clear: ${this._selectedElements.length}`); // TODO remove
   }
 
   public isSelectionEmpty(): boolean {
-    return this._selectedElements.size === 0;
+    return this._selectedElements.length === 0;
   }
 
-  get selectedElements(): Set<GraphElement> {
+  private removeAdjacentEdges(graph: Graph, nodeView: NodeView) {
+    let adjacentEdges: EdgeView[] = this.getAdjacentEdgeViews(graph, nodeView);
+    adjacentEdges.forEach((edgeView: EdgeView) => {
+      this.removeEdgeFromGraphView(graph, edgeView);
+    });
+  }
+
+  get selectedElements(): GraphElement[] {
     return this._selectedElements;
   }
 
-  get map(): Map<Node, NodeView> {
-    return this._map;
+  get nodeViews(): Map<number, NodeView> {
+    return this._nodeViews;
+  }
+
+  get edgeViews(): Map<string, EdgeView> {
+    return this._edgeViews;
   }
 
   get currentGraph(): Graph {
