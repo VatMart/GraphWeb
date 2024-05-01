@@ -52,7 +52,6 @@ export class DefaultMode implements ModeBehavior {
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_END, this.onDragEndBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_MOVE, this.onRectangleSelectionMoveBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_END, this.onRectangleSelectionEndBound);
-    console.log("DefaultMode constructor"); // TODO REMOVE
   }
 
   modeOn(): void {
@@ -71,12 +70,27 @@ export class DefaultMode implements ModeBehavior {
     this.moveableNodeOn(nodeView);
   }
 
+  onAddedEdge(edgeView: EdgeView): void {
+  }
+
+  onRemovedNode(nodeView: NodeView): void {
+  }
+
+  onRemovedEdge(edgeView: EdgeView): void {
+  }
+
+  onUndoInvoked(): void {
+  }
+
+  onRedoInvoked(): void {
+  }
+
   /**
    * Add listeners for moving nodes to all nodes
    */
   public moveableNodesOn() {
     // Add event listeners to all nodes
-    this.graphViewService.map.forEach((nodeView: NodeView) => {
+    this.graphViewService.nodeViews.forEach((nodeView: NodeView) => {
       this.moveableNodeOn(nodeView);
     });
   }
@@ -85,7 +99,7 @@ export class DefaultMode implements ModeBehavior {
    * Remove listeners for moving nodes to all nodes
    */
   public moveableNodesOff() {
-    this.graphViewService.map.forEach((nodeView: NodeView) => {
+    this.graphViewService.nodeViews.forEach((nodeView: NodeView) => {
       this.moveableNodeOff(nodeView);
     });
   }
@@ -118,7 +132,7 @@ export class DefaultMode implements ModeBehavior {
     const dragObject = event.target as NodeView;
 
     // Store the starting position of the drag
-    let nodesMove: NodeMove[] = [...this.graphViewService.selectedElements]
+    let nodesMove: NodeMove[] = this.graphViewService.selectedElements
       .filter(el => el instanceof NodeView)
       .map(el => {
         let element = el as NodeView;
@@ -132,7 +146,7 @@ export class DefaultMode implements ModeBehavior {
         {x: dragObject.x, y: dragObject.y},
         {x: event.global.x - dragObject.x, y: event.global.y - dragObject.y}));
     }
-    this.moveCommand = new MoveNodeViewCommand(nodesMove);
+    this.moveCommand = new MoveNodeViewCommand(this.graphViewService, nodesMove);
 
     this.dragTarget = nodesMove;  // Store the targets being dragged
     this.isDragging = false;
@@ -157,14 +171,15 @@ export class DefaultMode implements ModeBehavior {
       // Move the nodes if dragging
       if (this.isDragging) {
         // Check selected elements to remove from drag target (bug fix for multiple selection drag
-        if (this.graphViewService.selectedElements.size !== this.dragTarget.length) {
+        if (this.graphViewService.selectedElements.length !== this.dragTarget.length) {
           this.dragTarget = this.dragTarget
-            .filter(nm => this.graphViewService.selectedElements.has(nm.node));
+            .filter(nm => this.graphViewService.isElementSelected(nm.node));
         }
         // Move the nodes to the new position
         this.dragTarget.forEach(element => {
           element.node.alpha = 0.5;
-          element.node.coordinates = {x: newPosition.x - element.offset.x, y: newPosition.y - element.offset.y};
+          this.graphViewService.moveNodeView(element.node,
+            {x: newPosition.x - element.offset.x, y: newPosition.y - element.offset.y});
         });
       }
     }
@@ -260,12 +275,12 @@ export class DefaultMode implements ModeBehavior {
     if (this.isRectangleSelection && this.rectangleSelectionStart && this.rectangleSelection) {
       let rectangle: Rectangle = this.rectangleSelection.toRectangle();
       this.rectangleSelection.updatePosition(this.rectangleSelectionStart, newPosition);
-      this.graphViewService.map.forEach((nodeView: NodeView) => { // TODO optimize by using canvas with grid
+      this.graphViewService.nodeViews.forEach((nodeView: NodeView) => { // TODO optimize by using canvas with grid
         if (GraphicalUtils.rectanglesIntersect(rectangle, GraphicalUtils.nodeViewToRectangle(nodeView))) {
-          if (!this.graphViewService.selectedElements.has(nodeView)) {
+          if (!this.graphViewService.isElementSelected(nodeView)) {
             this.graphViewService.selectElement(nodeView);
           }
-        } else if (!event.ctrlKey && this.graphViewService.selectedElements.has(nodeView)) {
+        } else if (!event.ctrlKey && this.graphViewService.isElementSelected(nodeView)) {
             this.graphViewService.unselectElement(nodeView);
           }
       });
@@ -279,6 +294,7 @@ export class DefaultMode implements ModeBehavior {
       }
     }
     if (!this.isRectangleSelection) {
+      console.log("Clear selection"); // TODO remove
       this.graphViewService.clearSelection();
     }
     this.rectangleSelectionStart = null;
@@ -287,37 +303,5 @@ export class DefaultMode implements ModeBehavior {
       'pointerup', HandlerNames.RECTANGLE_SELECTION_END);
     this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage,
       'pointerupoutside', HandlerNames.RECTANGLE_SELECTION_END);
-  }
-
-  // TEST
-  private calculateRepulsiveForces() {
-    const repulsionConstant = 5000;  // Adjust as needed for your specific scenario
-    this.graphViewService.map.forEach((node, i) => {
-      this.graphViewService.map.forEach((other, j) => {
-        if (i !== j) {
-          const dx = node.x - other.x;
-          const dy = node.y - other.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          const forceMagnitude = repulsionConstant / (distance * distance);
-
-          const fx = (dx / distance) * forceMagnitude;
-          const fy = (dy / distance) * forceMagnitude;
-
-          other.vx += fx;
-          other.vy += fy;
-        }
-      });
-    });
-  }
-
-  private updatePositions(deltaTime: number) {
-    this.graphViewService.map.forEach(node => {
-      node.x += node.vx * deltaTime;
-      node.y += node.vy * deltaTime;
-
-      // Reset velocities after update to prevent runaway effects
-      node.vx = 0;
-      node.vy = 0;
-    });
   }
 }

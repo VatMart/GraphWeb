@@ -1,8 +1,10 @@
 import {NodeView} from "../../model/graphical-model/node-view";
 import {GraphViewService} from "../../service/graph-view.service";
 import {Command} from "./command";
-import {Graph} from "../../model/graph";
 
+/**
+ * Command to add a node to the graph view.
+ */
 export class AddNodeViewCommand implements Command {
   private node: NodeView;
   private graphService: GraphViewService;
@@ -23,6 +25,4 @@ export class AddNodeViewCommand implements Command {
   redo(): void {
     this.execute();
   }
-
-
 }

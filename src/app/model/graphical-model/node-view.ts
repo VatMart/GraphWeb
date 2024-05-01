@@ -4,6 +4,9 @@ import {Point} from "../../utils/graphical-utils";
 import {Node} from "../node";
 import {GraphElement} from "./graph-element";
 
+/**
+ * Graphical representation of node
+ */
 export class NodeView extends Sprite implements GraphElement { // TODO extends Sprite instead of Container, wrap text and graphics to sprite
   // Math model
   private _node: Node;
@@ -58,6 +61,7 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     //this.tint = 'white';
     this._text.anchor.set(0.5);
     this.coordinates = this._coordinates;
+    this.zIndex = 1; // TODO set to 1
   }
 
   public move() {
@@ -65,6 +69,10 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this.y = this.coordinates.y;
     this._text.x = this.width / 2;
     this._text.y = this.height / 2;
+  }
+
+  public centerCoordinates(): Point {
+    return {x: this.x + this.width / 2, y: this.y + this.height / 2};
   }
 
   get node(): Node {
@@ -118,7 +126,7 @@ export const SELECTED_NODE_STYLE: NodeStyle = {
   fillNode: DEFAULT_NODE_STYLE.fillNode,
   strokeColor: '#006FFF',
   strokeWidth: DEFAULT_NODE_STYLE.strokeWidth + 1
-}
+};
 
 export interface NodeStyle {
   fillNode: string;

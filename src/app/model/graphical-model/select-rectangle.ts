@@ -1,10 +1,13 @@
 import {Graphics} from "pixi.js";
 import {Point, Rectangle} from "../../utils/graphical-utils";
 
+/**
+ * Class for drawing rectangle for selecting graph elements
+ */
 export class SelectRectangle extends Graphics {
 
-  private fillColor: string = '#FFC618';  // Convert hex string to number if needed
-  private fillAlpha: number = 0.3;
+  private fillColor: string = '#FFC618';
+  private fillAlpha: number = 0.2;
 
   private xRect: number = 0;
   private yRect: number = 0;
@@ -17,17 +20,22 @@ export class SelectRectangle extends Graphics {
       .fill({color: this.fillColor, alpha: this.fillAlpha});
   }
 
+  /**
+   * Update position of rectangle
+   */
   public updatePosition(startPoint: Point, endPoint: Point): void {
+    // Set pivot and scale
     this.pivot = endPoint.x < startPoint.x && endPoint.y < startPoint.y ? {x: 1, y: 1} :
       endPoint.x > startPoint.x && endPoint.y > startPoint.y ? {x: -1, y: -1} :
         endPoint.x < startPoint.x && endPoint.y > startPoint.y ? {x: 1, y: -1} : {x: -1, y: 1};
     this.scale.x = Math.abs(endPoint.x - startPoint.x)/4;
     this.scale.y = Math.abs(endPoint.y - startPoint.y)/4;
 
-    // Position the rectangle based on the smaller of the start or end points
+    // Adjust position
     this.x = (endPoint.x > startPoint.x ? startPoint.x - this.scale.x : startPoint.x - this.scale.x*3);
     this.y = (endPoint.y > startPoint.y ? startPoint.y - this.scale.y : startPoint.y - this.scale.y*3);
 
+    // Calculate actual size of rectangle
     let newStartX = endPoint.x < startPoint.x ? endPoint.x : startPoint.x;
     let newStartY = endPoint.y < startPoint.y ? endPoint.y : startPoint.y;
     let width = Math.abs(endPoint.x - startPoint.x);

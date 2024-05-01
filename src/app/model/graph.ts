@@ -10,14 +10,18 @@ export class Graph {
   private nodes: Map<number, Node>;
 
   // key: index, value: Edge
-  private edges: Map<EdgeIndex, Edge>;
+  private edges: Map<string, Edge>;
 
   constructor() {
     this.nodes = new Map<number, Node>();
-    this.edges = new Map<EdgeIndex, Edge>();
+    this.edges = new Map<string, Edge>();
   }
 
   getNodes(): Map<number, Node> {
     return this.nodes;
+  }
+
+  getEdges(): Map<string, Edge> {
+    return this.edges;
   }
 }

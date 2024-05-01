@@ -1,23 +1,28 @@
 import {Point} from "../../utils/graphical-utils";
 import {Command} from "./command";
 import {NodeView} from "../../model/graphical-model/node-view";
+import {GraphViewService} from "../../service/graph-view.service";
 
+/**
+ * Command to move a node view.
+ */
 export class MoveNodeViewCommand implements Command {
 
-  constructor(private selectedNodes: NodeMove[]) {
+  constructor(private graphViewService: GraphViewService,
+              private selectedNodes: NodeMove[]) {
   }
 
   execute(): void {
     this.selectedNodes.forEach(nodeMove => {
       if (nodeMove.newPosition) {
-        nodeMove.node.coordinates = nodeMove.newPosition;
+        this.graphViewService.moveNodeView(nodeMove.node, nodeMove.newPosition);
       }
     });
   }
 
   undo(): void {
     this.selectedNodes.forEach(nodeMove => {
-      nodeMove.node.coordinates = nodeMove.oldPosition;
+      this.graphViewService.moveNodeView(nodeMove.node, nodeMove.oldPosition);
     });
   }
 
