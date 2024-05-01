@@ -284,6 +284,15 @@ export class DefaultMode implements ModeBehavior {
             this.graphViewService.unselectElement(nodeView);
           }
       });
+      this.graphViewService.edgeViews.forEach((edgeView: EdgeView) => {
+        if (GraphicalUtils.rectanglesIntersect(rectangle, GraphicalUtils.edgeViewToRectangle(edgeView))) {
+          if (!this.graphViewService.isElementSelected(edgeView)) {
+            this.graphViewService.selectElement(edgeView);
+          }
+        } else if (!event.ctrlKey && this.graphViewService.isElementSelected(edgeView)) {
+          this.graphViewService.unselectElement(edgeView);
+        }
+      });
     }
   }
 
@@ -294,7 +303,6 @@ export class DefaultMode implements ModeBehavior {
       }
     }
     if (!this.isRectangleSelection) {
-      console.log("Clear selection"); // TODO remove
       this.graphViewService.clearSelection();
     }
     this.rectangleSelectionStart = null;
