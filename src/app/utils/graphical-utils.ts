@@ -26,6 +26,9 @@ export class GraphicalUtils {
     };
   }
 
+  /**
+   * Utility function to calculate the distance between two points
+   */
   public static distanceBetween(p1: Point, p2: Point): number {
     return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
   }
@@ -35,7 +38,8 @@ export class GraphicalUtils {
    */
   public static edgeViewToRectangle(edgeView: EdgeView): Rectangle {
     // TODO implement
-    return {x: 0, y: 0, width: 0, height: 0};
+    let pixiRectangle = edgeView.getBounds().rectangle;
+    return {x: pixiRectangle.x, y: pixiRectangle.y, width: pixiRectangle.width, height: pixiRectangle.height};
   }
 }
 

@@ -1,4 +1,5 @@
 import {GraphElement} from "./graph-element";
+import {NodeView} from "./node-view";
 
 /**
  * Abstract class for fabric of graph elements
@@ -10,5 +11,5 @@ export abstract class AbstractGraphElementFabric {
    */
   abstract changeToStyle(graphElement: GraphElement, style: any): void;
 
-  // TODO add more methods
+  abstract changeToPreviousStyle(graphElement: GraphElement): void;
 }

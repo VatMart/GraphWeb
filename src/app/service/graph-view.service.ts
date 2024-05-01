@@ -28,9 +28,9 @@ export class GraphViewService extends GraphModelService {
   private _selectedElements: GraphElement[] = [];
 
   constructor(private pixiService: PixiService,
-              private nodeViewFabricService: NodeViewFabricService,
-              private edgeViewFabricService: EdgeViewFabricService,
-              private appState: StateService) {
+              private nodeFabric: NodeViewFabricService,
+              private edgeFabric: EdgeViewFabricService,
+              private stateService: StateService) {
     super();
   }
 
@@ -42,7 +42,7 @@ export class GraphViewService extends GraphModelService {
     super.addNodeToGraph(graph, nodeView.node);
     this._nodeViews.set(nodeView.node.index, nodeView);
     this.pixiService.getApp().stage.addChild(nodeView); // TODO Add container, not the node itself
-    this.appState.addedNode(nodeView); // Notify state service
+    this.stateService.addedNode(nodeView); // Notify state service
     console.log("Added node to graph: " + nodeView.node.index); // TODO remove
   }
 
@@ -59,7 +59,7 @@ export class GraphViewService extends GraphModelService {
     this._nodeViews.delete(nodeView.node.index);
     this.pixiService.getApp().stage.removeChild(nodeView);
     super.removeNodeFromGraph(graph, nodeView.node); // Should be called after removing from view
-    this.appState.deletedNode(nodeView); // Notify state service
+    this.stateService.deletedNode(nodeView); // Notify state service
     console.log("Removed node from graph: " + nodeView.node.index); // TODO remove
   }
 
@@ -71,7 +71,7 @@ export class GraphViewService extends GraphModelService {
     super.addEdgeToGraph(graph, edgeView.edge);
     this._edgeViews.set(edgeView.edge.edgeIndex.value, edgeView);
     this.pixiService.getApp().stage.addChild(edgeView); // TODO Add container, not the edge itself
-    this.appState.addedEdge(edgeView); // Notify state service
+    this.stateService.addedEdge(edgeView); // Notify state service
     console.log("Added edge to graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
 
@@ -86,7 +86,7 @@ export class GraphViewService extends GraphModelService {
     this._edgeViews.delete(edgeView.edge.edgeIndex.value);
     this.pixiService.getApp().stage.removeChild(edgeView);
     super.removeEdgeFromGraph(graph, edgeView.edge); // Should be called after removing from view
-    this.appState.deletedEdge(edgeView); // Notify state service
+    this.stateService.deletedEdge(edgeView); // Notify state service
     console.log("Removed edge from graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
 
@@ -115,7 +115,7 @@ export class GraphViewService extends GraphModelService {
    */
   public addNodeToCurrentGraphView(x: number, y: number) {
     if (this.currentGraph) {
-      let nodeView: NodeView = this.nodeViewFabricService.createDefaultNodeViewWithCoordinates(this.currentGraph,
+      let nodeView: NodeView = this.nodeFabric.createDefaultNodeViewWithCoordinates(this.currentGraph,
         {x: x, y: y});
       this.addNodeToGraphView(this.currentGraph, nodeView);
     } else {
@@ -142,11 +142,9 @@ export class GraphViewService extends GraphModelService {
       return; // Element already selected
     }
     if (element instanceof NodeView) {
-      this.nodeViewFabricService.changeToStyle(element, SELECTED_NODE_STYLE);
+      this.nodeFabric.changeToStyle(element, SELECTED_NODE_STYLE);
     } else if (element instanceof EdgeView) {
-      this.edgeViewFabricService.changeToStyle(element, SELECTED_EDGE_STYLE);
-      console.log("Edge selected. Index: " + element.edge.edgeIndex.value); // TODO remove
-      // TODO implement
+      this.edgeFabric.changeToStyle(element, SELECTED_EDGE_STYLE);
     }
   }
 
@@ -159,23 +157,21 @@ export class GraphViewService extends GraphModelService {
       return;
     }
     if (element instanceof NodeView) {
-      this.nodeViewFabricService.changeToPreviousStyle(element);
+      this.nodeFabric.changeToPreviousStyle(element);
     } else if (element instanceof EdgeView) {
-      // TODO implement
+      this.edgeFabric.changeToPreviousStyle(element);
     }
   }
 
   public clearSelection() {
-    console.log(`size selection before clear: ${this._selectedElements.length}`); // TODO remove
     this._selectedElements.forEach((element: GraphElement) => {
       if (element instanceof NodeView) {
-        this.nodeViewFabricService.changeToPreviousStyle(element);
+        this.nodeFabric.changeToPreviousStyle(element);
       } else if (element instanceof EdgeView) {
-        // TODO implement
+        this.edgeFabric.changeToPreviousStyle(element);
       }
     });
     this._selectedElements = [];
-    console.log(`size selection after clear: ${this._selectedElements.length}`); // TODO remove
   }
 
   public isSelectionEmpty(): boolean {

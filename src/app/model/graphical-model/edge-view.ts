@@ -17,7 +17,7 @@ export class EdgeView extends Graphics implements GraphElement {
   private _startCoordinates: Point;
   private _endCoordinates: Point;
 
-  private nodeStyle: EdgeStyle = DEFAULT_EDGE_STYLE;
+  private _nodeStyle: EdgeStyle = DEFAULT_EDGE_STYLE;
 
   public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView) : EdgeView {
     let edgeGraphical = new EdgeView(edge, startNode, endNode, DEFAULT_EDGE_STYLE);
@@ -35,7 +35,7 @@ export class EdgeView extends Graphics implements GraphElement {
     const points = this.resolveConnectors();
     this._startCoordinates = points[0];
     this._endCoordinates = points[1];
-    this.nodeStyle = nodeStyle;
+    this._nodeStyle = nodeStyle;
   }
 
   public draw() {
@@ -43,11 +43,11 @@ export class EdgeView extends Graphics implements GraphElement {
     //console.log(`Drawing edge from x: ${this._startCoordinates.x}, y: ${this._startCoordinates.y} to x: ${this._endCoordinates.x}, y: ${this._endCoordinates.y}`); // TODO remove
     this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
       .lineTo(this._endCoordinates.x, this._endCoordinates.y)
-      .stroke({width: this.nodeStyle.strokeWidth, color: this.nodeStyle.strokeColor, cap: 'round'});
+      .stroke({width: this._nodeStyle.strokeWidth, color: this._nodeStyle.strokeColor, cap: 'round'});
     this.zIndex = 0;
   }
 
-  getIndex(): string | number {
+  getIndex(): string {
     return this._edge.edgeIndex.value;
   }
 
@@ -85,6 +85,14 @@ export class EdgeView extends Graphics implements GraphElement {
 
   get endNode(): NodeView {
     return this._endNode;
+  }
+
+  get nodeStyle(): EdgeStyle {
+    return this._nodeStyle;
+  }
+
+  set nodeStyle(value: EdgeStyle) {
+    this._nodeStyle = value;
   }
 }
 

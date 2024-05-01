@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
-import {GraphicsContext, Texture} from "pixi.js";
+import {GraphicsContext} from "pixi.js";
 import {Graph} from "../model/graph";
 import {NodeView} from "../model/graphical-model/node-view";
-import {GraphModelService} from "./graph-model.service";
 import {Edge} from "../model/edge";
-import {EdgeView} from "../model/graphical-model/edge-view";
+import {EdgeStyle, EdgeView} from "../model/graphical-model/edge-view";
 import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";
 
 /**
@@ -16,10 +15,10 @@ import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-grap
 export class EdgeViewFabricService extends AbstractGraphElementFabric {
 
   // TODO
-  private textureCache: Map<string, Texture> = new Map();
+  private styleCache: Map<string, EdgeStyle> = new Map();
   private graphics: GraphicsContext = new GraphicsContext();
 
-  constructor(private graphModelService: GraphModelService) {
+  constructor() {
     super();
   }
 
@@ -28,6 +27,21 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     return EdgeView.createFrom(newEdge, startNodeView, endNodeView);
   }
 
-  changeToStyle(graphElement: EdgeView, style: any): void {
+  changeToStyle(edge: EdgeView, style: EdgeStyle): void {
+    // Save current style to cache before changing
+    this.styleCache.set(edge.getIndex(), edge.nodeStyle);
+    edge.nodeStyle = style;
+    edge.move();
+  }
+
+  changeToPreviousStyle(edge: EdgeView): void {
+    const previousStyle = this.styleCache.get(edge.getIndex());
+    if (previousStyle) {
+      this.styleCache.delete(edge.getIndex());
+      edge.nodeStyle = previousStyle;
+      edge.move();
+    } else {
+      console.error("Previous style not found in cache for edge: " + edge.getIndex());
+    }
   }
 }
