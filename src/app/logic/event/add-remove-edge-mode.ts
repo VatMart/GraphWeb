@@ -61,6 +61,10 @@ export class AddRemoveEdgeMode implements ModeBehavior {
   onRemovedNode(nodeView: NodeView): void {
   }
 
+  onGraphCleared(): void {
+    this.clearSelectedNodes();
+  }
+
   onUndoInvoked(): void {
     this.clearSelectedNodes();
   }

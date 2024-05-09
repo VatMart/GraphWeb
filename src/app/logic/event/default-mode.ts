@@ -79,6 +79,9 @@ export class DefaultMode implements ModeBehavior {
   onRemovedEdge(edgeView: EdgeView): void {
   }
 
+  onGraphCleared(): void {
+  }
+
   onUndoInvoked(): void {
   }
 

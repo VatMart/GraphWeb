@@ -52,6 +52,9 @@ export class AddRemoveVertexMode implements ModeBehavior {
   onRemovedEdge(edgeView: EdgeView): void {
   }
 
+  onGraphCleared(): void {
+  }
+
   onUndoInvoked(): void {
   }
 

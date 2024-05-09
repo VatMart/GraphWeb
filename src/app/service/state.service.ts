@@ -30,15 +30,18 @@ export class StateService {
 
   // All modes
   private stateAddVertexSource = new BehaviorSubject<boolean>(false);
-  currentAddVertexState = this.stateAddVertexSource.asObservable();
+  public currentAddVertexState = this.stateAddVertexSource.asObservable();
   private stateAddEdgesSource = new BehaviorSubject<boolean>(false);
-  currentAddEdgesState = this.stateAddEdgesSource.asObservable();
+  public currentAddEdgesState = this.stateAddEdgesSource.asObservable();
 
   // Canvas cursor coordinates
   private cursorXSource = new BehaviorSubject<number>(0);
   private cursorYSource = new BehaviorSubject<number>(0);
-  currentCursorX = this.cursorXSource.asObservable();
-  currentCursorY = this.cursorYSource.asObservable();
+  public currentCursorX = this.cursorXSource.asObservable();
+  public currentCursorY = this.cursorYSource.asObservable();
+
+  private graphClearedSource = new BehaviorSubject<boolean>(false);
+  public graphCleared$ = this.graphClearedSource.asObservable();
 
   // Node related events
   private nodeAddedSource = new BehaviorSubject<NodeView | null>(null);
@@ -89,6 +92,13 @@ export class StateService {
    */
   changeMode(mode: ModeState) {
     this.modeStateSource.next(mode);
+  }
+
+  /**
+   * Notify that the graph has been cleared.
+   */
+  graphCleared() {
+   this.graphClearedSource.next(true);
   }
 
   /**

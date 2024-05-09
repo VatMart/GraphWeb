@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Graph} from "../model/graph";
 import {Node} from "../model/node";
-import {Edge, EdgeIndex} from "../model/edge";
+import {Edge} from "../model/edge";
 
 /**
  * Service for handling the model of the graph.
@@ -72,6 +72,11 @@ export class GraphModelService {
   protected removeEdgeFromGraph(graph: Graph, edge: Edge): boolean {
     this.removeAdjacentEdgeOfNodes(edge);
     return graph.getEdges().delete(edge.edgeIndex.value);
+  }
+
+  protected clearAllElements(graph: Graph) {
+    graph.getEdges().clear();
+    graph.getNodes().clear();
   }
 
   public calculateNewNodeIndex(graph: Graph): number {
