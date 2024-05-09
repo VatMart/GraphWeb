@@ -1,7 +1,7 @@
 import {GraphViewService} from "../../service/graph-view.service";
-import {NodeView} from "../../model/graphical-model/node-view";
+import {NodeView} from "../../model/graphical-model/node/node-view";
 import {Command} from "./command";
-import {EdgeView} from "../../model/graphical-model/edge-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 
 /**
  * Command to remove a node from the graph view.

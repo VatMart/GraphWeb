@@ -17,17 +17,17 @@ export class Edge {
 
   // If you use oriented edge, remember that order of nodes is important.
   // First node is always one which initiate direction: firstNode -> secondNode
-  private orientation: EdgeOrientation;
+  private _orientation: EdgeOrientation;
 
   // Weight of graph (default value is 1.0)
-  private weight: number;
+  private _weight: number;
 
-  constructor(firstNode: Node, secondNode: Node) {
+  constructor(firstNode: Node, secondNode: Node, orientation?: EdgeOrientation, weight?: number) {
     this._firstNode = firstNode;
     this._secondNode = secondNode;
     this._edgeIndex = EdgeIndex.fromNodes(firstNode, secondNode);
-    this.weight = 1.0; // default value
-    this.orientation = EdgeOrientation.NON_ORIENTED; // default value
+    this._weight = weight ? weight : 1.0; // default value
+    this._orientation = orientation ? orientation : EdgeOrientation.ORIENTED; // default value
   }
 
   get firstNode(): Node {
@@ -40,6 +40,22 @@ export class Edge {
 
   get edgeIndex(): EdgeIndex {
     return this._edgeIndex;
+  }
+
+  get orientation(): EdgeOrientation {
+    return this._orientation;
+  }
+
+  set orientation(value: EdgeOrientation) {
+    this._orientation = value;
+  }
+
+  get weight(): number {
+    return this._weight;
+  }
+
+  set weight(value: number) {
+    this._weight = value;
   }
 }
 

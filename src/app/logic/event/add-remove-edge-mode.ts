@@ -1,11 +1,11 @@
 import {ModeBehavior} from "../../service/event/mode-manager.service";
 import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
-import {DEFAULT_NODE_STYLE, NodeStyle, NodeView} from "../../model/graphical-model/node-view";
+import {DEFAULT_NODE_STYLE, NodeStyle, NodeView} from "../../model/graphical-model/node/node-view";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {FederatedPointerEvent} from "pixi.js";
 import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
-import {EdgeView} from "../../model/graphical-model/edge-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {EdgeIndex} from "../../model/edge";
 import {AddEdgeViewCommand} from "../command/add-edge-view-command";
 import {HistoryService} from "../../service/history.service";

@@ -1,8 +1,8 @@
 import * as PIXI from "pixi.js";
 import {Graphics, Sprite, Text, Texture} from "pixi.js";
-import {Point} from "../../utils/graphical-utils";
-import {Node} from "../node";
-import {GraphElement} from "./graph-element";
+import {Point} from "../../../utils/graphical-utils";
+import {Node} from "../../node";
+import {GraphElement} from "../graph-element";
 
 /**
  * Graphical representation of node

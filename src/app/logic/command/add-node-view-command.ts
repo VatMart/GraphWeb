@@ -1,4 +1,4 @@
-import {NodeView} from "../../model/graphical-model/node-view";
+import {NodeView} from "../../model/graphical-model/node/node-view";
 import {GraphViewService} from "../../service/graph-view.service";
 import {Command} from "./command";
 

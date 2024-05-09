@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {ModeState} from "./event/mode-manager.service";
-import {NodeView} from "../model/graphical-model/node-view";
-import {EdgeView} from "../model/graphical-model/edge-view";
+import {NodeView} from "../model/graphical-model/node/node-view";
+import {EdgeView} from "../model/graphical-model/edge/edge-view";
 
 /**
  * Service for managing the state of the application.

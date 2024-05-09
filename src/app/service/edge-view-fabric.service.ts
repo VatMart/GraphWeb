@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {GraphicsContext} from "pixi.js";
 import {Graph} from "../model/graph";
-import {NodeView} from "../model/graphical-model/node-view";
+import {NodeView} from "../model/graphical-model/node/node-view";
 import {Edge} from "../model/edge";
-import {EdgeStyle, EdgeView} from "../model/graphical-model/edge-view";
+import {EdgeStyle, EdgeView} from "../model/graphical-model/edge/edge-view";
 import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";
 
 /**

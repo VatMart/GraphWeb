@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 import {Graph} from "../model/graph";
 import {PixiService} from "./pixi.service";
 import {GraphModelService} from "./graph-model.service";
-import {NodeView, SELECTED_NODE_STYLE} from "../model/graphical-model/node-view";
+import {NodeView, SELECTED_NODE_STYLE} from "../model/graphical-model/node/node-view";
 import {NodeViewFabricService} from "./node-view-fabric.service";
 import {StateService} from "./state.service";
 import {GraphElement} from "../model/graphical-model/graph-element";
-import {EdgeView, SELECTED_EDGE_STYLE} from "../model/graphical-model/edge-view";
+import {EdgeView, SELECTED_EDGE_STYLE} from "../model/graphical-model/edge/edge-view";
 import {EdgeViewFabricService} from "./edge-view-fabric.service";
 import {Point} from "../utils/graphical-utils";
 

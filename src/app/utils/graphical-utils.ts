@@ -1,5 +1,5 @@
-import {NodeView} from "../model/graphical-model/node-view";
-import {EdgeView} from "../model/graphical-model/edge-view";
+import {NodeView} from "../model/graphical-model/node/node-view";
+import {EdgeView} from "../model/graphical-model/edge/edge-view";
 
 /**
  * Utility class for graphical operations
@@ -31,6 +31,20 @@ export class GraphicalUtils {
    */
   public static distanceBetween(p1: Point, p2: Point): number {
     return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+  }
+
+  /**
+   * Calculate the midpoint between two points
+   */
+  public static midpoint(p1: Point, p2: Point): Point {
+    return {x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2};
+  }
+
+  /**
+   * Convert degrees to radians
+   */
+  public static toRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
   }
 
   /**

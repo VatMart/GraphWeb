@@ -1,7 +1,7 @@
 import {Command} from "./command";
 import {GraphViewService} from "../../service/graph-view.service";
-import {NodeView} from "../../model/graphical-model/node-view";
-import {EdgeView} from "../../model/graphical-model/edge-view";
+import {NodeView} from "../../model/graphical-model/node/node-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 
 /**
  * Command to clear the graph view.

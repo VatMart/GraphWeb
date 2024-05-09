@@ -1,14 +1,14 @@
 import {ModeBehavior} from "../../service/event/mode-manager.service";
 import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
-import {NodeView} from "../../model/graphical-model/node-view";
+import {NodeView} from "../../model/graphical-model/node/node-view";
 import {Container, FederatedPointerEvent} from "pixi.js";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 import {AddNodeViewCommand} from "../command/add-node-view-command";
 import {HistoryService} from "../../service/history.service";
 import {RemoveNodeViewCommand} from "../command/remove-node-view-command";
-import {EdgeView} from "../../model/graphical-model/edge-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 
 /**
  * Mode to add or remove vertices from the graph.
