@@ -1,6 +1,6 @@
 import {Command} from "./command";
 import {GraphViewService} from "../../service/graph-view.service";
-import {EdgeView} from "../../model/graphical-model/edge-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 
 /**
  * Command to remove an edge from the graph view.

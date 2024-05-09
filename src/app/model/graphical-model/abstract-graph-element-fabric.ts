@@ -1,5 +1,5 @@
 import {GraphElement} from "./graph-element";
-import {NodeView} from "./node-view";
+import {NodeView} from "./node/node-view";
 
 /**
  * Abstract class for fabric of graph elements

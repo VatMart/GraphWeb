@@ -1,12 +1,12 @@
 import {ModeBehavior} from "../../service/event/mode-manager.service";
 import {FederatedPointerEvent} from "pixi.js";
 import {PixiService} from "../../service/pixi.service";
-import {NodeView} from "../../model/graphical-model/node-view";
+import {NodeView} from "../../model/graphical-model/node/node-view";
 import {GraphViewService} from "../../service/graph-view.service";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {MoveNodeViewCommand, NodeMove} from "../command/move-node-view-command";
 import {HistoryService} from "../../service/history.service";
-import {EdgeView} from "../../model/graphical-model/edge-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {GraphicalUtils, Point, Rectangle} from "../../utils/graphical-utils";
 import {SelectRectangle} from "../../model/graphical-model/select-rectangle";
 

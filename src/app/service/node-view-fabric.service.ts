@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {DEFAULT_NODE_STYLE, NodeStyle, NodeView, SELECTED_NODE_STYLE} from "../model/graphical-model/node-view";
+import {DEFAULT_NODE_STYLE, NodeStyle, NodeView} from "../model/graphical-model/node/node-view";
 import {Node} from "../model/node";
 import {GraphModelService} from "./graph-model.service";
 import {Graph} from "../model/graph";
-import {Graphics, RenderTexture, Texture} from "pixi.js";
 import * as PIXI from "pixi.js";
+import {Graphics, RenderTexture, Texture} from "pixi.js";
 import {PixiService} from "./pixi.service";
 import {Point} from "../utils/graphical-utils";
 import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";

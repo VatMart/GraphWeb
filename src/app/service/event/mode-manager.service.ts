@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {NodeView} from "../../model/graphical-model/node-view";
+import {NodeView} from "../../model/graphical-model/node/node-view";
 import {StateService} from "../state.service";
 import {DefaultMode} from "../../logic/event/default-mode";
 import {AddRemoveVertexMode} from "../../logic/event/add-remove-vertex-mode";
@@ -10,7 +10,7 @@ import {EventBusService} from "./event-bus.service";
 import {NodeViewFabricService} from "../node-view-fabric.service";
 import {HistoryService} from "../history.service";
 import {EdgeViewFabricService} from "../edge-view-fabric.service";
-import {EdgeView} from "../../model/graphical-model/edge-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 
 /**
  * Service for managing the modes of the application.
