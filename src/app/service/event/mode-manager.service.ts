@@ -80,6 +80,9 @@ export class ModeManagerService {
         this.onRemovedEdge(edgeView);
       }
     });
+    this.stateService.graphCleared$.subscribe(() => {
+      this.onGraphCleared();
+    });
     this.stateService.undoInvoked$.subscribe(() => {
       this.onUndoInvoked();
     });
@@ -129,6 +132,13 @@ export class ModeManagerService {
   }
 
   /**
+   * On graph cleared handling, while mode is active
+   */
+  public onGraphCleared() {
+    this.modeStateActions[this.currentModeState].onGraphCleared();
+  }
+
+  /**
    * On undo invoked handling, while mode is active
    */
   public onUndoInvoked() {
@@ -156,6 +166,8 @@ export interface ModeBehavior {
   onAddedEdge(edgeView: EdgeView): void;
 
   onRemovedEdge(edgeView: EdgeView): void;
+
+  onGraphCleared(): void;
 
   onUndoInvoked(): void;
 

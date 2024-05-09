@@ -10,7 +10,8 @@ import {StateService} from "../../service/state.service";
 import {EnvironmentService} from "../../service/environment.service";
 import {HistoryService} from "../../service/history.service";
 import {Subscription} from "rxjs";
-import {ModeState} from "../../service/event/mode-manager.service";
+import {GraphViewService} from "../../service/graph-view.service";
+import {ClearGraphViewCommand} from "../../logic/command/clear-graph-view-command";
 
 ClarityIcons.addIcons(undoIcon, redoIcon);
 
@@ -53,7 +54,8 @@ export class ToolBarComponent implements OnInit, OnDestroy {
 
   constructor(private stateService: StateService,
               private environmentService: EnvironmentService,
-              private historyService: HistoryService) {
+              private historyService: HistoryService,
+              private graphViewService: GraphViewService) {
     this.isMobileDevice = this.environmentService.isMobile();
   }
 
@@ -98,6 +100,11 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.isAddEdgesButtonActive = !this.isAddEdgesButtonActive;
     // Toggle use of gradient on button press
     this.useAddEdgesGradient = this.isAddEdgesButtonActive;
+  }
+
+  onClearGraph() {
+    this.historyService.execute(new ClearGraphViewCommand(this.graphViewService));
+    this.stateService.graphCleared();
   }
 
   undoAction() {

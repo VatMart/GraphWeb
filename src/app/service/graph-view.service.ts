@@ -23,6 +23,7 @@ export class GraphViewService extends GraphModelService {
 
   private _edgeViews: Map<string, EdgeView> = new Map<string, EdgeView>(); // key is the edge index
 
+  // TODO Add support for multiple graphs
   private _currentGraph: Graph | undefined;
 
   private _selectedElements: GraphElement[] = [];
@@ -88,6 +89,36 @@ export class GraphViewService extends GraphModelService {
     super.removeEdgeFromGraph(graph, edgeView.edge); // Should be called after removing from view
     this.stateService.deletedEdge(edgeView); // Notify state service
     console.log("Removed edge from graph: " + edgeView.edge.edgeIndex.value); // TODO remove
+  }
+
+  /**
+   * Clears all elements from the graph view.
+   * All other methods for clearing elements should call this method.
+   */
+  public clearAllElementsView(graph: Graph) {
+    this.clearSelection();
+    this._edgeViews.forEach((edgeView: EdgeView) => {
+      this.pixiService.getApp().stage.removeChild(edgeView);
+    });
+    this._nodeViews.forEach((nodeView: NodeView) => {
+      this.pixiService.getApp().stage.removeChild(nodeView);
+    });
+    this._nodeViews.clear();
+    this._edgeViews.clear();
+    super.clearAllElements(graph);
+    console.log("Cleared all elements from graph view"); // TODO remove
+  }
+
+  /**
+   * Populates the graph view of the given graph with node views and edge views.
+   */
+  public populateGraphView(graph: Graph, nodeViews: NodeView[], edgeViews: EdgeView[]) {
+    nodeViews.forEach((nodeView: NodeView) => {
+      this.addNodeToGraphView(graph, nodeView);
+    });
+    edgeViews.forEach((edgeView: EdgeView) => {
+      this.addEdgeToGraphView(graph, edgeView);
+    });
   }
 
   public moveNodeView(nodeView: NodeView, point: Point) {

@@ -61,6 +61,7 @@
 
   <!-- Button for Clear graph -->
   <button class="graph-web-button"
+          (click)="onClearGraph()"
           (mouseleave)="useClearGradient = false"
           (mousedown)="useClearGradient = true"
           (mouseup)="useClearGradient = false">
