@@ -43,8 +43,6 @@ export class ModeManagerService {
 
     // Subscribe to the currentMode$ mode state
     this.stateService.currentMode$.subscribe(mode => {
-      console.log("ModeManagerService: mode: " + mode);
-      console.log("ModeManagerService: currentMode: " + this.currentModeState);
       if (this.currentModeState !== mode) {
         this.graphViewService.clearSelection();
         this.updateModeState(mode);
