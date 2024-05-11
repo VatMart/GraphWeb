@@ -7,6 +7,7 @@ import {Graph} from "../../model/graph";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
+import * as PIXI from "pixi.js";
 
 /**
  * Component for the main canvas.
@@ -44,8 +45,9 @@ export class CanvasComponent implements OnInit {
     let someElement = document.getElementById('testId');
     // document.documentElement.clientHeight
     await this.pixiService.getApp().init({
-      antialias: true, background: '#e0e0e0', width: window.innerWidth,
-      height: window.innerHeight - 200
+      antialias: true, background: '#F5F5F5', width: window.innerWidth,
+      height: window.innerHeight - 200, preference: 'webgpu', webgpu: {antialias: true, bezierSmoothness: 1},
+      bezierSmoothness: 1
     });
     document.body.appendChild(this.pixiService.getApp().canvas);
     // TODO move to Pixi service
@@ -66,6 +68,13 @@ export class CanvasComponent implements OnInit {
     this.graphViewService.addEdgeToGraphView(graph, edge1);
     let edge2 = this.edgeFabric.createDefaultEdgeView(graph, node2, node3);
     this.graphViewService.addEdgeToGraphView(graph, edge2);
+
+    console.log("Renderer: " + this.pixiService.getApp().renderer.constructor.name); // TODO remove
+
+    (window as any).__PIXI_DEVTOOLS__ = { // TODO remove in production
+      pixi: PIXI,
+      app: this.pixiService.getApp(),
+    };
 
     this.setDefaultListeners();
   }

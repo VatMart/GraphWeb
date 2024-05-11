@@ -18,6 +18,7 @@ export class SelectRectangle extends Graphics {
     super();
     this.rect(0, 0, 4, 4)
       .fill({color: this.fillColor, alpha: this.fillAlpha});
+    this.zIndex = 1000; // On top of all elements
   }
 
   /**

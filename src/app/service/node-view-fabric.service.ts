@@ -41,7 +41,6 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
       const texture = RenderTexture.create({width: 2 * totalRadius, height: 2 * totalRadius, antialias: true,
         resolution: Math.max(2, window.devicePixelRatio)});
       this.pixiService.getApp().renderer.render({container: graphics, target: texture, clear: true});
-
       this.textureCache.set(key, texture);
     }
     return <Texture>this.textureCache.get(key);
@@ -55,15 +54,11 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
 
   public changeToStyle(nodeView: NodeView, nodeStyle: NodeStyle) {
     // Save current key of texture in cache
-    const textureKey = `${nodeView.radius}_${nodeView.nodeStyle.fillNode}_${nodeView.nodeStyle.strokeColor}_${nodeView.nodeStyle.strokeWidth}`;
+    const textureKey = `${nodeView.radius}_${nodeView.nodeStyle.fillNode}_${nodeView.nodeStyle.strokeColor}
+    _${nodeView.nodeStyle.strokeWidth}`;
     this.styleCache.set(nodeView.node.index, textureKey);
-    // Build selected style
-    let toNodeStyle: NodeStyle = {
-      fillNode: nodeStyle.fillNode,
-      strokeColor: nodeStyle.strokeColor,
-      strokeWidth: nodeStyle.strokeWidth
-    };
-    this.switchNodeStyle(nodeView, toNodeStyle);
+    // Build new style
+    this.switchNodeStyle(nodeView, nodeStyle);
     nodeView.hitArea = new PIXI.Circle(nodeView.width / 2, nodeView.height / 2, nodeView.radius);
     nodeView.move(); // adjust position
   }

@@ -9,6 +9,7 @@ import {GraphElement} from "../model/graphical-model/graph-element";
 import {EdgeView, SELECTED_EDGE_STYLE} from "../model/graphical-model/edge/edge-view";
 import {EdgeViewFabricService} from "./edge-view-fabric.service";
 import {Point} from "../utils/graphical-utils";
+import {GraphOrientation} from "../model/orientation";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -121,6 +122,10 @@ export class GraphViewService extends GraphModelService {
     });
   }
 
+
+  /**
+   * Moves the given node view to the given point.
+   */
   public moveNodeView(nodeView: NodeView, point: Point) {
     nodeView.coordinates = point; // Move node (called move() inside setter)
     // Move adjacent edges
@@ -130,6 +135,22 @@ export class GraphViewService extends GraphModelService {
     });
   }
 
+  public changeEdgeViewWeight(edgeView: EdgeView, weight: number) {
+    // TODO implement
+  }
+
+  public changeGraphOrientation(graph: Graph, orientation: GraphOrientation) {
+    // TODO implement
+  }
+
+  public changeEdgeViewOrientation(edgeView: EdgeView, orientation: GraphOrientation) {
+    // TODO implement
+    // TODO implement restriction to non-oriented graph
+  }
+
+  /**
+   * Returns the edge views adjacent to the given node view.
+   */
   public getAdjacentEdgeViews(graph: Graph, nodeView: NodeView): EdgeView[] {
     let edges: EdgeView[] = [];
     nodeView.node.getAdjacentEdges().forEach((edgeIndex: string) => {
@@ -139,27 +160,6 @@ export class GraphViewService extends GraphModelService {
       }
     })
     return edges;
-  }
-
-  /**
-   * Adds a node to the current graph view with the given coordinates.
-   */
-  public addNodeToCurrentGraphView(x: number, y: number) {
-    if (this.currentGraph) {
-      let nodeView: NodeView = this.nodeFabric.createDefaultNodeViewWithCoordinates(this.currentGraph,
-        {x: x, y: y});
-      this.addNodeToGraphView(this.currentGraph, nodeView);
-    } else {
-      console.error("No current graph set"); // TODO throw exception
-    }
-  }
-
-  public removeNodeFromCurrentGraphView(nodeView: NodeView) {
-    if (this.currentGraph) {
-      this.removeNodeFromGraphView(this.currentGraph, nodeView);
-    } else {
-      console.error("No current graph set"); // TODO throw exception
-    }
   }
 
   public isElementSelected(element: GraphElement): boolean {

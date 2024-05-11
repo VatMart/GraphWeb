@@ -1,29 +1,34 @@
 import {Graphics} from "pixi.js";
 import {GraphicalUtils, Point} from "../../../utils/graphical-utils";
 
+/**
+ * Graphical representation of arrow for edge
+ */
 export class Arrow extends Graphics {
 
-  constructor() {
+  private _arrowStyle: ArrowStyle;
+
+  constructor(arrowStyle?: ArrowStyle) {
     super();
+    this._arrowStyle = arrowStyle ? arrowStyle : DEFAULT_ARROW_STYLE;
   }
 
   /**
    * Draw arrow. End point is the arrow head.
    * Returns the center point of arrow
    */
-  public draw(startPoint: Point, endPoint: Point, arrowStyle?: ArrowStyle): Point {
+  public draw(startPoint: Point, endPoint: Point): Point {
     this.clear();
-    let actualArrowStyle = arrowStyle ? arrowStyle : DEFAULT_ARROW_STYLE;
     const distance = GraphicalUtils.distanceBetween(endPoint, startPoint);
-    let ko = actualArrowStyle.size / distance;
+    let ko = this._arrowStyle.size / distance;
     const base: Point = {
       x: endPoint.x + (startPoint.x - endPoint.x) * ko,
       y: endPoint.y + (startPoint.y - endPoint.y) * ko};
-    ko = (actualArrowStyle.size / 1.6) / distance;
+    ko = (this._arrowStyle.size / 1.6) / distance;
     const curve: Point = {
       x: endPoint.x + (startPoint.x - endPoint.x) * ko,
       y: endPoint.y + (startPoint.y - endPoint.y) * ko};
-    const radius = actualArrowStyle.size + 2;
+    const radius = this._arrowStyle.size + 2;
     const angle = Math.atan2(base.y - endPoint.y, base.x - endPoint.x);
     const left: Point = {
       x: endPoint.x + radius * Math.cos(GraphicalUtils.toRadians(30) + angle),
@@ -36,24 +41,31 @@ export class Arrow extends Graphics {
       .lineTo(left.x, left.y)
       .quadraticCurveTo(curve.x, curve.y, right.x, right.y)
       .closePath()
-      .fill(actualArrowStyle.color)
-      .stroke({width: actualArrowStyle.strokeWidth, color: actualArrowStyle.strokeColor}); // TODO
+      .fill(this._arrowStyle.color)
+      .stroke({width: this._arrowStyle.strokeWidth, color: this._arrowStyle.strokeColor}); // TODO
     return GraphicalUtils.midpoint(base, endPoint);
   }
 
+  get arrowStyle(): ArrowStyle {
+    return this._arrowStyle;
+  }
+
+  set arrowStyle(value: ArrowStyle) {
+    this._arrowStyle = value;
+  }
 }
 
 export const DEFAULT_ARROW_STYLE: ArrowStyle = {
   size: 25,
-  color: 'red',
-  strokeWidth: 3,
+  color: 'black',
+  strokeWidth: 0,
   strokeColor: 'black'
 }
 
 export const SELECTED_ARROW_STYLE: ArrowStyle = {
   size: 25,
   color: '#006FFF',
-  strokeWidth: 3,
+  strokeWidth: 1,
   strokeColor: '#006FFF'
 }
 

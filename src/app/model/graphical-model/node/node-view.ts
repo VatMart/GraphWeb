@@ -58,10 +58,9 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
       fontFamily: this.labelStyle.labelFontFamily,
       fontWeight: 'bold'
     });
-    //this.tint = 'white';
     this._text.anchor.set(0.5);
     this.coordinates = this._coordinates;
-    this.zIndex = 1; // TODO set to 1
+    this.zIndex = 1;
   }
 
   public move() {
