@@ -1,4 +1,4 @@
-import {Edge, EdgeIndex} from "./edge";
+import {Edge} from "./edge";
 import {Node} from "./node";
 import {GraphOrientation} from "./orientation";
 
@@ -13,15 +13,15 @@ export class Graph {
   // key: index, value: Edge
   private edges: Map<string, Edge>;
 
-  private orientation: GraphOrientation;
+  private _orientation: GraphOrientation;
 
   constructor(orientation?: GraphOrientation) {
     this.nodes = new Map<number, Node>();
     this.edges = new Map<string, Edge>();
     if (orientation) {
-      this.orientation = orientation;
+      this._orientation = orientation;
     } else {
-      this.orientation = GraphOrientation.ORIENTED;
+      this._orientation = GraphOrientation.ORIENTED;
     }
   }
 
@@ -31,5 +31,13 @@ export class Graph {
 
   getEdges(): Map<string, Edge> {
     return this.edges;
+  }
+
+  get orientation(): GraphOrientation {
+    return this._orientation;
+  }
+
+  set orientation(value: GraphOrientation) {
+    this._orientation = value;
   }
 }

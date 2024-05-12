@@ -54,6 +54,8 @@
 
 .dropdown-menu {
   padding: 5px;
+  background-color: #fafafa;
+  min-width: fit-content;
 }
 
 .dropdown-menu .dropdown-header {
@@ -61,11 +63,17 @@
 }
 
 .dropdown-menu .dropdown-item {
-  padding-left: 8px;
+  padding: 4px;
+  width: fit-content;
 }
 
 .clr-form-control {
   margin-top: 0;
+}
+
+option {
+  font-size: unset;
+  font-weight: normal;
 }
 
 * {

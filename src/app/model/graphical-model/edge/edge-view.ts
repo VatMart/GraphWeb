@@ -96,7 +96,9 @@ export class EdgeView extends Graphics implements GraphElement {
   }
 
   public changeEdgeOrientation(orientation: EdgeOrientation) {
-    // TODO Test implementation
+    if (orientation === this.edge.orientation) {
+      return;
+    }
     this.edge.orientation = orientation;
     if (orientation === EdgeOrientation.ORIENTED && this.arrow) {
       this.arrow.renderable = true;
@@ -108,6 +110,7 @@ export class EdgeView extends Graphics implements GraphElement {
     if (orientation === EdgeOrientation.NON_ORIENTED && this.arrow) {
       this.arrow.renderable = false;
     }
+    this.move();
   }
 
   public changeEdgeWeight(weight: number) {

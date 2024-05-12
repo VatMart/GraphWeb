@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import {GraphViewService} from "./graph-view.service";
 import {StateService} from "./state.service";
 import {EdgeView} from "../model/graphical-model/edge/edge-view";
+import {ChangeGraphOrientationCommand} from "../logic/command/change-graph-orientation-command";
+import {HistoryService} from "./history.service";
 
 /**
  * Service for managing the state of the graph.
@@ -12,6 +14,7 @@ import {EdgeView} from "../model/graphical-model/edge/edge-view";
 export class GraphStateManagerService {
 
   constructor(private stateService: StateService,
+              private historyService: HistoryService,
               private graphService: GraphViewService) {
     this.stateService.showWeights$.subscribe(showWeights => {
       this.graphService.changeEdgeWeightsVisibility(showWeights);
@@ -20,6 +23,16 @@ export class GraphStateManagerService {
       if (edge && edge.weightVisible !== EdgeView.SHOW_WEIGHT) {
         edge.changeWeightVisible(EdgeView.SHOW_WEIGHT);
       }
+    });
+    this.stateService.graphOrientation$.subscribe(orientation => {
+      if (!this.graphService.currentGraph) {
+        return;
+      }
+      if (orientation === this.graphService.currentGraph.orientation) {
+        return;
+      }
+      const command = new ChangeGraphOrientationCommand(this.graphService, orientation);
+      this.historyService.execute(command);
     });
   }
 }
