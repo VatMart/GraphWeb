@@ -149,6 +149,19 @@ export class GraphViewService extends GraphModelService {
   }
 
   /**
+   * Changes the visibility of the edge weights. Changes the visibility of all edge weights and default value
+   * for new edges.
+   */
+  public changeEdgeWeightsVisibility(visible: boolean) {
+    EdgeView.SHOW_WEIGHT = visible;
+    this.edgeViews.forEach((edgeView: EdgeView) => {
+      if (edgeView.weightVisible !== visible) {
+        edgeView.changeWeightVisible(visible);
+      }
+    });
+  }
+
+  /**
    * Returns the edge views adjacent to the given node view.
    */
   public getAdjacentEdgeViews(graph: Graph, nodeView: NodeView): EdgeView[] {
@@ -162,10 +175,16 @@ export class GraphViewService extends GraphModelService {
     return edges;
   }
 
+  /**
+   * Return whether the given element is selected.
+   */
   public isElementSelected(element: GraphElement): boolean {
     return this._selectedElements.includes(element);
   }
 
+  /**
+   * Selects the given element.
+   */
   public selectElement(element: GraphElement) {
     if (!this.isElementSelected(element)) {
       this._selectedElements.push(element);
@@ -179,6 +198,9 @@ export class GraphViewService extends GraphModelService {
     }
   }
 
+  /**
+   * Unselects the given element.
+   */
   public unselectElement(element: GraphElement) {
     const index = this._selectedElements.indexOf(element);
     if (index !== -1) {
@@ -194,6 +216,9 @@ export class GraphViewService extends GraphModelService {
     }
   }
 
+  /**
+   * Clears the selection of all elements.
+   */
   public clearSelection() {
     this._selectedElements.forEach((element: GraphElement) => {
       if (element instanceof NodeView) {
@@ -205,6 +230,9 @@ export class GraphViewService extends GraphModelService {
     this._selectedElements = [];
   }
 
+  /**
+   * Returns whether the selection is empty.
+   */
   public isSelectionEmpty(): boolean {
     return this._selectedElements.length === 0;
   }

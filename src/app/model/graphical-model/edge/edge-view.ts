@@ -11,13 +11,17 @@ import {DEFAULT_WEIGHT_STYLE, SELECTED_WEIGHT_STYLE, Weight, WeightStyle} from "
  * Graphical representation of edge
  */
 export class EdgeView extends Graphics implements GraphElement {
+
+  // Default value for showing weight of edge
+  public static SHOW_WEIGHT: boolean; // Default value sets via event handling
+
   // Math model
   private _edge: Edge;
 
   // Representation of arrow, if edge is oriented
   private arrow: Arrow | undefined;
   private _weightView: Weight;
-  private _weightVisible: boolean = true; // TODO change to false
+  private _weightVisible: boolean = EdgeView.SHOW_WEIGHT;
 
   private _startNode: NodeView;
   private _endNode: NodeView;
@@ -114,6 +118,9 @@ export class EdgeView extends Graphics implements GraphElement {
     // TODO Test implementation
     this._weightVisible = bool;
     this.weightView.renderable = this._weightVisible;
+    if (this.weightVisible) {
+      this.moveWeight();
+    }
   }
 
   /**

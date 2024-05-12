@@ -10,6 +10,7 @@ import '@cds/core/icon/register.js';
 import {ClarityIcons, cogIcon} from '@cds/core/icon';
 import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/event/mode-manager.service";
+import {GraphStateManagerService} from "./service/graph-state-manager.service";
 
 ClarityIcons.addIcons(cogIcon);
 
@@ -23,7 +24,9 @@ ClarityIcons.addIcons(cogIcon);
 export class AppComponent implements OnInit {
   title = 'GraphWeb';
 
-  constructor(private http: HttpClient, private modeManagerService: ModeManagerService) {}
+  constructor(private http: HttpClient,
+              private modeManagerService: ModeManagerService,
+              private graphStateManager: GraphStateManagerService) {}
 
   async ngOnInit(): Promise<void> {
   }
