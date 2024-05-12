@@ -13,6 +13,7 @@ import {Subscription} from "rxjs";
 import {GraphViewService} from "../../service/graph-view.service";
 import {ClearGraphViewCommand} from "../../logic/command/clear-graph-view-command";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {GraphOrientation} from "../../model/orientation";
 
 ClarityIcons.addIcons(undoIcon, redoIcon);
 
@@ -35,7 +36,8 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   isAddEdgesButtonPressed: boolean = false;
 
   // Dropdown components states
-  showWeights =  new FormControl(true); // TODO change to false
+  showWeights =  new FormControl(true); // TODO change to false by default
+  graphOrientation = new FormControl(GraphOrientation.ORIENTED);
 
   // Gradient state
   useAddVertexGradient: boolean = false;
@@ -69,10 +71,20 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
     this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
     this.showWeights.valueChanges.subscribe(value => {
-      if (typeof value === "boolean") {
+      if (value !== null) {
         this.onToggleShowWeights(value)
       }
     });
+    this.subscriptions.add(this.graphOrientation.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onChoseGraphOrientation(value);
+      }
+    }));
+    this.subscriptions.add(this.stateService.graphOrientationChanged$.subscribe(state => {
+      if (state !== this.graphOrientation.value) {
+        this.graphOrientation.setValue(state);
+      }
+    }));
     this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
       if (this.isAddVertexButtonActive && state !== 'AddRemoveVertex') {
         console.log("Switching add vertex button");
@@ -86,6 +98,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     const showWeights = this.showWeights.value;
     if (showWeights) {
       this.onToggleShowWeights(showWeights); // Set initial state
+    }
+    const orientation = this.graphOrientation.value;
+    if (orientation) {
+      this.onChoseGraphOrientation(orientation);
     }
   }
 
@@ -116,12 +132,16 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   }
 
   onClearGraph() {
-    this.historyService.execute(new ClearGraphViewCommand(this.graphViewService));
+    this.historyService.execute(new ClearGraphViewCommand(this.graphViewService)); // TODO move to GraphStateManagerService
     this.stateService.graphCleared();
   }
 
   onToggleShowWeights(value: boolean) {
     this.stateService.changeShowWeights(value);
+  }
+
+  onChoseGraphOrientation(value: GraphOrientation) {
+    this.stateService.changeGraphOrientation(value);
   }
 
   undoAction() {
@@ -183,4 +203,6 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.gradientColorEnd = '#ff0000';
     this.useAddEdgesGradient = false;
   }
+
+  protected readonly GraphOrientation = GraphOrientation;
 }

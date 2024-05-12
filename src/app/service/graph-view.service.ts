@@ -9,7 +9,7 @@ import {GraphElement} from "../model/graphical-model/graph-element";
 import {EdgeView, SELECTED_EDGE_STYLE} from "../model/graphical-model/edge/edge-view";
 import {EdgeViewFabricService} from "./edge-view-fabric.service";
 import {Point} from "../utils/graphical-utils";
-import {GraphOrientation} from "../model/orientation";
+import {EdgeOrientation, GraphOrientation} from "../model/orientation";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -139,13 +139,29 @@ export class GraphViewService extends GraphModelService {
     // TODO implement
   }
 
+  /**
+   * Changes the graph orientation.
+   */
   public changeGraphOrientation(graph: Graph, orientation: GraphOrientation) {
-    // TODO implement
+    if (orientation === graph.orientation) {
+      return;
+    }
+    graph.orientation = orientation;
+    console.log("Graph orientation changed: " + orientation); // TODO remove
+    if (orientation === GraphOrientation.MIXED) { // If mixed, do not change edge orientations
+      return;
+    }
+    const edgeOrientation = orientation === GraphOrientation.ORIENTED ? EdgeOrientation.ORIENTED
+      : EdgeOrientation.NON_ORIENTED;
+    this.edgeViews.forEach((edgeView: EdgeView) => {
+      edgeView.changeEdgeOrientation(edgeOrientation);
+    });
+    this.stateService.graphOrientationChanged(orientation);
   }
 
-  public changeEdgeViewOrientation(edgeView: EdgeView, orientation: GraphOrientation) {
+  public changeEdgeViewOrientation(edgeView: EdgeView, orientation: EdgeOrientation) {
     // TODO implement
-    // TODO implement restriction to non-oriented graph
+    // TODO implement restriction to non-oriented graph. If graph is non-oriented, do not allow changing edge orientation
   }
 
   /**

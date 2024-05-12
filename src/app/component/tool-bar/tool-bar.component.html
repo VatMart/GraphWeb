@@ -141,7 +141,7 @@
           <clr-icon shape="caret down"></clr-icon>
         </button>
         <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>
-          <label class="dropdown-header" aria-hidden="true">Graph</label>
+          <label class="dropdown-header" aria-hidden="true">View options</label>
           <div class="dropdown-item">
             <clr-toggle-container>
               <clr-toggle-wrapper>
@@ -150,8 +150,19 @@
               </clr-toggle-wrapper>
             </clr-toggle-container>
           </div>
+
           <!-- TODO use select component-->
-          <a class="dropdown-item">Graph orientation</a>
+          <label class="dropdown-header" aria-hidden="true">Graph orientation</label>
+          <div class="dropdown-item">
+            <clr-select-container>
+              <select clrSelect name="graph-orientation" [formControl]="graphOrientation"
+                      [value]="graphOrientation.defaultValue">
+                <option [value]="GraphOrientation.ORIENTED">Directed</option>
+                <option [value]="GraphOrientation.NON_ORIENTED">Undirected</option>
+                <option [value]="GraphOrientation.MIXED">Mixed</option>
+              </select>
+            </clr-select-container>
+          </div>
         </clr-dropdown-menu>
       </clr-dropdown>
     </div>

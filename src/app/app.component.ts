@@ -7,12 +7,9 @@ import {NgOptimizedImage} from "@angular/common";
 import '@clr/icons';
 import '@clr/icons/clr-icons.min.css';
 import '@cds/core/icon/register.js';
-import {ClarityIcons, cogIcon} from '@cds/core/icon';
 import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/event/mode-manager.service";
 import {GraphStateManagerService} from "./service/graph-state-manager.service";
-
-ClarityIcons.addIcons(cogIcon);
 
 @Component({
   selector: 'app-root',

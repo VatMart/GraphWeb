@@ -3,6 +3,7 @@ import {BehaviorSubject} from "rxjs";
 import {ModeState} from "./event/mode-manager.service";
 import {NodeView} from "../model/graphical-model/node/node-view";
 import {EdgeView} from "../model/graphical-model/edge/edge-view";
+import {GraphOrientation} from "../model/orientation";
 
 /**
  * Service for managing the state of the application.
@@ -61,6 +62,12 @@ export class StateService {
   private showWeightsSource = new BehaviorSubject<boolean>(true);
   public showWeights$ = this.showWeightsSource.asObservable();
 
+  private graphOrientationSource = new BehaviorSubject<GraphOrientation>(GraphOrientation.ORIENTED);
+  public graphOrientation$ = this.graphOrientationSource.asObservable();
+
+  private graphOrientationChangedSource = new BehaviorSubject<GraphOrientation>(GraphOrientation.ORIENTED);
+  public graphOrientationChanged$ = this.graphOrientationChangedSource.asObservable();
+
   constructor() { }
 
   /**
@@ -110,6 +117,20 @@ export class StateService {
    */
   changeShowWeights(state: boolean) {
     this.showWeightsSource.next(state);
+  }
+
+  /**
+   * Change the graph orientation.
+   */
+  changeGraphOrientation(value: GraphOrientation) {
+    this.graphOrientationSource.next(value);
+  }
+
+  /**
+   * Notify that the graph orientation has been changed.
+   */
+  graphOrientationChanged(value: GraphOrientation) {
+    this.graphOrientationChangedSource.next(value);
   }
 
   /**
