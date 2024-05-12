@@ -25,7 +25,9 @@ export class ChangeGraphOrientationCommand implements Command {
   undo(): void {
     this.graphService.changeGraphOrientation(this.graphService.currentGraph, this._previousOrientation);
     // Only if the graph is mixed, restore the edge orientations
-    if (this.orientation === GraphOrientation.MIXED && this._edgeOrientations.size > 0) {
+    console.log(`restoring edge orientations. size: ` + this._edgeOrientations.size + ` orientation: ` + this.orientation + ` previous orientation: ` + this._previousOrientation);
+    if (this._previousOrientation === GraphOrientation.MIXED && this._edgeOrientations.size > 0) {
+
       this.graphService.edgeViews.forEach((edgeView: EdgeView) => {
         const edgeOrientation = this._edgeOrientations.get(edgeView.getIndex());
         if (edgeOrientation) {
