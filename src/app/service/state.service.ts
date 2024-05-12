@@ -40,9 +40,6 @@ export class StateService {
   public currentCursorX = this.cursorXSource.asObservable();
   public currentCursorY = this.cursorYSource.asObservable();
 
-  private graphClearedSource = new BehaviorSubject<boolean>(false);
-  public graphCleared$ = this.graphClearedSource.asObservable();
-
   // Node related events
   private nodeAddedSource = new BehaviorSubject<NodeView | null>(null);
   public nodeAdded$ = this.nodeAddedSource.asObservable();
@@ -56,6 +53,13 @@ export class StateService {
 
   private edgeDeletedSource = new BehaviorSubject<EdgeView | null>(null);
   public edgeDeleted$ = this.edgeDeletedSource.asObservable();
+
+  // Graph related events
+  private graphClearedSource = new BehaviorSubject<boolean>(false);
+  public graphCleared$ = this.graphClearedSource.asObservable();
+
+  private showWeightsSource = new BehaviorSubject<boolean>(true);
+  public showWeights$ = this.showWeightsSource.asObservable();
 
   constructor() { }
 
@@ -99,6 +103,13 @@ export class StateService {
    */
   graphCleared() {
    this.graphClearedSource.next(true);
+  }
+
+  /**
+   * Change the state of showing weights.
+   */
+  changeShowWeights(state: boolean) {
+    this.showWeightsSource.next(state);
   }
 
   /**

@@ -12,13 +12,14 @@ import {HistoryService} from "../../service/history.service";
 import {Subscription} from "rxjs";
 import {GraphViewService} from "../../service/graph-view.service";
 import {ClearGraphViewCommand} from "../../logic/command/clear-graph-view-command";
+import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 ClarityIcons.addIcons(undoIcon, redoIcon);
 
 @Component({
   selector: 'app-tool-bar',
   standalone: true,
-  imports: [ClarityModule, CdkMenuTrigger, CdkMenu, CdkMenuItem, NgIf, DecimalPipe],
+  imports: [ClarityModule, CdkMenuTrigger, CdkMenu, CdkMenuItem, NgIf, DecimalPipe, FormsModule, ReactiveFormsModule],
   templateUrl: './tool-bar.component.html',
   styleUrl: './tool-bar.component.css'
 })
@@ -32,6 +33,9 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   isAddVertexButtonPressed: boolean = false;
   isAddEdgesButtonActive: boolean = false;
   isAddEdgesButtonPressed: boolean = false;
+
+  // Dropdown components states
+  showWeights =  new FormControl(true); // TODO change to false
 
   // Gradient state
   useAddVertexGradient: boolean = false;
@@ -64,6 +68,11 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.stateService.currentCursorY.subscribe(state => this.yCursor = state));
     this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
     this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
+    this.showWeights.valueChanges.subscribe(value => {
+      if (typeof value === "boolean") {
+        this.onToggleShowWeights(value)
+      }
+    });
     this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
       if (this.isAddVertexButtonActive && state !== 'AddRemoveVertex') {
         console.log("Switching add vertex button");
@@ -74,6 +83,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         this.switchAddEdgesButton(); // Turn off add edges mode
       }
     }));
+    const showWeights = this.showWeights.value;
+    if (showWeights) {
+      this.onToggleShowWeights(showWeights); // Set initial state
+    }
   }
 
   ngOnDestroy(): void {
@@ -105,6 +118,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   onClearGraph() {
     this.historyService.execute(new ClearGraphViewCommand(this.graphViewService));
     this.stateService.graphCleared();
+  }
+
+  onToggleShowWeights(value: boolean) {
+    this.stateService.changeShowWeights(value);
   }
 
   undoAction() {
