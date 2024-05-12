@@ -7,6 +7,7 @@ import {EdgeStyle, EdgeView} from "../model/graphical-model/edge/edge-view";
 import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";
 import {WeightStyle} from "../model/graphical-model/edge/weight";
 import {PixiService} from "./pixi.service";
+import {EdgeOrientation, GraphOrientation} from "../model/orientation";
 
 /**
  * Fabric for creating edge views.
@@ -45,7 +46,9 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
   }
 
   public createDefaultEdgeView(graph: Graph, startNodeView: NodeView, endNodeView: NodeView): EdgeView {
-    let newEdge: Edge = new Edge(startNodeView.node, endNodeView.node);
+    const edgeOrientation = graph.orientation === GraphOrientation.NON_ORIENTED ?
+      EdgeOrientation.NON_ORIENTED : EdgeOrientation.ORIENTED
+    let newEdge: Edge = new Edge(startNodeView.node, endNodeView.node, edgeOrientation);
     const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
