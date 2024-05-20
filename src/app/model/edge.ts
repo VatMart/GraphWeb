@@ -64,8 +64,12 @@ export class Edge {
  */
 export class EdgeIndex {
   private readonly _value: string;
+  readonly from: number;
+  readonly to: number;
 
   constructor(from: number, to: number) {
+    this.from = from;
+    this.to = to;
     // Create a unique index by concatenating the node indexes
     this._value = `${from}-${to}`;
   }
@@ -84,6 +88,21 @@ export class EdgeIndex {
    */
   static fromEdge(edge: Edge): EdgeIndex {
     return new this(edge.firstNode.index, edge.secondNode.index)
+  }
+
+  /**
+   * Get Edge index from string.
+   */
+  static fromString(input: string): EdgeIndex {
+    const [fromStr, toStr] = input.split('-');
+    const from = parseInt(fromStr, 10);
+    const to = parseInt(toStr, 10);
+
+    if (isNaN(from) || isNaN(to)) {
+      throw new Error('Invalid input string'); // TODO change
+    }
+
+    return new this(from, to);
   }
 
   get value(): string {

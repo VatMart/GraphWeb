@@ -25,6 +25,10 @@ export class Graph {
     }
   }
 
+  public isEmpty(): boolean {
+    return this.nodes.size === 0;
+  }
+
   getNodes(): Map<number, Node> {
     return this.nodes;
   }

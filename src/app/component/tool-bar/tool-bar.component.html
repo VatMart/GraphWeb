@@ -72,36 +72,6 @@
     </svg>
   </button>
 
-  <!-- Dropdown Menus -->
-<!--  <clr-dropdown>-->
-<!--    <button clrDropdownTrigger class="btn btn-outline-primary" id="menuButtonShow">-->
-<!--      Show-->
-<!--      <clr-icon shape="caret down"></clr-icon>-->
-<!--    </button>-->
-<!--    <clr-dropdown-menu *clrIfOpen>-->
-<!--      <label class="dropdown-item">-->
-<!--        <input type="checkbox" id="checkNames">-->
-<!--        <span class="dropdown-item-description">Names</span>-->
-<!--      </label>-->
-<!--      <label class="dropdown-item">-->
-<!--        <input type="checkbox" id="showWeightsEdges">-->
-<!--        <span class="dropdown-item-description">Weights</span>-->
-<!--      </label>-->
-<!--    </clr-dropdown-menu>-->
-<!--  </clr-dropdown>-->
-<!--  <clr-dropdown>-->
-<!--    <button clrDropdownTrigger class="btn btn-outline-primary" id="pathButton">-->
-<!--      Path-->
-<!--      <clr-icon shape="caret down"></clr-icon>-->
-<!--    </button>-->
-<!--    <clr-dropdown-menu *clrIfOpen>-->
-<!--      <a href="#" class="dropdown-item">Wide Search</a>-->
-<!--      <a href="#" class="dropdown-item">Depth Search</a>-->
-<!--      <a href="#" class="dropdown-item">Dijkstra</a>-->
-<!--      <a href="#" class="dropdown-item">Find Cycles</a>-->
-<!--    </clr-dropdown-menu>-->
-<!--  </clr-dropdown>-->
-
   <!-- Undo/Redo Buttons -->
   <button class="graph-web-button"
           (click)="undoAction()"
@@ -150,8 +120,8 @@
               </clr-toggle-wrapper>
             </clr-toggle-container>
           </div>
+          <!-- TODO add show/hid Index of vertexes -->
 
-          <!-- TODO use select component-->
           <label class="dropdown-header" aria-hidden="true">Graph orientation</label>
           <div class="dropdown-item">
             <clr-select-container>
@@ -167,28 +137,28 @@
       </clr-dropdown>
     </div>
 
-    <div>
+    <div *ngIf="!isMobileDevice">
       <!-- scale (lens) button -->
       <clr-dropdown>
-      <button clrDropdownTrigger class="graph-web-button" id="mbScale" style="padding-inline: 3px">
-        100%
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="31" viewBox="-1 -0.5 7 7" fill="none">
-          <path
-            d="M2.142.151C1.272.134.454.802.294 1.657.11 2.48.56 3.385 1.324 3.738c.436.212.954.245 1.412.088a.83.83 0 0 0 .753.247c.375.41.742.825 1.12 1.23.247.244.688.017.694-.31.007-.248-.227-.389-.363-.566L4.1 3.5c.05-.248-.068-.496-.253-.657.375-.753.153-1.737-.505-2.26a1.9 1.9 0 0 0-1.2-.43m0 .693c.634-.016 1.181.568 1.165 1.194.016.626-.53 1.21-1.165 1.194-.634.015-1.18-.569-1.164-1.194C.966 1.41 1.502.834 2.142.846"
-            fill="currentColor"/>
-        </svg>
-        <clr-icon shape="caret down"></clr-icon>
-      </button>
-      <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>
-        <a href="#" class="dropdown-item">200%</a>
-        <a href="#" class="dropdown-item">150%</a>
-        <a href="#" class="dropdown-item">125%</a>
-        <a href="#" class="dropdown-item">100%</a>
-        <a href="#" class="dropdown-item">75%</a>
-        <a href="#" class="dropdown-item">50%</a>
-        <a href="#" class="dropdown-item">25%</a>
-      </clr-dropdown-menu>
-    </clr-dropdown>
+        <button clrDropdownTrigger class="graph-web-button" id="mbScale" style="padding-inline: 3px">
+          100%
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="31" viewBox="-1 -0.5 7 7" fill="none">
+            <path
+              d="M2.142.151C1.272.134.454.802.294 1.657.11 2.48.56 3.385 1.324 3.738c.436.212.954.245 1.412.088a.83.83 0 0 0 .753.247c.375.41.742.825 1.12 1.23.247.244.688.017.694-.31.007-.248-.227-.389-.363-.566L4.1 3.5c.05-.248-.068-.496-.253-.657.375-.753.153-1.737-.505-2.26a1.9 1.9 0 0 0-1.2-.43m0 .693c.634-.016 1.181.568 1.165 1.194.016.626-.53 1.21-1.165 1.194-.634.015-1.18-.569-1.164-1.194C.966 1.41 1.502.834 2.142.846"
+              fill="currentColor"/>
+          </svg>
+          <clr-icon shape="caret down"></clr-icon>
+        </button>
+        <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>
+          <a href="#" class="dropdown-item">200%</a>
+          <a href="#" class="dropdown-item">150%</a>
+          <a href="#" class="dropdown-item">125%</a>
+          <a href="#" class="dropdown-item">100%</a>
+          <a href="#" class="dropdown-item">75%</a>
+          <a href="#" class="dropdown-item">50%</a>
+          <a href="#" class="dropdown-item">25%</a>
+        </clr-dropdown-menu>
+      </clr-dropdown>
     </div>
   </div>
 </div>

@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+* {
+  font-family: 'Metropolis', sans-serif;
+  font-size: medium;
+  font-weight: bold;
+  --clr-toggle-bg-color-off: #adadad;
+  --clr-toggle-handle-border-color: black;
+  --clr-toggle-handle-border-color-on: black;
+  --clr-forms-focused-color: #006FFF;
+  --clr-toggle-bg-color-on: #006FFF;
+}
+
+.move-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}

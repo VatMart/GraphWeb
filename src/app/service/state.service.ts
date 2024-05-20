@@ -56,6 +56,13 @@ export class StateService {
   public edgeDeleted$ = this.edgeDeletedSource.asObservable();
 
   // Graph related events
+  /**
+   * State of any changes with graph (added node/edge, deleted node/edge, changed weight, changed orientation etc.).
+   * Be careful with this event, if you already subscribed to child events (nodeAdded$, nodeDeleted$ etc.).
+   */
+  private graphChangedSource = new BehaviorSubject<boolean>(false);
+  public graphChanged$ = this.graphChangedSource.asObservable();
+
   private graphClearedSource = new BehaviorSubject<boolean>(false);
   public graphCleared$ = this.graphClearedSource.asObservable();
 
@@ -110,6 +117,7 @@ export class StateService {
    */
   graphCleared() {
    this.graphClearedSource.next(true);
+   this.graphChangedSource.next(true);
   }
 
   /**
@@ -131,6 +139,7 @@ export class StateService {
    */
   graphOrientationChanged(value: GraphOrientation) {
     this.graphOrientationChangedSource.next(value);
+    this.graphChangedSource.next(true);
   }
 
   /**
@@ -166,6 +175,7 @@ export class StateService {
    */
   addedNode(nodeView: NodeView) {
     this.nodeAddedSource.next(nodeView);
+    this.graphChangedSource.next(true);
   }
 
   /**
@@ -173,6 +183,7 @@ export class StateService {
    */
   deletedNode(nodeView: NodeView) {
     this.nodeDeletedSource.next(nodeView);
+    this.graphChangedSource.next(true);
   }
 
   /**
@@ -180,6 +191,7 @@ export class StateService {
    */
   addedEdge(edgeView: EdgeView) {
     this.edgeAddedSource.next(edgeView);
+    this.graphChangedSource.next(true);
   }
 
   /**
@@ -187,5 +199,6 @@ export class StateService {
    */
   deletedEdge(edgeView: EdgeView) {
     this.edgeDeletedSource.next(edgeView);
+    this.graphChangedSource.next(true);
   }
 }

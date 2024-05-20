@@ -1,32 +1,31 @@
 <main class="main">
   <body cds-theme="light">
-<!--  TODO REMAKE HEADER-->
-<!--  <header class="header-6">-->
-<!--    <div class="branding">-->
-<!--      <a>-->
-<!--        <img class="logo" ngSrc="assets/logo_white.png" priority alt="logo" height="251" width="249"/>-->
-<!--        <span class="title">{{title}}</span>-->
-<!--      </a>-->
-<!--    </div>-->
-<!--    <div class="header-nav">-->
-<!--      <a href="" class="active nav-link nav-text">Test</a>-->
-<!--      <a href="" class="nav-link nav-text">About</a>-->
-<!--    </div>-->
-<!--    <div class="header-actions">-->
-<!--      <a href="" class="nav-link nav-icon" aria-label="help">-->
-<!--        <cds-icon shape="help"></cds-icon>-->
-<!--      </a>-->
-<!--    </div>-->
-<!--  </header>-->
-  <div>
-    <section>
-      <app-tool-bar/>
-    </section>
-  </div>
-  <div>
-    <section>
-      <app-canvas/>
-    </section>
-  </div>
+  <!--  TODO REMAKE HEADER-->
+  <!--  <header class="header-6">-->
+  <!--    <div class="branding">-->
+  <!--      <a>-->
+  <!--        <img class="logo" ngSrc="assets/logo_white.png" priority alt="logo" height="251" width="249"/>-->
+  <!--        <span class="title">{{title}}</span>-->
+  <!--      </a>-->
+  <!--    </div>-->
+  <!--    <div class="header-nav">-->
+  <!--      <a href="" class="active nav-link nav-text">Test</a>-->
+  <!--      <a href="" class="nav-link nav-text">About</a>-->
+  <!--    </div>-->
+  <!--    <div class="header-actions">-->
+  <!--      <a href="" class="nav-link nav-icon" aria-label="help">-->
+  <!--        <cds-icon shape="help"></cds-icon>-->
+  <!--      </a>-->
+  <!--    </div>-->
+  <!--  </header>-->
+    <div class="main-container">
+      <div>
+        <app-tool-bar/>
+      </div>
+      <div class="content-container">
+        <app-left-side-nav/>
+        <app-canvas/>
+      </div>
+    </div>
   </body>
 </main>

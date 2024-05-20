@@ -5,11 +5,10 @@
   justify-content: flex-start;
   padding-inline: 5px;
   background-color: #e8e8e8; /* TODO CHANGE*/
-  margin-top: 2px;
-  margin-left: 2px;
-  border-width: 2px;
-  border-style: solid;
-  border-block-color: black;
+  /*margin-top: 2px;*/
+  border-block-width: 1px;
+  border-block-style: solid;
+  border-block-color: var(--clr-vertical-nav-trigger-divider-border-color);
 }
 
 .coordinates-panel {
@@ -74,20 +73,4 @@
 option {
   font-size: unset;
   font-weight: normal;
-}
-
-* {
-  font-family: 'Metropolis', sans-serif;
-  font-size: medium;
-  font-weight: bold;
-}
-
-.move-right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  --clr-toggle-bg-color-off: #adadad;
-  --clr-toggle-handle-border-color: black;
-  --clr-toggle-handle-border-color-on: black;
 }
