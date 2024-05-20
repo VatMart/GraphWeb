@@ -57,7 +57,10 @@ export class EdgeView extends Graphics implements GraphElement {
     this._nodeStyle = nodeStyle;
   }
 
-  public draw() {
+  /**
+   * Draw edge between two nodes. Should be called after creating edge and moving adjacent nodes.
+   */
+  private draw() {
     this.clear();
     // Draw Arrow of edge first, because it reset end point coordinates
     if (this._edge.orientation === EdgeOrientation.ORIENTED) {

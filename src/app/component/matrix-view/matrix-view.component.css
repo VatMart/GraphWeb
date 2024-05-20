@@ -1,0 +1,17 @@
+* {
+}
+
+.matrix-table-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+th {
+  font-weight: bold;
+  font-family: Calibri,serif;
+  font-size: 18px
+}
+
+td {
+  font-weight: normal;
+}

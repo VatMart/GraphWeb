@@ -50,6 +50,10 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     return this._node.index;
   }
 
+  /**
+   * Draw node with label.
+   * Should be called after creating node. Since it use texture, node shouldn't be redrawn when moving.
+   */
   private draw(): void {
     this._text.text = this._labelText;
     this._text.style = new PIXI.TextStyle({

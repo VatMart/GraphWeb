@@ -42,14 +42,14 @@ export class CanvasComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    let someElement = document.getElementById('testId');
+    let someElement = document.getElementById('canvasContainer');
     // document.documentElement.clientHeight
     await this.pixiService.getApp().init({
       antialias: true, background: '#F5F5F5', width: window.innerWidth,
       height: window.innerHeight - 200, preference: 'webgpu', webgpu: {antialias: true, bezierSmoothness: 1},
       bezierSmoothness: 1
     });
-    document.body.appendChild(this.pixiService.getApp().canvas);
+    someElement?.appendChild(this.pixiService.getApp().canvas);
     // TODO move to Pixi service
     this.pixiService.getApp().stage.eventMode = 'dynamic';
     this.pixiService.getApp().stage.hitArea = this.pixiService.getApp().screen;

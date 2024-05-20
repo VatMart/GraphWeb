@@ -1,31 +1,26 @@
-import {Component, OnInit} from '@angular/core';
-import {RouterOutlet} from '@angular/router';
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {Component} from '@angular/core';
 import {ToolBarComponent} from "./component/tool-bar/tool-bar.component";
 import {ClarityModule} from "@clr/angular";
-import {NgOptimizedImage} from "@angular/common";
 import '@clr/icons';
 import '@clr/icons/clr-icons.min.css';
 import '@cds/core/icon/register.js';
 import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/event/mode-manager.service";
 import {GraphStateManagerService} from "./service/graph-state-manager.service";
+import {LeftSideNavComponent} from "./component/left-side-nav/left-side-nav.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HttpClientModule, ToolBarComponent, CanvasComponent, ClarityModule, NgOptimizedImage],
+  imports: [ToolBarComponent, CanvasComponent, ClarityModule, LeftSideNavComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'GraphWeb';
 
-  constructor(private http: HttpClient,
-              private modeManagerService: ModeManagerService,
-              private graphStateManager: GraphStateManagerService) {}
-
-  async ngOnInit(): Promise<void> {
+  constructor(private modeManagerService: ModeManagerService,
+              private graphStateManager: GraphStateManagerService) {
   }
 
 }

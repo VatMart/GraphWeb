@@ -1,0 +1,71 @@
+/* Adjust clarity components */
+* {
+  --clr-vertical-nav-bg-color: #e8e8e8;
+  --clr-vertical-nav-toggle-icon-color: black;
+  --clr-vertical-nav-item-color: black;
+  --clr-vertical-nav-item-child-padding: var(--cds-global-space-5) var(--cds-global-space-6) var(--cds-global-space-5) 16px;
+}
+
+.clr-vertical-nav {
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: var(--clr-vertical-nav-trigger-divider-border-color);
+  width: auto;
+}
+
+.nav-group-text {
+  padding-left: 4px;
+  font-size: 16px;
+}
+
+.nav-text {
+  padding-left: 4px;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.matrix-icon {
+  margin-left: 8px !important;
+}
+
+.close-button {
+  background-color: transparent;
+  border: none;
+  background-clip: content-box;
+  padding: 0;
+  opacity: 80%;
+}
+
+.close-button:not(:disabled):hover {
+  /*background-color: #DCDCDC;*/
+  color: #006FFF;
+}
+
+.left-side-content-header {
+  display: flex;
+  justify-content: center;
+}
+
+.left-side-content-header > h3 {
+  margin-block: 8px;
+}
+
+
+/* Other components styles */
+.left-side-content-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-content: stretch;
+  height: 100%;
+  padding: 8px;
+  min-width: 280px; /*TODO CHANGE*/
+  max-width: 280px;
+  background-color: #e8e8e8; /*TODO CHANGE*/
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: var(--clr-vertical-nav-trigger-divider-border-color);
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: var(--clr-vertical-nav-trigger-divider-border-color);
+}
