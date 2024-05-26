@@ -24,9 +24,14 @@
 /* Regular button styles */
 .graph-web-button, .graph-web-toggle-button {
   background-color: transparent;
+  color: black;
   border: none;
   margin: 3px;
   border-radius: 10px;
+}
+
+.graph-web-button:disabled, .graph-web-toggle-button:disabled {
+  color: #adadad;
 }
 
 .graph-web-toggle-button:not(:disabled):hover, .graph-web-button:not(:disabled):hover {

@@ -1,4 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+@import "primeicons/primeicons.css";
+
 * {
   font-family: 'Metropolis', sans-serif;
   font-size: medium;
@@ -15,4 +17,53 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+}
+
+/* Style for the overall scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the vertical scrollbar */
+  height: 8px; /* Height of the horizontal scrollbar */
+}
+
+/* Style for the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+}
+
+/* Style for the scrollbar thumb when hovered */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Darker color when hovered */
+}
+
+/* Style for the scrollbar track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the scrollbar track */
+  border-radius: 10px; /* Rounded corners for the scrollbar track */
+}
+
+/* Mobile styles */
+.p-tabmenu .p-tabmenu-nav {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-width: 2px 0 0 0;
+}
+
+.p-tabmenuitem .p-menuitem-link {
+  border: 1px solid #e5e7eb;
+  border-width: 2px 0 0 0;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  margin: -2px 0 0 0;
+  padding: 0.5rem 1rem;
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link {
+  background: #ffffff;
+  border-color: #3B82F6;
+  color: #3B82F6;
+}
+
+.black-icon {
+  color: black;
 }

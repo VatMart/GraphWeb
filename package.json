@@ -25,6 +25,7 @@
     "@webcomponents/custom-elements": "^1.6.0",
     "bootstrap": "^5.3.3",
     "pixi.js": "^8.1.1",
+    "primeicons": "^7.0.0",
     "primeng": "^17.17.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

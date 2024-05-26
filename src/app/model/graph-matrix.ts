@@ -5,6 +5,8 @@ export class GraphMatrix {
    */
   public matrix: number[][];
 
+  private _vertexIndexes: number[] = [];
+
   constructor(matrix?: number[][], type?: TypeMatrix) {
     matrix ? this.matrix = matrix : this.matrix = [];
   }
@@ -14,9 +16,19 @@ export class GraphMatrix {
       .map(row => row.join(', '))
       .join(';\n') + ';';
   }
+
+
+  get vertexIndexes(): number[] {
+    return this._vertexIndexes;
+  }
+
+  set vertexIndexes(value: number[]) {
+    console.log('Setting vertex indexes: ' + value);
+    this._vertexIndexes = value;
+  }
 }
 
 export enum TypeMatrix {
-  ADJACENCY,
-  INCIDENCE
+  ADJACENCY = 'Adjacency',
+  INCIDENCE = 'Incidence'
 }
