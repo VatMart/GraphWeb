@@ -18,12 +18,12 @@
   <!--      </a>-->
   <!--    </div>-->
   <!--  </header>-->
-    <div class="main-container">
+    <div [ngClass]="isMobileDevice ? 'main-body-mobile-container' : 'main-body-desktop-container'">
       <div>
         <app-tool-bar/>
       </div>
-      <div class="content-container">
-        <app-left-side-nav/>
+      <div [ngClass]="isMobileDevice ? 'main-content-mobile-container' : 'main-content-desktop-container'">
+        <app-tab-nav/>
         <app-canvas/>
       </div>
     </div>

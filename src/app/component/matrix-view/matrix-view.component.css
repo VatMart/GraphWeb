@@ -1,17 +1,84 @@
 * {
 }
 
-.matrix-table-wrapper {
+.matrix-type-container {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  padding-top: 16px;
+  padding-bottom: 4px;
+}
+
+.matrix-type-label {
+  display: block;
+  color: var(--clr-forms-label-color);
+  font-weight: var(--clr-forms-label-font-weight);
+  line-height: var(--cds-alias-typography-secondary-line-height);
+  letter-spacing: var(--cds-alias-typography-secondary-letter-spacing);
+  padding-right: 4px;
+}
+
+.matrix-table-container {
+  display: flex;
+  flex-grow: 1;
+}
+
+.matrix-table-wrapper {
+  display: flow;
+  max-width: calc(100% - 43px - 4px);
+  min-width: calc(100% - 43px - 4px);
+  /*overflow: ;*/
+  /*flex-direction: row;*/
+}
+
+.graph-web-button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  background-clip: content-box;
+  padding-inline: 4px;
+}
+
+.graph-web-button:not(:disabled):hover {
+  /*background-color: #DCDCDC;*/
+  color: #006FFF;
+}
+
+.th-first {
+  width: 5px;
+}
+
+.td-first {
+  font-weight: bold;
+  font-family: Calibri,serif;
+  font-size: 18px;
+  background-color: #F9FAFB;
+}
+
+.matrix-vertical-bar-container {
+  display: flex;
+  flex-direction: column;
+  margin-inline: 4px;
+  height: fit-content;
+  background-color: black; /*TODO Change to black */
+  opacity: 80%;
+  border-radius: 10px;
 }
 
 th {
+  text-align: center;
+  vertical-align: middle;
   font-weight: bold;
   font-family: Calibri,serif;
   font-size: 18px
 }
 
 td {
+  text-align: center;
+  vertical-align: middle;
   font-weight: normal;
+}
+
+clr-select-container {
+  margin-top: 0;
 }

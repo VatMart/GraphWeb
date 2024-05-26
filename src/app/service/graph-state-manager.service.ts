@@ -17,8 +17,7 @@ export class GraphStateManagerService {
 
   constructor(private stateService: StateService,
               private historyService: HistoryService,
-              private graphService: GraphViewService,
-              private matrixService: GraphMatrixService) {
+              private graphService: GraphViewService) {
     // Subscribe to state changes
     // Change edge weights visibility
     this.stateService.showWeights$.subscribe(showWeights => {
@@ -40,10 +39,6 @@ export class GraphStateManagerService {
       }
       const command = new ChangeGraphOrientationCommand(this.graphService, orientation);
       this.historyService.execute(command);
-    });
-    // Only during developing matrix implementation. TODO CHANGE
-    this.stateService.graphChanged$.subscribe(() => {
-      this.matrixService.buildMatrixFromGraph(this.graphService.currentGraph, TypeMatrix.ADJACENCY); // Only for testing
     });
   }
 }

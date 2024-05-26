@@ -42,7 +42,7 @@ export class CanvasComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    let someElement = document.getElementById('canvasContainer');
+    let someElement = document.getElementsByClassName('canvas-container').item(0);
     // document.documentElement.clientHeight
     await this.pixiService.getApp().init({
       antialias: true, background: '#F5F5F5', width: window.innerWidth,

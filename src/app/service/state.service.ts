@@ -4,6 +4,7 @@ import {ModeState} from "./event/mode-manager.service";
 import {NodeView} from "../model/graphical-model/node/node-view";
 import {EdgeView} from "../model/graphical-model/edge/edge-view";
 import {GraphOrientation} from "../model/orientation";
+import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
 
 /**
  * Service for managing the state of the application.
@@ -13,6 +14,9 @@ import {GraphOrientation} from "../model/orientation";
 })
 export class StateService {
 
+  // --------------------------------------------------
+  // UI component states. Tool bar
+  // --------------------------------------------------
   // Can undo and redo
   private canUndoSource = new BehaviorSubject<boolean>(false);
   public canUndo$ = this.canUndoSource.asObservable();
@@ -35,12 +39,30 @@ export class StateService {
   private stateAddEdgesSource = new BehaviorSubject<boolean>(false);
   public currentAddEdgesState = this.stateAddEdgesSource.asObservable();
 
+  // --------------------------------------------------
+  // UI component states. Matrix view states
+  // --------------------------------------------------
+  private matrixViewVisibilitySource = new BehaviorSubject<boolean>(false);
+  public matrixViewVisibility$ = this.matrixViewVisibilitySource.asObservable();
+
+  private matrixTypeSource = new BehaviorSubject<TypeMatrix>(TypeMatrix.ADJACENCY);
+  public currentMatrixType$ = this.matrixTypeSource.asObservable();
+
+  private matrixSource = new BehaviorSubject<GraphMatrix | null>(null);
+  public currentMatrix$ = this.matrixSource.asObservable();
+
+  // --------------------------------------------------
+  // UI component states. Canvas
+  // --------------------------------------------------
   // Canvas cursor coordinates
   private cursorXSource = new BehaviorSubject<number>(0);
   private cursorYSource = new BehaviorSubject<number>(0);
   public currentCursorX = this.cursorXSource.asObservable();
   public currentCursorY = this.cursorYSource.asObservable();
 
+  // --------------------------------------------------
+  // Graph elements and graph states
+  // --------------------------------------------------
   // Node related events
   private nodeAddedSource = new BehaviorSubject<NodeView | null>(null);
   public nodeAdded$ = this.nodeAddedSource.asObservable();
@@ -140,6 +162,29 @@ export class StateService {
   graphOrientationChanged(value: GraphOrientation) {
     this.graphOrientationChangedSource.next(value);
     this.graphChangedSource.next(true);
+  }
+
+  /**
+   * Change the visibility of the matrix view.
+   */
+  changedMatrixViewVisibility(value: boolean) {
+    console.log("Matrix view visibility changed: " + value);
+    this.matrixViewVisibilitySource.next(value);
+  }
+
+  /**
+   * Change the matrix type.
+   */
+  changeMatrixType(type: TypeMatrix) {
+    console.log("Matrix type changed: " + type);
+    this.matrixTypeSource.next(type);
+  }
+
+  /**
+   * Change the matrix.
+   */
+  changeMatrix(matrix: GraphMatrix) {
+    this.matrixSource.next(matrix);
   }
 
   /**

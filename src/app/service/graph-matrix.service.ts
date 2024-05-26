@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Graph} from "../model/graph";
 import {Node} from "../model/node";
 import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";

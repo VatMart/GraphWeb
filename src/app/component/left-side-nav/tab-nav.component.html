@@ -1,0 +1,94 @@
+<ng-container *ngIf="!isMobileDevice; else bottomNavTab">
+  <div class="main-container">
+    <div class="content-container">
+      <clr-vertical-nav class="clr-vertical-nav" [clrVerticalNavCollapsible]="true">
+        <div class="nav-content">
+          <!-- template for group elements -->
+          <!--          <clr-vertical-nav-group [clrVerticalNavGroupExpanded]="clrVerticalNavGroupExpanded"-->
+          <!--                                  (clrVerticalNavGroupExpandedChange)="clrVerticalNavGroupExpandedChange($event)">-->
+          <!--            <cds-icon class="matrix-icon" *ngIf="includeIcons" shape="matrix-icon" clrVerticalNavIcon></cds-icon>-->
+          <!--            <div class="nav-group-text"> Matrices</div>-->
+          <!--            <clr-vertical-nav-group-children>-->
+          <!--              <a *ngFor="let navLink of matricesLinks; let index = index" clrVerticalNavLink-->
+          <!--                 [ngClass]="{ active: index == activeIndex }"-->
+          <!--                 href="javascript:void(0)"-->
+          <!--                 (click)="onMatrixItemClick(index)">-->
+          <!--                <cds-icon *ngIf="includeIcons" [attr.shape]="navLink.iconShapeTuple[0]" clrVerticalNavIcon></cds-icon>-->
+          <!--                <a class="nav-text">-->
+          <!--                  {{ navLink.navName }}-->
+          <!--                </a>-->
+          <!--              </a>-->
+          <!--            </clr-vertical-nav-group-children>-->
+          <!--          </clr-vertical-nav-group>-->
+          <a clrVerticalNavLink class="nav-link" href="javascript:void(0)"
+             [ngClass]="{ active: activeIndex !== null }"
+             (click)="onMatrixItemClick()">
+            <cds-icon class="matrix-icon" *ngIf="includeIcons" shape="matrix-icon" clrVerticalNavIcon></cds-icon>
+            Matrices
+          </a>
+        </div>
+      </clr-vertical-nav>
+      <div class="left-side-content-container" *ngIf="activeIndex !== null">
+        <div class="left-side-content-header">
+          <h3>Matrix view</h3>
+          <button class="close-button move-right"
+                  (click)="onCloseLeftSideContainer()"
+                  (mouseleave)="useCloseButtonGradient = false"
+                  (mousedown)="useCloseButtonGradient = true"
+                  (mouseup)="useCloseButtonGradient = false">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 20 20" width="35" height="38"
+                 [attr.fill]="useCloseButtonGradient ? 'url(#grad1)' : 'currentColor'">
+              <ng-container *ngIf="useCloseButtonGradient">
+                <defs>
+                  <linearGradient id="grad1" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="#ff0000"/>
+                    <stop offset="100%" stop-color="#FFC618"/>
+                  </linearGradient>
+                </defs>
+              </ng-container>
+              <path
+                d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m4.707 13.293a.999.999 0 1 1-1.414 1.414L12 13.414l-3.293 3.293a.997.997 0 0 1-1.414 0 1 1 0 0 1 0-1.414L10.586 12 7.293 8.707a.999.999 0 1 1 1.414-1.414L12 10.586l3.293-3.293a.999.999 0 1 1 1.414 1.414L13.414 12z"/>
+            </svg>
+          </button>
+
+        </div>
+        <div class="content-separator"></div>
+        <!-- TODO -->
+        <app-matrix-view/>
+
+      </div>
+    </div>
+  </div>
+</ng-container>
+<ng-template #bottomNavTab>
+  <div #tabMenuContainer></div>
+  <div class="mobile-tab-menu">
+    <p-tabMenu [model]="items" [(activeItem)]="activeItem">
+      <ng-template pTemplate="item" let-item let-i="index">
+        <a pRipple class="p-menuitem-link" (click)="onMobileTabMenuActiveItemChange(i)">
+          <ng-container *ngIf="svgIconService.getIcon(item.icon); else defaultIcon">
+              <span class="custom-icon-container">
+                <span appSvgIcon [appSvgIcon]="item.icon"></span>
+              </span>
+          </ng-container>
+          <!-- Find icon in primeng icons -->
+          <ng-template #defaultIcon>
+            <span class="black-icon p-menuitem-icon" [class]="item.icon"></span>
+          </ng-template>
+          <span class="font-bold">
+                {{ item.label }}
+          </span>
+        </a>
+      </ng-template>
+    </p-tabMenu>
+  </div>
+  <p-sidebar [visible]="bottomPanelVisible"
+             (visibleChange)="onBottomPanelVisible($event)"
+             (onHide)="onBottomPanelHide()"
+             [appendTo]="tabMenuContainer"
+             autoZIndex="false"
+             [modal]="false"
+             [fullScreen]="true">
+    <app-matrix-view/>
+  </p-sidebar>
+</ng-template>
