@@ -1,7 +1,9 @@
-.main-body-desktop-container{
+.main-body-desktop-container {
+  background-color: #F5F5F5; /* TODO CHANGE to same as canvas*/
 }
 
 .main-body-mobile-container {
+  background-color: #F5F5F5; /* TODO CHANGE to same as canvas*/
 }
 
 .main-content-mobile-container {

@@ -62,7 +62,7 @@
 </ng-container>
 <ng-template #bottomNavTab>
   <div #tabMenuContainer></div>
-  <div class="mobile-tab-menu">
+  <div id="mobile-navbar" class="mobile-tab-menu">
     <p-tabMenu [model]="items" [(activeItem)]="activeItem">
       <ng-template pTemplate="item" let-item let-i="index">
         <a pRipple class="p-menuitem-link" (click)="onMobileTabMenuActiveItemChange(i)">

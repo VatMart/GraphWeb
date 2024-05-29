@@ -118,7 +118,7 @@ export class TabNavComponent implements OnInit {
   onBottomPanelVisible($event: boolean) {
     console.log('onBottomPanelVisible:', $event);
     this.bottomPanelVisible = $event;
-    this.stateService.changedMatrixViewVisibility($event);
+    this.stateService.changedMatrixViewVisibility($event); // TODO CHANGE
     if (this.items) {
       console.log('test:');
       this.activeItem = undefined;

@@ -6,7 +6,7 @@ import {AddRemoveVertexMode} from "../../logic/event/add-remove-vertex-mode";
 import {AddRemoveEdgeMode} from "../../logic/event/add-remove-edge-mode";
 import {PixiService} from "../pixi.service";
 import {GraphViewService} from "../graph-view.service";
-import {EventBusService} from "./event-bus.service";
+import {EventBusService} from "../event-bus.service";
 import {NodeViewFabricService} from "../node-view-fabric.service";
 import {HistoryService} from "../history.service";
 import {EdgeViewFabricService} from "../edge-view-fabric.service";
@@ -20,9 +20,9 @@ import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 })
 export class ModeManagerService {
 
-  private modeStateActions: { [key in ModeState]: ModeBehavior };
+  private modeStateActions!: { [key in ModeState]: ModeBehavior };
 
-  private currentModeState: ModeState;
+  private currentModeState!: ModeState;
 
   constructor(private stateService: StateService,
               private eventBus: EventBusService,
@@ -31,13 +31,19 @@ export class ModeManagerService {
               private edgeViewFabricService: EdgeViewFabricService,
               private historyService: HistoryService,
               private graphViewService: GraphViewService) {
+  }
 
+  /**
+   * Initialize the mode manager service.
+   * Should be called after all ui components are initialized (including Pixi canvas)
+   */
+  initialize(): void {
     this.modeStateActions = {
-      'default': new DefaultMode(pixiService, eventBus, historyService, graphViewService),
-      'AddRemoveVertex': new AddRemoveVertexMode(pixiService, eventBus, nodeViewFabricService, historyService,
-        graphViewService),
-      'AddRemoveEdge': new AddRemoveEdgeMode(pixiService, eventBus, nodeViewFabricService, edgeViewFabricService, historyService,
-        graphViewService)
+      'default': new DefaultMode(this.pixiService, this.eventBus, this.historyService, this.graphViewService),
+      'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.nodeViewFabricService,this.historyService,
+        this.graphViewService),
+      'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.nodeViewFabricService, this.edgeViewFabricService, this.historyService,
+        this.graphViewService)
       // TODO Add selection mode for mobile devices (for multiple selection)
     };
 
@@ -91,7 +97,7 @@ export class ModeManagerService {
     this.currentModeState = 'default';
   }
 
-  updateModeState(newState: ModeState) {
+  private updateModeState(newState: ModeState) {
     if (this.modeStateActions[this.currentModeState]) {
       this.modeStateActions[this.currentModeState].modeOff(); // Turn off current mode
     }

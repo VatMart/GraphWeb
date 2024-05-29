@@ -22,7 +22,7 @@ export class EventBusService {
   public registerPixiEvent(target: PIXI.EventEmitter, event: string, handlerName: string, handler?: any) {
     if (!handler) {
       if (!this.hasHandler(handlerName)) {
-        console.log(`Can't register handler. Handler: ${handlerName} is not registered.`); // TODO throw exception
+        console.error(`Can't register handler. Handler: ${handlerName} is not registered.`); // TODO throw exception
         return;
       } else {
         handler = this.getHandler(handlerName); // Get the handler from the map
@@ -60,6 +60,28 @@ export class EventBusService {
         this.eventSubscriptions.delete(event);
       }
     }
+  }
+
+  /**
+   * Registers a TypeScript event and subscribes the handler to the corresponding Subject.
+   */
+  public registerTsEvent(target: EventTarget, event: string, handlerName: string, handler?: any) {
+    if (!handler) {
+      if (!this.hasHandler(handlerName)) {
+        console.error(`Can't register handler. Handler: ${handlerName} is not registered.`); // TODO throw exception
+        return;
+      } else {
+        handler = this.getHandler(handlerName); // Get the handler from the map
+      }
+    } else if (!this.hasHandler(handlerName)) {
+      this.registerHandler(handlerName, handler);
+    }
+    target.addEventListener(event, handler);  // Attach handler to the event target
+    let sub = this.getEventSubject(event).subscribe(handler);  // Subscribe handler to the Subject
+    if (!this.eventSubscriptions.has(event)) {
+      this.eventSubscriptions.set(event, new Map<any, Subscription>());
+    }
+    this.eventSubscriptions.get(event)?.set(handler, sub);  // Store the subscription
   }
 
   /**
@@ -144,4 +166,5 @@ export const HandlerNames = {
   CANVAS_CONTEXT_MENU: 'canvasContextMenu', // Handler for the canvas context menu
   CANVAS_ADD_REMOVE_NODE: 'canvasAddRemoveNode', // Handler for the node add/remove for click on canvas/node
   CANVAS_ADD_REMOVE_EDGE: 'canvasAddRemoveEdge', // Handler for the node add edge event
+  CANVAS_RESIZE: 'canvasResize', // Handler for the canvas resize event
 }

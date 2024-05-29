@@ -1,8 +1,8 @@
-import {ModeBehavior} from "../../service/event/mode-manager.service";
+import {ModeBehavior} from "../../service/manager/mode-manager.service";
 import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
 import {DEFAULT_NODE_STYLE, NodeStyle, NodeView} from "../../model/graphical-model/node/node-view";
-import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {EventBusService, HandlerNames} from "../../service/event-bus.service";
 import {FederatedPointerEvent} from "pixi.js";
 import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
@@ -74,11 +74,11 @@ export class AddRemoveEdgeMode implements ModeBehavior {
   }
 
   private selectableElementsOn(): void {
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerdown', HandlerNames.CANVAS_ADD_REMOVE_EDGE);
+    this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown', HandlerNames.CANVAS_ADD_REMOVE_EDGE);
   }
 
   private selectableElementsOff(): void {
-    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerdown', HandlerNames.CANVAS_ADD_REMOVE_EDGE);
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerdown', HandlerNames.CANVAS_ADD_REMOVE_EDGE);
   }
 
   private onAddRemoveEdge(event: FederatedPointerEvent): void {

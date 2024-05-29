@@ -40,7 +40,7 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
 
       const texture = RenderTexture.create({width: 2 * totalRadius, height: 2 * totalRadius, antialias: true,
         resolution: Math.max(2, window.devicePixelRatio)});
-      this.pixiService.getApp().renderer.render({container: graphics, target: texture, clear: true});
+      this.pixiService.renderer.render({container: graphics, target: texture, clear: true});
       this.textureCache.set(key, texture);
     }
     return <Texture>this.textureCache.get(key);

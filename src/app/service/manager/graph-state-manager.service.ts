@@ -1,11 +1,9 @@
 import {Injectable} from '@angular/core';
-import {GraphViewService} from "./graph-view.service";
-import {StateService} from "./state.service";
-import {EdgeView} from "../model/graphical-model/edge/edge-view";
-import {ChangeGraphOrientationCommand} from "../logic/command/change-graph-orientation-command";
-import {HistoryService} from "./history.service";
-import {GraphMatrixService} from "./graph-matrix.service";
-import {TypeMatrix} from "../model/graph-matrix";
+import {GraphViewService} from "../graph-view.service";
+import {StateService} from "../state.service";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {ChangeGraphOrientationCommand} from "../../logic/command/change-graph-orientation-command";
+import {HistoryService} from "../history.service";
 
 /**
  * Service for managing the state of the graph.
