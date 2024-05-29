@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import {StateService} from "./state.service";
-import {HistoryService} from "./history.service";
-import {GraphViewService} from "./graph-view.service";
-import {GraphMatrixService} from "./graph-matrix.service";
-import {TypeMatrix} from "../model/graph-matrix";
+import {StateService} from "../state.service";
+import {HistoryService} from "../history.service";
+import {GraphViewService} from "../graph-view.service";
+import {GraphMatrixService} from "../graph-matrix.service";
+import {TypeMatrix} from "../../model/graph-matrix";
 
 @Injectable({
   providedIn: 'root'

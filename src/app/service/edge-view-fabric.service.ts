@@ -39,7 +39,7 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
 
       const texture = RenderTexture.create({width: totalWidth, height: totalHeight, antialias: true,
         resolution: Math.max(2, window.devicePixelRatio)});
-      this.pixiService.getApp().renderer.render({container: graphics, target: texture, clear: true});
+      this.pixiService.renderer.render({container: graphics, target: texture, clear: true});
       this.textureWeightCache.set(key, texture);
     }
     return <Texture>this.textureWeightCache.get(key);

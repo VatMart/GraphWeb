@@ -20,11 +20,11 @@
   <!--  </header>-->
     <div [ngClass]="isMobileDevice ? 'main-body-mobile-container' : 'main-body-desktop-container'">
       <div>
-        <app-tool-bar/>
+        <app-tool-bar id="toolbar"/>
       </div>
       <div [ngClass]="isMobileDevice ? 'main-content-mobile-container' : 'main-content-desktop-container'">
-        <app-tab-nav/>
-        <app-canvas/>
+        <app-tab-nav id="navbar"/>
+        <app-canvas id="pixiCanvas"/>
       </div>
     </div>
   </body>

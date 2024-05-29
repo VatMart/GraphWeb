@@ -1,13 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {FederatedPointerEvent} from "pixi.js";
 import {StateService} from "../../service/state.service";
 import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
 import {Graph} from "../../model/graph";
-import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {EventBusService, HandlerNames} from "../../service/event-bus.service";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
 import * as PIXI from "pixi.js";
+import {PixiManagerService} from "../../service/manager/pixi-manager.service";
 
 /**
  * Component for the main canvas.
@@ -19,49 +20,32 @@ import * as PIXI from "pixi.js";
   templateUrl: './canvas.component.html',
   styleUrl: './canvas.component.css'
 })
-export class CanvasComponent implements OnInit {
-  // TODO create separate canvas on stage
-  private boundHandleCursorMoving: (event: FederatedPointerEvent) => void;
-  private boundHandleContextMenu: (event: any) => void;
-
-  // CursorCoordinates
-  xCursor: number = 0;
-  yCursor: number = 0;
+export class CanvasComponent implements AfterViewInit {
 
   constructor(private pixiService: PixiService,
               private stateService: StateService,
               private eventBus: EventBusService,
               private nodeFabric: NodeViewFabricService,
               private edgeFabric: EdgeViewFabricService,
-              private graphViewService: GraphViewService) {
-    this.boundHandleCursorMoving = this.handlePointerDown.bind(this);
-    this.boundHandleContextMenu = this.handlerContextMenu.bind(this);
-    // Registering event handlers
-    this.eventBus.registerHandler(HandlerNames.CANVAS_CURSOR_MOVE, this.boundHandleCursorMoving);
-    this.eventBus.registerHandler(HandlerNames.CANVAS_CONTEXT_MENU, this.boundHandleContextMenu)
+              private graphViewService: GraphViewService,
+              private pixiManager: PixiManagerService) {
   }
 
-  async ngOnInit(): Promise<void> {
-    let someElement = document.getElementsByClassName('canvas-container').item(0);
-    // document.documentElement.clientHeight
-    await this.pixiService.getApp().init({
-      antialias: true, background: '#F5F5F5', width: window.innerWidth,
-      height: window.innerHeight - 200, preference: 'webgpu', webgpu: {antialias: true, bezierSmoothness: 1},
-      bezierSmoothness: 1
-    });
-    someElement?.appendChild(this.pixiService.getApp().canvas);
-    // TODO move to Pixi service
-    this.pixiService.getApp().stage.eventMode = 'dynamic';
-    this.pixiService.getApp().stage.hitArea = this.pixiService.getApp().screen;
+  async ngAfterViewInit(): Promise<void> {
+    // Start PIXI after the view is initialized
+    await this.pixiManager.startPixi();
 
+    // TODO Remove below. Its only for development
     let graph: Graph = new Graph(); // TODO create graph via graph model service
     this.graphViewService.currentGraph = graph; // TODO Change creating graph behaviour
 
-    let node1 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: 200, y: 200});
+    let screenCenter = {x: this.pixiService.renderer.screen.width/2, y: this.pixiService.renderer.screen.height/2};
+
+    let node1 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: screenCenter.x + 100, y: screenCenter.y - 100});
     this.graphViewService.addNodeToGraphView(graph, node1);
-    let node2 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: 300, y: 500});
+    let node2 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: screenCenter.x + 100 , y: screenCenter.y + 100 });
     this.graphViewService.addNodeToGraphView(graph, node2);
-    let node3 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: 500, y: 200});
+    let node3 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: screenCenter.x - 100, y: screenCenter.y - 100});
     this.graphViewService.addNodeToGraphView(graph, node3);
     // Create edges
     let edge1 = this.edgeFabric.createDefaultEdgeView(graph, node1, node2);
@@ -69,33 +53,10 @@ export class CanvasComponent implements OnInit {
     let edge2 = this.edgeFabric.createDefaultEdgeView(graph, node2, node3);
     this.graphViewService.addEdgeToGraphView(graph, edge2);
 
-    console.log("Renderer: " + this.pixiService.getApp().renderer.constructor.name); // TODO remove
-
     (window as any).__PIXI_DEVTOOLS__ = { // TODO remove in production
       pixi: PIXI,
-      app: this.pixiService.getApp(),
+      renderer: this.pixiService.renderer,
+      stage: this.pixiService.stage
     };
-
-    this.setDefaultListeners();
   }
-
-  private setDefaultListeners() {
-    // Moving cursor on canvas
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointermove', HandlerNames.CANVAS_CURSOR_MOVE);
-    this.pixiService.getApp().canvas.addEventListener('contextmenu', this.boundHandleContextMenu); // TODO move to event bus
-  }
-
-  handlePointerDown(event: FederatedPointerEvent): void {
-    this.xCursor = event.globalX;
-    this.yCursor = event.globalY;
-    this.stateService.changeCursorX(this.xCursor)
-    this.stateService.changeCursorY(this.yCursor)
-  }
-
-  handlerContextMenu(event: any): void {
-    event.preventDefault();
-    console.log("Context menu")
-    // TODO add context menu
-  }
-
 }

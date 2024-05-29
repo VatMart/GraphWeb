@@ -6,6 +6,10 @@
   --clr-vertical-nav-item-child-padding: var(--cds-global-space-5) var(--cds-global-space-6) var(--cds-global-space-5) 16px;
 }
 
+.main-container {
+  height: 100% !important;
+}
+
 .clr-vertical-nav {
   border-right-width: 1px;
   border-right-style: solid;
@@ -90,9 +94,6 @@
   border-right-width: 1px;
   border-right-style: solid;
   border-right-color: var(--clr-vertical-nav-trigger-divider-border-color);
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-bottom-color: var(--clr-vertical-nav-trigger-divider-border-color);
 }
 
 /* Mobile styles */

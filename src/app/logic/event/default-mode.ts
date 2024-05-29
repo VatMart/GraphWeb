@@ -1,9 +1,9 @@
-import {ModeBehavior} from "../../service/event/mode-manager.service";
+import {ModeBehavior} from "../../service/manager/mode-manager.service";
 import {FederatedPointerEvent} from "pixi.js";
 import {PixiService} from "../../service/pixi.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {GraphViewService} from "../../service/graph-view.service";
-import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {EventBusService, HandlerNames} from "../../service/event-bus.service";
 import {MoveNodeViewCommand, NodeMove} from "../command/move-node-view-command";
 import {HistoryService} from "../../service/history.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
@@ -122,12 +122,12 @@ export class DefaultMode implements ModeBehavior {
   }
 
   private selectableModeOn() {
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
+    this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.ELEMENT_SELECT);
   }
 
   private selectableModeOff() {
-    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.ELEMENT_SELECT);
   }
 
@@ -154,14 +154,14 @@ export class DefaultMode implements ModeBehavior {
     this.dragTarget = nodesMove;  // Store the targets being dragged
     this.isDragging = false;
 
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerup', HandlerNames.NODE_DRAG_END);
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
+    this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);
+    this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerup', HandlerNames.NODE_DRAG_END);
+    this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
   }
 
   private onDragMove(event: FederatedPointerEvent): void {
     if (this.dragTarget) {
-      const newPosition = event.getLocalPosition(this.pixiService.getApp().stage);
+      const newPosition = event.getLocalPosition(this.pixiService.stage);
       // Check if the drag has moved beyond the threshold
       if (!this.isDragging) {
         let nodeMove = this.dragTarget[0]
@@ -205,8 +205,8 @@ export class DefaultMode implements ModeBehavior {
       this.dragTarget = null;
       this.isDragging = false;
     }
-    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerup', HandlerNames.NODE_DRAG_END);
-    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerup', HandlerNames.NODE_DRAG_END);
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
   }
 
   private onSelectElement(event: FederatedPointerEvent): void {
@@ -244,23 +244,23 @@ export class DefaultMode implements ModeBehavior {
   private onRectangleSelectionStart(event: FederatedPointerEvent): void {
     this.rectangleSelectionStart = {x: event.global.x, y: event.global.y};
     this.rectangleSelection = new SelectRectangle();
-    if (!this.pixiService.getApp().stage.children.some(ch => ch == this.rectangleSelection)) {
-      this.pixiService.getApp().stage.addChild(this.rectangleSelection);
+    if (!this.pixiService.stage.children.some(ch => ch == this.rectangleSelection)) {
+      this.pixiService.stage.addChild(this.rectangleSelection);
       this.rectangleSelection.visible = false;
     }
     this.isRectangleSelection = false;
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+    this.eventBus.registerPixiEvent(this.pixiService.stage,
       'pointermove', HandlerNames.RECTANGLE_SELECTION_MOVE);
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+    this.eventBus.registerPixiEvent(this.pixiService.stage,
       'pointerup', HandlerNames.RECTANGLE_SELECTION_END);
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+    this.eventBus.registerPixiEvent(this.pixiService.stage,
       'pointerupoutside', HandlerNames.RECTANGLE_SELECTION_END);
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage,
+    this.eventBus.registerPixiEvent(this.pixiService.stage,
       'rightdown', HandlerNames.RECTANGLE_SELECTION_END);
   }
 
   private onRectangleSelectionMove(event: FederatedPointerEvent): void {
-    const newPosition = event.getLocalPosition(this.pixiService.getApp().stage);
+    const newPosition = event.getLocalPosition(this.pixiService.stage);
     if (this.rectangleSelectionStart) {
       // Check if the drag has moved beyond the threshold
       if (!this.isRectangleSelection) {
@@ -301,8 +301,8 @@ export class DefaultMode implements ModeBehavior {
 
   private onRectangleSelectionEnd(event: FederatedPointerEvent): void {
     if (this.rectangleSelection) {
-      if (this.pixiService.getApp().stage.children.some(ch => ch == this.rectangleSelection)) {
-        this.pixiService.getApp().stage.removeChild(this.rectangleSelection);
+      if (this.pixiService.stage.children.some(ch => ch == this.rectangleSelection)) {
+        this.pixiService.stage.removeChild(this.rectangleSelection);
       }
     }
     if (!this.isRectangleSelection) {
@@ -310,9 +310,9 @@ export class DefaultMode implements ModeBehavior {
     }
     this.rectangleSelectionStart = null;
     this.isRectangleSelection = false;
-    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage,
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage,
       'pointerup', HandlerNames.RECTANGLE_SELECTION_END);
-    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage,
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage,
       'pointerupoutside', HandlerNames.RECTANGLE_SELECTION_END);
   }
 }

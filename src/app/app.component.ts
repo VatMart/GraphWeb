@@ -5,10 +5,10 @@ import '@clr/icons';
 import '@clr/icons/clr-icons.min.css';
 import '@cds/core/icon/register.js';
 import {CanvasComponent} from "./component/canvas/canvas.component";
-import {ModeManagerService} from "./service/event/mode-manager.service";
-import {GraphStateManagerService} from "./service/graph-state-manager.service";
-import {TabNavComponent} from "./component/left-side-nav/tab-nav.component";
-import {GraphMatrixViewStateManagerService} from "./service/graph-matrix-view-state-manager.service";
+import {ModeManagerService} from "./service/manager/mode-manager.service";
+import {GraphStateManagerService} from "./service/manager/graph-state-manager.service";
+import {TabNavComponent} from "./component/tab-nav/tab-nav.component";
+import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix-view-state-manager.service";
 import {EnvironmentService} from "./service/environment.service";
 import {NgClass} from "@angular/common";
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from "rxjs";
-import {ModeState} from "./event/mode-manager.service";
+import {ModeState} from "./manager/mode-manager.service";
 import {NodeView} from "../model/graphical-model/node/node-view";
 import {EdgeView} from "../model/graphical-model/edge/edge-view";
 import {GraphOrientation} from "../model/orientation";
@@ -59,6 +59,9 @@ export class StateService {
   private cursorYSource = new BehaviorSubject<number>(0);
   public currentCursorX = this.cursorXSource.asObservable();
   public currentCursorY = this.cursorYSource.asObservable();
+
+  private rendererResizedSource = new BehaviorSubject<{width: number, height: number}>({width: 0, height: 0});
+  public rendererResized$ = this.rendererResizedSource.asObservable();
 
   // --------------------------------------------------
   // Graph elements and graph states
@@ -199,6 +202,13 @@ export class StateService {
    */
   changeCursorY(y: number) {
     this.cursorYSource.next(y);
+  }
+
+  /**
+   * Notify that the renderer size has been changed.
+   */
+  changedRendererSize(width: number, height: number) {
+    this.rendererResizedSource.next({width: width, height: height});
   }
 
   /**

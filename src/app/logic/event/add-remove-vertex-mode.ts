@@ -1,9 +1,9 @@
-import {ModeBehavior} from "../../service/event/mode-manager.service";
+import {ModeBehavior} from "../../service/manager/mode-manager.service";
 import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {Container, FederatedPointerEvent} from "pixi.js";
-import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {EventBusService, HandlerNames} from "../../service/event-bus.service";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 import {AddNodeViewCommand} from "../command/add-node-view-command";
 import {HistoryService} from "../../service/history.service";
@@ -28,14 +28,14 @@ export class AddRemoveVertexMode implements ModeBehavior {
 
   modeOn(): void {
     console.log("AddRemoveVertexMode ON");
-    const stage = this.pixiService.getApp().stage;
-    this.eventBus.registerPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
+    const stage = this.pixiService.stage;
+    this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }
 
   modeOff(): void {
     console.log("AddRemoveVertexMode OFF");
-    this.eventBus.unregisterPixiEvent(this.pixiService.getApp().stage, 'pointerdown',
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }
 
@@ -62,8 +62,7 @@ export class AddRemoveVertexMode implements ModeBehavior {
   }
 
   private handlePointerDown(event: FederatedPointerEvent): void {
-    const stage: Container = this.pixiService.getApp().stage;
-    console.log(event.target.constructor.name)
+    const stage: Container = this.pixiService.stage;
     if (event.target === stage) {
       let newNodeView: NodeView = this.nodeFabric
         .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph,
