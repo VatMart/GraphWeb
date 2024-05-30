@@ -29,7 +29,7 @@ export class StateService {
   private redoInvokedSource = new BehaviorSubject<boolean>(false);
   public redoInvoked$ = this.redoInvokedSource.asObservable();
 
-  // Current mode
+  // Current mode (default, add vertex, add edges etc.)
   private modeStateSource = new BehaviorSubject<ModeState>('default');
   public currentMode$ = this.modeStateSource.asObservable();
 
@@ -40,7 +40,7 @@ export class StateService {
   public currentAddEdgesState = this.stateAddEdgesSource.asObservable();
 
   // --------------------------------------------------
-  // UI component states. Matrix view states
+  // UI component states. Nav bar components
   // --------------------------------------------------
   private matrixViewVisibilitySource = new BehaviorSubject<boolean>(false);
   public matrixViewVisibility$ = this.matrixViewVisibilitySource.asObservable();
@@ -50,6 +50,9 @@ export class StateService {
 
   private matrixSource = new BehaviorSubject<GraphMatrix | null>(null);
   public currentMatrix$ = this.matrixSource.asObservable();
+
+  private needResizeCanvasSource = new BehaviorSubject<boolean>(false);
+  public needResizeCanvas$ = this.needResizeCanvasSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas
@@ -188,6 +191,13 @@ export class StateService {
    */
   changeMatrix(matrix: GraphMatrix) {
     this.matrixSource.next(matrix);
+  }
+
+  /**
+   * Notify that the canvas needs to be resized.
+   */
+  needResizeCanvas() {
+    this.needResizeCanvasSource.next(true);
   }
 
   /**

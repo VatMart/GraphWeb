@@ -167,4 +167,7 @@ export const HandlerNames = {
   CANVAS_ADD_REMOVE_NODE: 'canvasAddRemoveNode', // Handler for the node add/remove for click on canvas/node
   CANVAS_ADD_REMOVE_EDGE: 'canvasAddRemoveEdge', // Handler for the node add edge event
   CANVAS_RESIZE: 'canvasResize', // Handler for the canvas resize event
+  CANVAS_DRAG_START: 'canvasDragStart', // Handler for the canvas drag start event
+  CANVAS_DRAG_MOVE: 'canvasDragMove', // Handler for the canvas drag move event
+  CANVAS_DRAG_END: 'canvasDragEnd', // Handler for the canvas drag end event
 }

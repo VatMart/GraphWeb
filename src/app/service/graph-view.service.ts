@@ -43,7 +43,7 @@ export class GraphViewService extends GraphModelService {
   public addNodeToGraphView(graph: Graph, nodeView: NodeView) {
     super.addNodeToGraph(graph, nodeView.node);
     this._nodeViews.set(nodeView.node.index, nodeView);
-    this.pixiService.stage.addChild(nodeView); // TODO Add container, not the node itself
+    this.pixiService.mainContainer.addChild(nodeView); // TODO Add container, not the node itself
     this.stateService.addedNode(nodeView); // Notify state service
     console.log("Added node to graph: " + nodeView.node.index); // TODO remove
   }
@@ -59,7 +59,7 @@ export class GraphViewService extends GraphModelService {
     // Remove adjacent edges
     this.removeAdjacentEdges(graph, nodeView);
     this._nodeViews.delete(nodeView.node.index);
-    this.pixiService.stage.removeChild(nodeView);
+    this.pixiService.mainContainer.removeChild(nodeView);
     super.removeNodeFromGraph(graph, nodeView.node); // Should be called after removing from view
     this.stateService.deletedNode(nodeView); // Notify state service
     console.log("Removed node from graph: " + nodeView.node.index); // TODO remove
@@ -72,7 +72,7 @@ export class GraphViewService extends GraphModelService {
   public addEdgeToGraphView(graph: Graph, edgeView: EdgeView) {
     super.addEdgeToGraph(graph, edgeView.edge);
     this._edgeViews.set(edgeView.edge.edgeIndex.value, edgeView);
-    this.pixiService.stage.addChild(edgeView); // TODO Add container, not the edge itself
+    this.pixiService.mainContainer.addChild(edgeView); // TODO Add container, not the edge itself
     this.stateService.addedEdge(edgeView); // Notify state service
     console.log("Added edge to graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
@@ -86,7 +86,7 @@ export class GraphViewService extends GraphModelService {
       this.unselectElement(edgeView);
     }
     this._edgeViews.delete(edgeView.edge.edgeIndex.value);
-    this.pixiService.stage.removeChild(edgeView);
+    this.pixiService.mainContainer.removeChild(edgeView);
     super.removeEdgeFromGraph(graph, edgeView.edge); // Should be called after removing from view
     this.stateService.deletedEdge(edgeView); // Notify state service
     console.log("Removed edge from graph: " + edgeView.edge.edgeIndex.value); // TODO remove
@@ -99,10 +99,10 @@ export class GraphViewService extends GraphModelService {
   public clearAllElementsView(graph: Graph) {
     this.clearSelection();
     this._edgeViews.forEach((edgeView: EdgeView) => {
-      this.pixiService.stage.removeChild(edgeView);
+      this.pixiService.mainContainer.removeChild(edgeView);
     });
     this._nodeViews.forEach((nodeView: NodeView) => {
-      this.pixiService.stage.removeChild(nodeView);
+      this.pixiService.mainContainer.removeChild(nodeView);
     });
     this._nodeViews.clear();
     this._edgeViews.clear();

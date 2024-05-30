@@ -1,7 +1,7 @@
-import {Component, OnInit, Renderer2} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {ClarityModule} from "@clr/angular";
 import {barsIcon, ClarityIcons, namespaceIcon} from "@cds/core/icon";
-import {NgClass, NgForOf, NgIf} from "@angular/common";
+import {CommonModule, NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatrixViewComponent} from "../matrix-view/matrix-view.component";
 import {StateService} from "../../service/state.service";
 import {TypeMatrix} from "../../model/graph-matrix";
@@ -18,10 +18,12 @@ ClarityIcons.addIcons(['matrix-adjacency', '<svg width="32" height="32" viewBox=
 ClarityIcons.addIcons(['matrix-incidence', '<svg width="32" height="32" viewBox="0 1 60 60" xmlns="http://www.w3.org/2000/svg"><path d="M18 13V4h-2v2h-3v2h3v5h-3v2h8v-2zm-1.5 7a3.5 3.5 0 1 1-3.5 3.5 3.5 3.5 0 0 1 3.5-3.5m0-2a5.5 5.5 0 1 0 5.5 5.5 5.5 5.5 0 0 0-5.5-5.5M8 30H2V2h6v2H4v24h4zm22 0h-6v-2h4V4h-4V2h6zM8.903 9.427h3.871v1.935H8.903z"/></svg>']);
 ClarityIcons.addIcons(['close-panel', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m4.707 13.293a.999.999 0 1 1-1.414 1.414L12 13.414l-3.293 3.293a.997.997 0 0 1-1.414 0 1 1 0 0 1 0-1.414L10.586 12 7.293 8.707a.999.999 0 1 1 1.414-1.414L12 10.586l3.293-3.293a.999.999 0 1 1 1.414 1.414L13.414 12z"/></svg>']);
 ClarityIcons.addIcons(namespaceIcon, barsIcon);
+
 @Component({
   selector: 'app-tab-nav',
   standalone: true,
-  imports: [ClarityModule, NgClass, NgIf, NgForOf, MatrixViewComponent, TabMenuModule, RippleModule, SvgIconDirective, SidebarModule],
+  imports: [CommonModule, ClarityModule, NgClass, NgIf, NgForOf, MatrixViewComponent, TabMenuModule, RippleModule,
+    SvgIconDirective, SidebarModule],
   templateUrl: './tab-nav.component.html',
   styleUrl: './tab-nav.component.css'
 })
@@ -29,10 +31,8 @@ export class TabNavComponent implements OnInit {
 
   isMobileDevice: boolean;
 
-  collapsed: boolean = false;
   includeIcons = true;
-  activeIndex: number | null = null;
-  clrVerticalNavGroupExpanded = false;
+  @Input() activeIndex: number | null = null;
 
   // Mobile
   items: MenuItem[] | undefined;
@@ -47,24 +47,20 @@ export class TabNavComponent implements OnInit {
   useCloseButtonGradient: boolean = false;
 
   constructor(private stateService: StateService,
-              private  environmentService: EnvironmentService,
+              private environmentService: EnvironmentService,
               protected svgIconService: SvgIconService,
-              private renderer: Renderer2) {
+              private cdr: ChangeDetectorRef) {
     this.isMobileDevice = this.environmentService.isMobile();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.items = [
-      { label: 'hidden', visible: false },
-      { label: 'Matrices', icon: 'matrix-icon', header: 'Matrix view' },
-      { label: 'Test1', icon: 'pi pi-chart-line' },
-      { label: 'Test2', icon: 'pi pi-list' },
-      { label: 'Test3', icon: 'pi pi-inbox' }
+      {label: 'hidden', visible: false},
+      {label: 'Matrices', icon: 'matrix-icon', header: 'Matrix view'},
+      {label: 'Test1', icon: 'pi pi-chart-line'},
+      {label: 'Test2', icon: 'pi pi-list'},
+      {label: 'Test3', icon: 'pi pi-inbox'}
     ];
-  }
-
-  clrVerticalNavGroupExpandedChange(event: boolean) {
-    this.clrVerticalNavGroupExpanded = event;
   }
 
   onMatrixItemClick() {
@@ -74,16 +70,29 @@ export class TabNavComponent implements OnInit {
       this.activeIndex = 0;
       this.stateService.changedMatrixViewVisibility(true); // TODO change when more components will be added
     }
+    // Resize canvas on UI changes
+    this.cdr.detectChanges();
+    this.stateService.needResizeCanvas();
   }
 
   onCloseLeftSideContainer() {
     this.activeIndex = null;
     this.useCloseButtonGradient = false;
     this.stateService.changedMatrixViewVisibility(false); // TODO change when more components will be added
+    // Resize canvas on UI changes
+    this.cdr.detectChanges();
+    this.stateService.needResizeCanvas();
+  }
+
+  onCollapseLeftNavBar() {
+    this.stateService.needResizeCanvas();
   }
 
   protected readonly TypeMatrix = TypeMatrix;
 
+  // ----------------
+  // Mobile UI logic
+  // ----------------
   onMobileTabMenuActiveItemChange(index: number) {
     console.log('this.activeItem:', this.activeItem);
     //this.activeItem = undefined;
@@ -120,7 +129,6 @@ export class TabNavComponent implements OnInit {
     this.bottomPanelVisible = $event;
     this.stateService.changedMatrixViewVisibility($event); // TODO CHANGE
     if (this.items) {
-      console.log('test:');
       this.activeItem = undefined;
     }
   }

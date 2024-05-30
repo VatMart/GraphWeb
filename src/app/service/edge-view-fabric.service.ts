@@ -18,7 +18,7 @@ import {EdgeOrientation, GraphOrientation} from "../model/orientation";
 export class EdgeViewFabricService extends AbstractGraphElementFabric {
 
   private styleCache: Map<string, EdgeStyle> = new Map();
-  private textureWeightCache: Map<string, Texture> = new Map();
+  private textureWeightCache: Map<string, Texture> = new Map(); // TODO add cache clearing mechanism. (when edge removed from graph)
 
   constructor(private pixiService: PixiService) {
     super();
