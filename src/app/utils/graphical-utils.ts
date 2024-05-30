@@ -51,8 +51,7 @@ export class GraphicalUtils {
    * Utility function to check if a point is inside a rectangle
    */
   public static edgeViewToRectangle(edgeView: EdgeView): Rectangle {
-    // TODO implement
-    let pixiRectangle = edgeView.getBounds().rectangle;
+    let pixiRectangle = edgeView.getLocalBounds();
     return {x: pixiRectangle.x, y: pixiRectangle.y, width: pixiRectangle.width, height: pixiRectangle.height};
   }
 }

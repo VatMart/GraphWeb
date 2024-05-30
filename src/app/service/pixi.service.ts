@@ -1,19 +1,21 @@
 import {Injectable} from '@angular/core';
-import * as PIXI from "pixi.js";
-import {Container, Renderer, Ticker, autoDetectRenderer} from "pixi.js";
+import {autoDetectRenderer, Container, Renderer, Ticker} from "pixi.js";
 import {EnvironmentService} from "./environment.service";
 
 /**
- * Service to manage the PIXI canvas
+ * Service for handling the PixiJS rendering engine.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class PixiService {
 
+  // Those properties should be initialized
   private _stage!: Container;
   private _renderer!: Renderer;
   private _ticker!: Ticker;
+  // Main container for all the elements
+  private _mainContainer!: Container;
 
   constructor(private environment: EnvironmentService) {
   }
@@ -45,15 +47,17 @@ export class PixiService {
     return ticker;
   }
 
+  /**
+   * Calculate the size of the renderer based on the window size and UI components sizes.
+   */
   public calculateRendererSize(): { width: number, height: number } {
+    // UI components which occupy space
     const toolbar = document.getElementById('toolbar');
     const navbar = this.environment.isMobile() ? document.getElementById('mobile-navbar')
       : document.getElementById('navbar');
     if (navbar == null || toolbar == null) {
       throw new Error('Navbar or toolbar not found'); // TODO: Create custom error
     }
-    console.log('navbar width: ' + navbar.offsetWidth);
-    console.log('navbar height: ' + navbar.offsetHeight);
     let occupiedHeight = (this.environment.isMobile() ? navbar.offsetHeight : 0) + toolbar.offsetHeight+5;
     let occupiedWidth = (this.environment.isMobile() ? 0 : navbar.offsetWidth+8);
     console.log("Occupied width: " + occupiedWidth + ", occupied height: " + occupiedHeight); // TODO remove
@@ -100,5 +104,13 @@ export class PixiService {
 
   set ticker(value: Ticker) {
     this._ticker = value;
+  }
+
+  get mainContainer(): Container {
+    return this._mainContainer;
+  }
+
+  set mainContainer(value: Container) {
+    this._mainContainer = value;
   }
 }

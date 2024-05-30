@@ -133,6 +133,7 @@ export class DefaultMode implements ModeBehavior {
 
   private onDragStart(event: FederatedPointerEvent): void {
     const dragObject = event.target as NodeView;
+    const position = event.getLocalPosition(this.pixiService.mainContainer);
 
     // Store the starting position of the drag
     let nodesMove: NodeMove[] = this.graphViewService.selectedElements
@@ -141,13 +142,13 @@ export class DefaultMode implements ModeBehavior {
         let element = el as NodeView;
         return new NodeMove(element,
           {x: element.x, y: element.y},
-          {x: event.global.x - element.x, y: event.global.y - element.y});
+          {x: position.x - element.x, y: position.y - element.y});
       });
     // If the node being dragged is not already in the list of nodes to move, add it
     if (!nodesMove.some(nm => nm.node === dragObject)) {
       nodesMove.push(new NodeMove(dragObject,
         {x: dragObject.x, y: dragObject.y},
-        {x: event.global.x - dragObject.x, y: event.global.y - dragObject.y}));
+        {x: position.x - dragObject.x, y: position.y - dragObject.y}));
     }
     this.moveCommand = new MoveNodeViewCommand(this.graphViewService, nodesMove);
 
@@ -161,7 +162,7 @@ export class DefaultMode implements ModeBehavior {
 
   private onDragMove(event: FederatedPointerEvent): void {
     if (this.dragTarget) {
-      const newPosition = event.getLocalPosition(this.pixiService.stage);
+      const newPosition = event.getLocalPosition(this.pixiService.mainContainer);
       // Check if the drag has moved beyond the threshold
       if (!this.isDragging) {
         let nodeMove = this.dragTarget[0]
@@ -210,6 +211,9 @@ export class DefaultMode implements ModeBehavior {
   }
 
   private onSelectElement(event: FederatedPointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
     const selectedElement = event.target instanceof NodeView
       ? event.target as NodeView
       : event.target instanceof EdgeView
@@ -218,6 +222,10 @@ export class DefaultMode implements ModeBehavior {
 
     if (!selectedElement) { // Canvas clicked (no selection before - clear selection, else - rectangle selection)
       // Rectangle selection
+      if (event.pointerType === 'touch') { // Rectangle selection not supported for touchpad devices
+        this.graphViewService.clearSelection();
+        return;
+      }
       this.onRectangleSelectionStart(event);
       return; // No element selected
     }
@@ -242,10 +250,11 @@ export class DefaultMode implements ModeBehavior {
   }
 
   private onRectangleSelectionStart(event: FederatedPointerEvent): void {
-    this.rectangleSelectionStart = {x: event.global.x, y: event.global.y};
+    const position = event.getLocalPosition(this.pixiService.mainContainer);
+    this.rectangleSelectionStart = {x: position.x, y: position.y};
     this.rectangleSelection = new SelectRectangle();
-    if (!this.pixiService.stage.children.some(ch => ch == this.rectangleSelection)) {
-      this.pixiService.stage.addChild(this.rectangleSelection);
+    if (!this.pixiService.mainContainer.children.some(ch => ch == this.rectangleSelection)) {
+      this.pixiService.mainContainer.addChild(this.rectangleSelection);
       this.rectangleSelection.visible = false;
     }
     this.isRectangleSelection = false;
@@ -260,7 +269,7 @@ export class DefaultMode implements ModeBehavior {
   }
 
   private onRectangleSelectionMove(event: FederatedPointerEvent): void {
-    const newPosition = event.getLocalPosition(this.pixiService.stage);
+    const newPosition = event.getLocalPosition(this.pixiService.mainContainer);
     if (this.rectangleSelectionStart) {
       // Check if the drag has moved beyond the threshold
       if (!this.isRectangleSelection) {
@@ -301,8 +310,8 @@ export class DefaultMode implements ModeBehavior {
 
   private onRectangleSelectionEnd(event: FederatedPointerEvent): void {
     if (this.rectangleSelection) {
-      if (this.pixiService.stage.children.some(ch => ch == this.rectangleSelection)) {
-        this.pixiService.stage.removeChild(this.rectangleSelection);
+      if (this.pixiService.mainContainer.children.some(ch => ch == this.rectangleSelection)) {
+        this.pixiService.mainContainer.removeChild(this.rectangleSelection);
       }
     }
     if (!this.isRectangleSelection) {

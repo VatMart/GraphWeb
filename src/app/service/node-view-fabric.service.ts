@@ -18,7 +18,7 @@ import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-grap
 export class NodeViewFabricService extends AbstractGraphElementFabric {
 
   // Key in textureCache: 'radius_fillNode_strokeColor_strokeWidth'
-  private textureCache: Map<string, Texture> = new Map();
+  private textureCache: Map<string, Texture> = new Map(); // TODO add cache clearing mechanism. (when node removed from graph)
 
   private styleCache: Map<number, string> = new Map(); // key: node index, value: key in textureCache
 

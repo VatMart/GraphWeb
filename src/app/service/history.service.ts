@@ -9,6 +9,7 @@ export class HistoryService {
   private commands: Command[] = [];
   private redoStack: Command[] = [];
 
+  // TODO Limit the number of commands stored in the history
   constructor(private stateService: StateService) {
   }
 

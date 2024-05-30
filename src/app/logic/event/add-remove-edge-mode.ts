@@ -82,6 +82,9 @@ export class AddRemoveEdgeMode implements ModeBehavior {
   }
 
   private onAddRemoveEdge(event: FederatedPointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
     if (event.target instanceof NodeView) {
       let nodeView: NodeView = event.target as NodeView;
       if (!this.startNode) {

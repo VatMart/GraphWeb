@@ -28,7 +28,6 @@ export class AddRemoveVertexMode implements ModeBehavior {
 
   modeOn(): void {
     console.log("AddRemoveVertexMode ON");
-    const stage = this.pixiService.stage;
     this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }
@@ -62,11 +61,15 @@ export class AddRemoveVertexMode implements ModeBehavior {
   }
 
   private handlePointerDown(event: FederatedPointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
     const stage: Container = this.pixiService.stage;
+    const position = event.getLocalPosition(this.pixiService.mainContainer); // Get position relative to main container
     if (event.target === stage) {
       let newNodeView: NodeView = this.nodeFabric
         .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph,
-          {x: event.globalX - NodeView.DEFAULT_RADIUS, y: event.globalY - NodeView.DEFAULT_RADIUS});
+          {x: position.x - NodeView.DEFAULT_RADIUS, y: position.y - NodeView.DEFAULT_RADIUS});
       let command = new AddNodeViewCommand(newNodeView, this.graphViewService);
       this.historyService.execute(command);
       //this.graphViewService.addNodeToCurrentGraphView(event.globalX, event.globalY);
