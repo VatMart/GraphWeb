@@ -66,6 +66,12 @@ export class StateService {
   private rendererResizedSource = new BehaviorSubject<{width: number, height: number}>({width: 0, height: 0});
   public rendererResized$ = this.rendererResizedSource.asObservable();
 
+  private zoomToChangeSource = new BehaviorSubject<number | null>(null);
+  public zoomToChange$ = this.zoomToChangeSource.asObservable();
+
+  private zoomChangedSource = new BehaviorSubject<number>(100);
+  public zoomChanged$ = this.zoomChangedSource.asObservable();
+
   // --------------------------------------------------
   // Graph elements and graph states
   // --------------------------------------------------
@@ -219,6 +225,20 @@ export class StateService {
    */
   changedRendererSize(width: number, height: number) {
     this.rendererResizedSource.next({width: width, height: height});
+  }
+
+  /**
+   * Change the zoom value (in percentage) for canvas.
+   */
+  changeZoomTo(percentage: number) {
+    this.zoomToChangeSource.next(percentage);
+  }
+
+  /**
+   * Changed zoom value for canvas.
+   */
+  changedZoomPercentage(value: number) {
+    this.zoomChangedSource.next(value);
   }
 
   /**

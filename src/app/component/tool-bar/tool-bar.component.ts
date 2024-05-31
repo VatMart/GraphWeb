@@ -54,6 +54,9 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   xCursor: number = 0;
   yCursor: number = 0;
 
+  // Zooming button
+  zoomPercentage: number = 100; // Default zoom percentage
+
   // Gradient colors
   gradientColorStart: string = '#FFC618';
   gradientColorEnd: string = '#ff0000';
@@ -66,15 +69,23 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Init subscriptions
+    // Cursor coordinates
     this.subscriptions.add(this.stateService.currentCursorX.subscribe(state => this.xCursor = state));
     this.subscriptions.add(this.stateService.currentCursorY.subscribe(state => this.yCursor = state));
+    // Undo/Redo buttons
     this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
     this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
+    // Zooming button
+    this.subscriptions.add(this.stateService.zoomChanged$.subscribe(state => this.zoomPercentage = state));
+    // Cog dropdown components
+    // Show weights
     this.showWeights.valueChanges.subscribe(value => {
       if (value !== null) {
         this.onToggleShowWeights(value)
       }
     });
+    // Graph orientation
     this.subscriptions.add(this.graphOrientation.valueChanges.subscribe(value => {
       if (value !== null) {
         this.onChoseGraphOrientation(value);
@@ -85,6 +96,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         this.graphOrientation.setValue(state);
       }
     }));
+    // Mode buttons
     this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
       if (this.isAddVertexButtonActive && state !== 'AddRemoveVertex') {
         console.log("Switching add vertex button");
@@ -95,6 +107,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         this.switchAddEdgesButton(); // Turn off add edges mode
       }
     }));
+    // Default values
     const showWeights = this.showWeights.value;
     if (showWeights) {
       this.onToggleShowWeights(showWeights); // Set initial state
@@ -152,6 +165,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   redoAction() {
     this.historyService.redo()
     this.stateService.redoInvoked();
+  }
+
+  onZoomDropdownItemClick(number: number) {
+    this.stateService.changeZoomTo(number);
   }
 
   buttonAddVertexMouseLeave() {

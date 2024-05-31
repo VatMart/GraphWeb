@@ -170,4 +170,5 @@ export const HandlerNames = {
   CANVAS_DRAG_START: 'canvasDragStart', // Handler for the canvas drag start event
   CANVAS_DRAG_MOVE: 'canvasDragMove', // Handler for the canvas drag move event
   CANVAS_DRAG_END: 'canvasDragEnd', // Handler for the canvas drag end event
+  CANVAS_ZOOM: 'canvasZoom', // Handler for the canvas zooming event
 }
