@@ -29,6 +29,9 @@ export class StateService {
   private redoInvokedSource = new BehaviorSubject<boolean>(false);
   public redoInvoked$ = this.redoInvokedSource.asObservable();
 
+  private showGridSource = new BehaviorSubject<boolean>(false);
+  public showGrid$ = this.showGridSource.asObservable();
+
   // Current mode (default, add vertex, add edges etc.)
   private modeStateSource = new BehaviorSubject<ModeState>('default');
   public currentMode$ = this.modeStateSource.asObservable();
@@ -159,6 +162,13 @@ export class StateService {
    */
   changeShowWeights(state: boolean) {
     this.showWeightsSource.next(state);
+  }
+
+  /**
+   * Change the state of showing grid.
+   */
+  changeShowGrid(state: boolean) {
+    this.showGridSource.next(state);
   }
 
   /**

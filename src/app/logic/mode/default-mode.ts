@@ -31,7 +31,7 @@ export class DefaultMode implements ModeBehavior {
 
   // Selecting
   private isRectangleSelection = false;
-  private rectangleSelection: SelectRectangle | null = null;
+  private rectangleSelection: SelectRectangle;
   private rectangleSelectionStart: Point | null = null;
   private rectangleSelectionThreshold = 2; // Pixels the mouse must move to start rectangle selection
 
@@ -52,16 +52,20 @@ export class DefaultMode implements ModeBehavior {
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_END, this.onDragEndBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_MOVE, this.onRectangleSelectionMoveBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_END, this.onRectangleSelectionEndBound);
+    // Init rectangle selection
+    this.rectangleSelection = new SelectRectangle();
+    this.rectangleSelection.visible = false;
+    this.pixiService.mainContainer.addChild(this.rectangleSelection);
   }
 
   modeOn(): void {
-    console.log("DefaultMode ON");
+    console.log("DefaultMode ON"); // TODO remove
     this.selectableModeOn();
     this.moveableNodesOn();
   }
 
   modeOff(): void {
-    console.log("DefaultMode OFF");
+    console.log("DefaultMode OFF"); // TODO remove
     this.selectableModeOff();
     this.moveableNodesOff();
   }
@@ -172,18 +176,29 @@ export class DefaultMode implements ModeBehavior {
           this.isDragging = true; // Start dragging if moved beyond threshold
         }
       }
-      // Move the nodes if dragging
+      // Perform vertex dragging
       if (this.isDragging) {
-        // Check selected elements to remove from drag target (bug fix for multiple selection drag
+        // Check selected elements to remove from drag target
         if (this.graphViewService.selectedElements.length !== this.dragTarget.length) {
           this.dragTarget = this.dragTarget
             .filter(nm => this.graphViewService.isElementSelected(nm.node));
         }
-        // Move the nodes to the new position
+        // Move each selected node
         this.dragTarget.forEach(element => {
+          const targetX = newPosition.x - element.offset.x;
+          const targetY = newPosition.y - element.offset.y;
+
+          // Apply canvas boundary constraints
+          const constrainedX = Math.max(this.pixiService.canvasBoundaries.boundaryXMin,
+            Math.min(targetX, this.pixiService.canvasBoundaries.boundaryXMax - element.node.width));
+          const constrainedY = Math.max(this.pixiService.canvasBoundaries.boundaryYMin,
+            Math.min(targetY, this.pixiService.canvasBoundaries.boundaryYMax - element.node.height));
+
           element.node.alpha = 0.5;
-          this.graphViewService.moveNodeView(element.node,
-            {x: newPosition.x - element.offset.x, y: newPosition.y - element.offset.y});
+          this.graphViewService.moveNodeView(element.node, {
+            x: constrainedX,
+            y: constrainedY
+          });
         });
       }
     }
@@ -206,6 +221,7 @@ export class DefaultMode implements ModeBehavior {
       this.dragTarget = null;
       this.isDragging = false;
     }
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerup', HandlerNames.NODE_DRAG_END);
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
   }
@@ -251,12 +267,11 @@ export class DefaultMode implements ModeBehavior {
 
   private onRectangleSelectionStart(event: FederatedPointerEvent): void {
     const position = event.getLocalPosition(this.pixiService.mainContainer);
-    this.rectangleSelectionStart = {x: position.x, y: position.y};
-    this.rectangleSelection = new SelectRectangle();
-    if (!this.pixiService.mainContainer.children.some(ch => ch == this.rectangleSelection)) {
-      this.pixiService.mainContainer.addChild(this.rectangleSelection);
-      this.rectangleSelection.visible = false;
+    if (!this.pixiService.isPointWithinCanvasBoundaries(position.x, position.y, 0)) {
+      return;
     }
+    this.rectangleSelectionStart = {x: position.x, y: position.y};
+    this.rectangleSelection.visible = false;
     this.isRectangleSelection = false;
     this.eventBus.registerPixiEvent(this.pixiService.stage,
       'pointermove', HandlerNames.RECTANGLE_SELECTION_MOVE);
@@ -277,14 +292,12 @@ export class DefaultMode implements ModeBehavior {
         const dy = Math.abs((newPosition.y) - this.rectangleSelectionStart.y);
         if (dx > this.rectangleSelectionThreshold || dy > this.rectangleSelectionThreshold) {
           this.isRectangleSelection = true; // Start dragging if moved beyond threshold
-          if (this.rectangleSelection){
-            this.rectangleSelection.visible = true;
-          }
+          this.rectangleSelection.visible = true;
         }
       }
     }
 
-    if (this.isRectangleSelection && this.rectangleSelectionStart && this.rectangleSelection) {
+    if (this.isRectangleSelection && this.rectangleSelectionStart) {
       let rectangle: Rectangle = this.rectangleSelection.toRectangle();
       this.rectangleSelection.updatePosition(this.rectangleSelectionStart, newPosition);
       this.graphViewService.nodeViews.forEach((nodeView: NodeView) => { // TODO optimize by using canvas with grid
@@ -310,9 +323,7 @@ export class DefaultMode implements ModeBehavior {
 
   private onRectangleSelectionEnd(event: FederatedPointerEvent): void {
     if (this.rectangleSelection) {
-      if (this.pixiService.mainContainer.children.some(ch => ch == this.rectangleSelection)) {
-        this.pixiService.mainContainer.removeChild(this.rectangleSelection);
-      }
+      this.rectangleSelection.visible = false;
     }
     if (!this.isRectangleSelection) {
       this.graphViewService.clearSelection();

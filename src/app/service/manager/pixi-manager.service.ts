@@ -1,12 +1,14 @@
 import {Injectable} from '@angular/core';
 import {PixiService} from "../pixi.service";
-import {Container, FederatedPointerEvent, FederatedWheelEvent, Renderer} from "pixi.js";
+import {Container, FederatedPointerEvent, FederatedWheelEvent, Graphics, Point, Renderer} from "pixi.js";
 import {ModeManagerService} from "./mode-manager.service";
 import {EventBusService, HandlerNames} from "../event-bus.service";
 import {StateService} from "../state.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import * as Hammer from 'hammerjs';
+import {VisualGrid} from "../../model/graphical-model/visual-grid";
+import {CanvasBorder} from "../../model/graphical-model/canvas-border";
 
 /**
  * Service to manage the PIXI canvas
@@ -28,7 +30,7 @@ export class PixiManagerService {
   xCursor: number = 0;
   yCursor: number = 0;
 
-  // Canvas dragging
+  // Canvas panning
   private canvasDragging: boolean = false;
   private previousPoint = {x: 0, y: 0};
   // Map of active touches for multitouch dragging (used to prevent dragging with multiple fingers)
@@ -98,15 +100,28 @@ export class PixiManagerService {
     const renderer: Renderer = await this.pixiService.createDefaultRenderer(rendererSize.width, rendererSize.height);
     const ticker = this.pixiService.createDefaultTicker();
     const mainContainer = new Container();
+    const boundaryCanvasGraphics = new CanvasBorder(this.pixiService.boundaryXMin,
+      this.pixiService.boundaryXMax, this.pixiService.boundaryYMin, this.pixiService.boundaryYMax);
+    const visualGrid = new VisualGrid(VisualGrid.DEFAULT_CELL_SIZE, this.pixiService.boundaryXMin,
+      this.pixiService.boundaryXMax, this.pixiService.boundaryYMin, this.pixiService.boundaryYMax);
     this.pixiService.renderer = renderer;
     this.pixiService.ticker = ticker;
     this.pixiService.stage = stage;
     this.pixiService.mainContainer = mainContainer;
+    this.pixiService.canvasBoundaries = boundaryCanvasGraphics;
+    this.pixiService.canvasVisualGrid = visualGrid;
 
     // Set up
+    mainContainer.label = 'Main container';
     stage.eventMode = 'dynamic';
     stage.hitArea = renderer.screen;
     stage.addChild(mainContainer);
+
+    // Add boundaries to limit space
+    this.pixiService.canvasBoundaries.drawBorder();
+    stage.addChild(this.pixiService.canvasBoundaries);
+    // Add visual grid container
+    mainContainer.addChild(this.pixiService.canvasVisualGrid);
 
     // Append the canvas to the container
     htmlContainer.appendChild(renderer.canvas);
@@ -151,13 +166,22 @@ export class PixiManagerService {
         this.zoomCanvasTo(percentage);
       }
     });
+    this.stateService.showGrid$.subscribe(value => {
+      this.pixiService.canvasVisualGrid.renderable = value;
+      if (value) {
+        this.pixiService.canvasVisualGrid.drawGrid();
+      }
+    });
   }
 
   private handleCursorMoving(event: FederatedPointerEvent): void {
     this.xCursor = event.globalX;
     this.yCursor = event.globalY;
-    this.stateService.changeCursorX(this.xCursor)
-    this.stateService.changeCursorY(this.yCursor)
+    const currentPoint = event.getLocalPosition(this.pixiService.mainContainer); // TODO Change back
+    this.stateService.changeCursorX(currentPoint.x)
+    this.stateService.changeCursorY(currentPoint.y)
+    // this.stateService.changeCursorX(this.xCursor)
+    // this.stateService.changeCursorY(this.yCursor)
   }
 
   private handlerContextMenu(event: any): void {
@@ -179,7 +203,7 @@ export class PixiManagerService {
     if (event.pointerType === 'mouse' && event.button === 0) {
       return;
     }
-    this.activeTouches.set(event.pointerId, {x: event.clientX, y: event.clientY});
+    this.activeTouches.set(event.pointerId, {x: event.globalX, y: event.globalY});
     if (this.activeTouches.size === 1) {
       this.canvasDragging = true;
       this.previousPoint = {x: event.globalX, y: event.globalY};
@@ -191,17 +215,47 @@ export class PixiManagerService {
 
   private handleCanvasDragging(event: FederatedPointerEvent): void {
     if (this.activeTouches.has(event.pointerId)) {
-      this.activeTouches.set(event.pointerId, {x: event.clientX, y: event.clientY});
+      this.activeTouches.set(event.pointerId, {x: event.globalX, y: event.globalY});
 
       if (this.canvasDragging) {
         const currentPoint = event.getLocalPosition(this.pixiService.stage);
         const dx = currentPoint.x - this.previousPoint.x;
         const dy = currentPoint.y - this.previousPoint.y;
 
-        this.pixiService.mainContainer.x += dx;
-        this.pixiService.mainContainer.y += dy;
+        const newPoint: Point = new Point(this.pixiService.mainContainer.x + dx, this.pixiService.mainContainer.y + dy);
+
+        const currentBoundaryMinPosition = this.pixiService.mainContainer.toLocal(this.pixiService.stage); // TODO Change back
+        const currentBoundaryMaxPosition = this.pixiService.mainContainer.toLocal(new Point(this.pixiService.renderer.screen.x+this.pixiService.renderer.screen.width, this.pixiService.renderer.screen.y + this.pixiService.renderer.screen.height), this.pixiService.stage); // TODO Change back
+        const newBoundaryMinPosition = new Point(currentBoundaryMinPosition.x + dx, currentBoundaryMinPosition.y + dy);
+        const newBoundaryMaxPosition = new Point(currentBoundaryMaxPosition.x + dx, currentBoundaryMaxPosition.y + dy);
+        //this.drawDebugBoundaries();
+        // console.log(`newPoint x: ${newPoint.x}, y: ${newPoint.y}`)
+        // console.log(`currentBoundaryMinPosition.x: ${currentBoundaryMinPosition.x}, y: ${currentBoundaryMinPosition.y}`)
+        if (newBoundaryMinPosition.x < this.pixiService.boundaryXMin) {
+          //console.log("Out of bounds left");
+          //newPoint.x = -currentBoundaryMinPosition.x - 2;
+        }
+        //console.log(`stage max position: ${newBoundaryMaxPosition.x}`)
+        if (newBoundaryMaxPosition.x > this.pixiService.boundaryXMax) {
+          //console.log("Out of bounds right");
+          //newPoint.x = -currentBoundaryMinPosition.x + 2;
+        }
+        if (newBoundaryMaxPosition.y > this.pixiService.boundaryYMax) {
+          //console.log("Out of bounds bottom");
+          //newPoint.y = -currentBoundaryMinPosition.y + 2;
+        }
+        if (newBoundaryMinPosition.y < this.pixiService.boundaryYMin) {
+          //console.log("Out of bounds top");
+          //newPoint.y = -currentBoundaryMinPosition.y - 2;
+        }
+
+        this.pixiService.mainContainer.x = newPoint.x;
+        this.pixiService.mainContainer.y = newPoint.y;
 
         this.previousPoint = currentPoint;
+        // Move boundary graphics with the container
+        this.pixiService.canvasBoundaries.position.set(this.pixiService.mainContainer.x,
+          this.pixiService.mainContainer.y);
       }
     }
   }
@@ -234,9 +288,13 @@ export class PixiManagerService {
     // Set the pivot to the local cursor position
     this.pixiService.mainContainer.pivot.set(localPosition.x, localPosition.y);
     this.pixiService.mainContainer.position.set(cursorPosition.x, cursorPosition.y);
-    this.pixiService.mainContainer.scale.x = newScaleX;
-    this.pixiService.mainContainer.scale.y = newScaleY;
+    this.pixiService.mainContainer.scale.set(newScaleX, newScaleY);
     // TODO update textures resolutions on zoom
+
+    // Scale boundaries
+    this.pixiService.canvasBoundaries.pivot.set(localPosition.x, localPosition.y);
+    this.pixiService.canvasBoundaries.position.set(cursorPosition.x, cursorPosition.y);
+    this.pixiService.canvasBoundaries.scale.set(newScaleX, newScaleY);
 
     this.publishZoomPercentage();
   }
@@ -251,6 +309,9 @@ export class PixiManagerService {
     const newScaleY = (percentage / 100) * this.initialScaleY;
     this.pixiService.mainContainer.scale.x = newScaleX;
     this.pixiService.mainContainer.scale.y = newScaleY;
+    // Scale boundaries
+    this.pixiService.canvasBoundaries.pivot.set(this.pixiService.mainContainer.width/2, this.pixiService.stage.height/2);
+    this.pixiService.canvasBoundaries.scale.set(newScaleX, newScaleY);
     // TODO update textures resolutions on zoom
 
     this.stateService.changedZoomPercentage(percentage);
@@ -275,6 +336,7 @@ export class PixiManagerService {
   private addPinchListeners(hammerManager: HammerManager) {
     const pinch = new Hammer.Pinch();
 
+    // TODO add hammerjs mode managing to mode bus
     hammerManager.add(pinch);
     hammerManager.on('pinchstart', (e) => {
       this.handlePinchStart(e);
@@ -307,8 +369,12 @@ export class PixiManagerService {
 
     this.pixiService.mainContainer.pivot.set(localPosition.x, localPosition.y);
     this.pixiService.mainContainer.position.set(cursorPosition.x, cursorPosition.y);
-    this.pixiService.mainContainer.scale.x = clampedScaleX;
-    this.pixiService.mainContainer.scale.y = clampedScaleY;
+    this.pixiService.mainContainer.scale.set(clampedScaleX, clampedScaleY);
+    // Scale boundaries
+    this.pixiService.canvasBoundaries.pivot.set(localPosition.x, localPosition.y);
+    this.pixiService.canvasBoundaries.position.set(cursorPosition.x, cursorPosition.y);
+    this.pixiService.canvasBoundaries.scale.set(clampedScaleX, clampedScaleY);
+
     // TODO update textures resolutions on zoom
 
     this.publishZoomPercentage();
