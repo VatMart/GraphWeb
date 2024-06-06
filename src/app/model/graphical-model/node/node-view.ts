@@ -74,6 +74,10 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this._text.y = this.height / 2;
   }
 
+  /**
+   * Get accurate coordinates of node center.
+   * This method includes stroke width of node.
+   */
   public centerCoordinates(): Point {
     return {x: this.x + this.width / 2, y: this.y + this.height / 2};
   }

@@ -85,6 +85,29 @@ export class EventBusService {
   }
 
   /**
+   * Unregisters a TypeScript event and unsubscribes it from the corresponding Subject.
+   */
+  public unregisterTsEvent(target: EventTarget, event: string, handler: any | string) {
+    let handlerFunction;
+    if (typeof handler === 'string' && this.hasHandler(handler)) {
+      handlerFunction = this.getHandler(handler);
+    } else {
+      handlerFunction = handler;
+    }
+    target.removeEventListener(event, handlerFunction);  // Detach handler from the event target
+    let subs = this.eventSubscriptions.get(event);
+    if (subs?.has(handlerFunction)) {
+      subs.get(handlerFunction)?.unsubscribe();  // Unsubscribe the handler
+      subs.delete(handlerFunction);  // Remove the handler from the map
+      if (subs.size === 0) {
+        this.eventSubjects.get(event)?.complete();  // Complete the subject if no more subscribers
+        this.eventSubjects.delete(event);
+        this.eventSubscriptions.delete(event);
+      }
+    }
+  }
+
+  /**
    * Emits data to all subscribers of the specified event.
    */
   public emit(event: string, data: any) {

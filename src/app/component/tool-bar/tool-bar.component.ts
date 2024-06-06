@@ -37,6 +37,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
 
   // Dropdown components states
   showWeights =  new FormControl(true); // TODO change to false by default
+  showGrid = new FormControl(false);
   graphOrientation = new FormControl(GraphOrientation.ORIENTED);
 
   // Gradient state
@@ -83,6 +84,11 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.showWeights.valueChanges.subscribe(value => {
       if (value !== null) {
         this.onToggleShowWeights(value)
+      }
+    });
+    this.showGrid.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onToggleShowGrid(value);
       }
     });
     // Graph orientation
@@ -151,6 +157,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
 
   onToggleShowWeights(value: boolean) {
     this.stateService.changeShowWeights(value);
+  }
+
+  private onToggleShowGrid(value: boolean) {
+    this.stateService.changeShowGrid(value);
   }
 
   onChoseGraphOrientation(value: GraphOrientation) {

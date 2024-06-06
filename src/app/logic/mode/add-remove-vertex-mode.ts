@@ -64,15 +64,18 @@ export class AddRemoveVertexMode implements ModeBehavior {
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
-    const stage: Container = this.pixiService.stage;
     const position = event.getLocalPosition(this.pixiService.mainContainer); // Get position relative to main container
-    if (event.target === stage) {
+    if (event.target === this.pixiService.stage) {
+      if (!this.pixiService.isPointWithinCanvasBoundaries(position.x, position.y, NodeView.DEFAULT_RADIUS)) {
+        // TODO implement notification to user, outside of borders
+        return;
+      }
+      const positionNode = {x: position.x - NodeView.DEFAULT_RADIUS, y: position.y - NodeView.DEFAULT_RADIUS};
       let newNodeView: NodeView = this.nodeFabric
-        .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph,
-          {x: position.x - NodeView.DEFAULT_RADIUS, y: position.y - NodeView.DEFAULT_RADIUS});
+        .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph, positionNode);
       let command = new AddNodeViewCommand(newNodeView, this.graphViewService);
       this.historyService.execute(command);
-      //this.graphViewService.addNodeToCurrentGraphView(event.globalX, event.globalY);
+      //this.graphViewService.addNodeToCurrentGraphView(mode.globalX, mode.globalY);
     } else if (event.target instanceof NodeView) {
       let nodeView: NodeView = event.target as NodeView;
       let command = new RemoveNodeViewCommand(nodeView, this.graphViewService);

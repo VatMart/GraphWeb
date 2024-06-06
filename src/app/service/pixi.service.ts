@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {autoDetectRenderer, Container, Renderer, Ticker} from "pixi.js";
 import {EnvironmentService} from "./environment.service";
+import {VisualGrid} from "../model/graphical-model/visual-grid";
+import {CanvasBorder} from "../model/graphical-model/canvas-border";
 
 /**
  * Service for handling the PixiJS rendering engine.
@@ -16,10 +18,23 @@ export class PixiService {
   private _ticker!: Ticker;
   // Main container for all the elements
   private _mainContainer!: Container;
+  private _canvasBoundaries!: CanvasBorder;
+  private _canvasVisualGrid!: VisualGrid;
+
+  // Boundary of panning coordinates
+  // TODO move default values to the environment service
+  private _boundaryXMin: number = -1000;
+  private _boundaryXMax: number = 3000;
+  private _boundaryYMin: number = -1000;
+  private _boundaryYMax: number = 2000;
+  private _boundaryGap: number = 200;
 
   constructor(private environment: EnvironmentService) {
   }
 
+  /**
+   * Create a default stage container.
+   */
   createDefaultStage(): Container {
     const stage: Container = new Container();
     return stage;
@@ -34,7 +49,7 @@ export class PixiService {
       width: width,
       height: height,
       preference: 'webgpu',
-      background: '#F9F9F9',
+      background: '#ececec',
       antialias: true,
       autoDensity: true,
       resolution: Math.max(2, window.devicePixelRatio),
@@ -65,6 +80,13 @@ export class PixiService {
       width: window.innerWidth - occupiedWidth,
       height: window.innerHeight - occupiedHeight
     };
+  }
+
+  /**
+   * Check if the node is inside the canvas boundaries.
+   */
+  public isPointWithinCanvasBoundaries(x: number, y: number, radius?: number): boolean {
+    return this.canvasBoundaries.isNodeViewInside(x, y, radius);
   }
 
   public startRendering() {
@@ -112,5 +134,57 @@ export class PixiService {
 
   set mainContainer(value: Container) {
     this._mainContainer = value;
+  }
+
+  get canvasBoundaries(): CanvasBorder {
+    return this._canvasBoundaries;
+  }
+
+  set canvasBoundaries(value: CanvasBorder) {
+    this._canvasBoundaries = value;
+  }
+
+  get boundaryXMin(): number {
+    return this._boundaryXMin;
+  }
+
+  set boundaryXMin(value: number) {
+    this._boundaryXMin = value;
+  }
+
+  get boundaryXMax(): number {
+    return this._boundaryXMax;
+  }
+
+  set boundaryXMax(value: number) {
+    this._boundaryXMax = value;
+  }
+
+  get boundaryYMin(): number {
+    return this._boundaryYMin;
+  }
+
+  set boundaryYMin(value: number) {
+    this._boundaryYMin = value;
+  }
+
+  get boundaryYMax(): number {
+    return this._boundaryYMax;
+  }
+
+  set boundaryYMax(value: number) {
+    this._boundaryYMax = value;
+  }
+
+  get boundaryGap(): number {
+    return this._boundaryGap;
+  }
+
+  set canvasVisualGrid(value: VisualGrid) {
+    this._canvasVisualGrid = value;
+  }
+
+  get canvasVisualGrid(): VisualGrid {
+    return this._canvasVisualGrid;
   }
 }

@@ -1,5 +1,6 @@
 import {NodeView} from "../model/graphical-model/node/node-view";
 import {EdgeView} from "../model/graphical-model/edge/edge-view";
+import {Bounds, Container} from "pixi.js";
 
 /**
  * Utility class for graphical operations
@@ -53,6 +54,27 @@ export class GraphicalUtils {
   public static edgeViewToRectangle(edgeView: EdgeView): Rectangle {
     let pixiRectangle = edgeView.getLocalBounds();
     return {x: pixiRectangle.x, y: pixiRectangle.y, width: pixiRectangle.width, height: pixiRectangle.height};
+  }
+
+  /**
+   * Calculate the bounding box for multiple pixi.Container objects
+   */
+  public static calculateCompositeBounds(bounds: Rectangle[]): Rectangle {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    bounds.forEach(boundary => {
+      // Update the minimum and maximum boundaries
+      minX = Math.min(minX, boundary.x);
+      minY = Math.min(minY, boundary.y);
+      maxX = Math.max(maxX, boundary.x + boundary.width);
+      maxY = Math.max(maxY, boundary.y + boundary.height);
+    });
+
+    // Return rectangle that represents the bounds of all containers objects
+    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
   }
 }
 
