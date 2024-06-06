@@ -1,9 +1,5 @@
 import {Component} from '@angular/core';
 import {ToolBarComponent} from "./component/tool-bar/tool-bar.component";
-import {ClarityModule} from "@clr/angular";
-import '@clr/icons';
-import '@clr/icons/clr-icons.min.css';
-import '@cds/core/icon/register.js';
 import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/manager/mode-manager.service";
 import {GraphStateManagerService} from "./service/manager/graph-state-manager.service";
@@ -15,7 +11,7 @@ import {NgClass} from "@angular/common";
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ToolBarComponent, CanvasComponent, ClarityModule, TabNavComponent, NgClass],
+  imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

@@ -1,10 +1,4 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {CdkMenu, CdkMenuItem, CdkMenuTrigger} from '@angular/cdk/menu';
-import '@clr/icons';
-import '@clr/icons/clr-icons.min.css';
-import '@cds/core/icon/register.js';
-import {ClarityIcons, redoIcon, undoIcon} from '@cds/core/icon';
-import {ClarityModule} from "@clr/angular";
 import {DecimalPipe, NgIf} from "@angular/common";
 import {StateService} from "../../service/state.service";
 import {EnvironmentService} from "../../service/environment.service";
@@ -14,13 +8,16 @@ import {GraphViewService} from "../../service/graph-view.service";
 import {ClearGraphViewCommand} from "../../logic/command/clear-graph-view-command";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GraphOrientation} from "../../model/orientation";
+import {MenuModule} from "primeng/menu";
+import {ButtonModule} from "primeng/button";
+import {MenuItem} from "primeng/api";
 
-ClarityIcons.addIcons(undoIcon, redoIcon);
+// ClarityIcons.addIcons(undoIcon, redoIcon);
 
 @Component({
   selector: 'app-tool-bar',
   standalone: true,
-  imports: [ClarityModule, CdkMenuTrigger, CdkMenu, CdkMenuItem, NgIf, DecimalPipe, FormsModule, ReactiveFormsModule],
+  imports: [NgIf, DecimalPipe, FormsModule, ReactiveFormsModule, MenuModule, ButtonModule],
   templateUrl: './tool-bar.component.html',
   styleUrl: './tool-bar.component.css'
 })
@@ -56,6 +53,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   yCursor: number = 0;
 
   // Zooming button
+  zoomItems: MenuItem[] | undefined;
   zoomPercentage: number = 100; // Default zoom percentage
 
   // Gradient colors
@@ -122,6 +120,22 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     if (orientation) {
       this.onChoseGraphOrientation(orientation);
     }
+    // Init zooming button dropdown items
+    this.zoomItems = [
+      {
+        label: 'Options',
+        items: [
+          {
+            label: 'Refresh',
+            icon: 'pi pi-refresh'
+          },
+          {
+            label: 'Export',
+            icon: 'pi pi-upload'
+          }
+        ]
+      }
+    ];
   }
 
   ngOnDestroy(): void {
