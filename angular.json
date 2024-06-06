@@ -27,9 +27,7 @@
             "styles": [
               "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/@cds/core/global.min.css",
-              "node_modules/@cds/core/styles/theme.dark.min.css",
-              "node_modules/@clr/ui/clr-ui.min.css",
+              "node_modules/primeflex/primeflex.scss",
               "src/styles.css"
             ],
             "scripts": [

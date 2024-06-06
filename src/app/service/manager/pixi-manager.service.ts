@@ -18,6 +18,8 @@ import {CanvasBorder} from "../../model/graphical-model/canvas-border";
 })
 export class PixiManagerService {
 
+  // Refactor class to move all event handlers to separate class (CanvasEventHandler)
+
   private boundHandleCursorMoving: (event: FederatedPointerEvent) => void;
   private boundHandleContextMenu: (event: any) => void;
   private boundHandleResizeCanvas: () => void;

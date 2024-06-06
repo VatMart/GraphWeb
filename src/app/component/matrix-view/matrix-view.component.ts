@@ -6,7 +6,6 @@ import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
 import {NgForOf, NgIf} from "@angular/common";
 import {StateService} from "../../service/state.service";
 import {GraphOrientation} from "../../model/orientation";
-import {ClarityModule} from "@clr/angular";
 
 @Component({
   selector: 'app-matrix-view',
@@ -17,7 +16,6 @@ import {ClarityModule} from "@clr/angular";
     FormsModule,
     NgIf,
     NgForOf,
-    ClarityModule,
     ReactiveFormsModule
   ],
   templateUrl: './matrix-view.component.html',

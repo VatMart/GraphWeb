@@ -1,35 +1,35 @@
 <ng-container *ngIf="!isMobileDevice; else bottomNavTab">
   <div class="main-container">
     <div class="content-container">
-      <clr-vertical-nav class="clr-vertical-nav"
-                        [clrVerticalNavCollapsible]="true"
-                        (clrVerticalNavCollapsedChange)="onCollapseLeftNavBar()">
-        <div class="nav-content">
-          <!-- template for group elements -->
-          <!--          <clr-vertical-nav-group [clrVerticalNavGroupExpanded]="clrVerticalNavGroupExpanded"-->
-          <!--                                  (clrVerticalNavGroupExpandedChange)="clrVerticalNavGroupExpandedChange($event)">-->
-          <!--            <cds-icon class="matrix-icon" *ngIf="includeIcons" shape="matrix-icon" clrVerticalNavIcon></cds-icon>-->
-          <!--            <div class="nav-group-text"> Matrices</div>-->
-          <!--            <clr-vertical-nav-group-children>-->
-          <!--              <a *ngFor="let navLink of matricesLinks; let index = index" clrVerticalNavLink-->
-          <!--                 [ngClass]="{ active: index == activeIndex }"-->
-          <!--                 href="javascript:void(0)"-->
-          <!--                 (click)="onMatrixItemClick(index)">-->
-          <!--                <cds-icon *ngIf="includeIcons" [attr.shape]="navLink.iconShapeTuple[0]" clrVerticalNavIcon></cds-icon>-->
-          <!--                <a class="nav-text">-->
-          <!--                  {{ navLink.navName }}-->
-          <!--                </a>-->
-          <!--              </a>-->
-          <!--            </clr-vertical-nav-group-children>-->
-          <!--          </clr-vertical-nav-group>-->
-          <a clrVerticalNavLink class="nav-link" href="javascript:void(0)"
-             [ngClass]="{ active: activeIndex !== null }"
-             (click)="onMatrixItemClick()">
-            <cds-icon class="matrix-icon" *ngIf="includeIcons" shape="matrix-icon" clrVerticalNavIcon></cds-icon>
-            Matrices
-          </a>
-        </div>
-      </clr-vertical-nav>
+<!--      <clr-vertical-nav class="clr-vertical-nav"-->
+<!--                        [clrVerticalNavCollapsible]="true"-->
+<!--                        (clrVerticalNavCollapsedChange)="onCollapseLeftNavBar()">-->
+<!--        <div class="nav-content">-->
+<!--          &lt;!&ndash; template for group elements &ndash;&gt;-->
+<!--          &lt;!&ndash;          <clr-vertical-nav-group [clrVerticalNavGroupExpanded]="clrVerticalNavGroupExpanded"&ndash;&gt;-->
+<!--          &lt;!&ndash;                                  (clrVerticalNavGroupExpandedChange)="clrVerticalNavGroupExpandedChange($event)">&ndash;&gt;-->
+<!--          &lt;!&ndash;            <cds-icon class="matrix-icon" *ngIf="includeIcons" shape="matrix-icon" clrVerticalNavIcon></cds-icon>&ndash;&gt;-->
+<!--          &lt;!&ndash;            <div class="nav-group-text"> Matrices</div>&ndash;&gt;-->
+<!--          &lt;!&ndash;            <clr-vertical-nav-group-children>&ndash;&gt;-->
+<!--          &lt;!&ndash;              <a *ngFor="let navLink of matricesLinks; let index = index" clrVerticalNavLink&ndash;&gt;-->
+<!--          &lt;!&ndash;                 [ngClass]="{ active: index == activeIndex }"&ndash;&gt;-->
+<!--          &lt;!&ndash;                 href="javascript:void(0)"&ndash;&gt;-->
+<!--          &lt;!&ndash;                 (click)="onMatrixItemClick(index)">&ndash;&gt;-->
+<!--          &lt;!&ndash;                <cds-icon *ngIf="includeIcons" [attr.shape]="navLink.iconShapeTuple[0]" clrVerticalNavIcon></cds-icon>&ndash;&gt;-->
+<!--          &lt;!&ndash;                <a class="nav-text">&ndash;&gt;-->
+<!--          &lt;!&ndash;                  {{ navLink.navName }}&ndash;&gt;-->
+<!--          &lt;!&ndash;                </a>&ndash;&gt;-->
+<!--          &lt;!&ndash;              </a>&ndash;&gt;-->
+<!--          &lt;!&ndash;            </clr-vertical-nav-group-children>&ndash;&gt;-->
+<!--          &lt;!&ndash;          </clr-vertical-nav-group>&ndash;&gt;-->
+<!--          <a clrVerticalNavLink class="nav-link" href="javascript:void(0)"-->
+<!--             [ngClass]="{ active: activeIndex !== null }"-->
+<!--             (click)="onMatrixItemClick()">-->
+<!--            <cds-icon class="matrix-icon" *ngIf="includeIcons" shape="matrix-icon" clrVerticalNavIcon></cds-icon>-->
+<!--            Matrices-->
+<!--          </a>-->
+<!--        </div>-->
+<!--      </clr-vertical-nav>-->
 
       <div #leftSideContentContainer>
         <div  class="left-side-content-container" *ngIf="activeIndex !== null">

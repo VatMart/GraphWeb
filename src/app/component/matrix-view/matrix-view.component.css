@@ -11,10 +11,8 @@
 
 .matrix-type-label {
   display: block;
-  color: var(--clr-forms-label-color);
-  font-weight: var(--clr-forms-label-font-weight);
-  line-height: var(--cds-alias-typography-secondary-line-height);
-  letter-spacing: var(--cds-alias-typography-secondary-letter-spacing);
+  color: black;
+  font-weight: bold;
   padding-right: 4px;
 }
 

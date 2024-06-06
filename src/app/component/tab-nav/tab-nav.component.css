@@ -13,7 +13,7 @@
 .clr-vertical-nav {
   border-right-width: 1px;
   border-right-style: solid;
-  border-right-color: var(--clr-vertical-nav-trigger-divider-border-color);
+  border-right-color: #d3d3d3;
   width: auto;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .content-separator {
-  border-top: 1px solid var(--clr-vertical-nav-trigger-divider-border-color); /* Adjust the color and width as needed */
+  border-top: 1px solid var(--main-border-color); /* Adjust the color and width as needed */
 }
 
 /* Other components styles */
@@ -93,7 +93,7 @@
   box-sizing: border-box;
   border-right-width: 1px;
   border-right-style: solid;
-  border-right-color: var(--clr-vertical-nav-trigger-divider-border-color);
+  border-right-color: var(--main-border-color);
 }
 
 /* Mobile styles */
