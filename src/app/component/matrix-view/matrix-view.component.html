@@ -1,12 +1,10 @@
 <div class="matrix-type-container">
   <label class="matrix-type-label">Matrix type:</label>
-<!--  <clr-select-container>-->
-<!--    <select clrSelect name="matrix-type" [formControl]="matrixType"-->
-<!--            [value]="matrixType.defaultValue">-->
-<!--      <option [value]="TypeMatrix.ADJACENCY">Adjacency</option>-->
-<!--      <option [value]="TypeMatrix.INCIDENCE">Incidence</option>-->
-<!--    </select>-->
-<!--  </clr-select-container>-->
+  <p-dropdown
+    [options]="matrixTypes"
+    [formControl]="matrixType"
+    optionValue="value"
+    optionLabel="label"/>
 </div>
 
 <div class="matrix-content-container">
@@ -52,7 +50,7 @@
         </ng-template>
       </div>
       <div *ngIf="matrixType.value === TypeMatrix.INCIDENCE">
-        <!-- TODO -->
+        <!-- TODO Implement-->
       </div>
     </div>
 

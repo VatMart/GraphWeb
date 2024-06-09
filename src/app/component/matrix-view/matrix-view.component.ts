@@ -1,11 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { TableModule } from 'primeng/table';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {SelectButtonModule} from 'primeng/selectbutton';
+import {TableModule} from 'primeng/table';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
 import {NgForOf, NgIf} from "@angular/common";
 import {StateService} from "../../service/state.service";
-import {GraphOrientation} from "../../model/orientation";
+import {MenuModule} from "primeng/menu";
+import {DropdownModule} from "primeng/dropdown";
 
 @Component({
   selector: 'app-matrix-view',
@@ -16,34 +17,33 @@ import {GraphOrientation} from "../../model/orientation";
     FormsModule,
     NgIf,
     NgForOf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MenuModule,
+    DropdownModule
   ],
   templateUrl: './matrix-view.component.html',
   styleUrls: ['./matrix-view.component.css']
 })
-export class MatrixViewComponent implements OnInit {
+export class MatrixViewComponent implements OnInit, OnDestroy {
 
   useExpandButtonGradient: boolean = false;
 
   protected readonly TypeMatrix = TypeMatrix;
+  matrixTypes: SelectMatrixTypeItem[] | undefined;
   matrixType = new FormControl(TypeMatrix.ADJACENCY);
 
   columns: string[] = [];
   valuesOfFirstColumn: string[] = [];
   matrix: number[][] = [];
 
-  // products = [
-  //   { code: '1', name: '1', category: '0', quantity: 1 },
-  //   { code: '2', name: '0', category: '1', quantity: 0 },
-  //   { code: '3', name: '1', category: '0', quantity: 1 },
-  //   { code: '4', name: '0', category: '1', quantity: 0 },
-  //   { code: '5', name: '1', category: '0', quantity: 1 }
-  // ];
-
   constructor(private stateService: StateService) {
   }
 
   ngOnInit(): void {
+    this.matrixTypes = [
+      {label: 'Adjacency', value: TypeMatrix.ADJACENCY},
+      {label: 'Incidence', value: TypeMatrix.INCIDENCE}
+    ];
     // On matrix type change
     this.matrixType.valueChanges.subscribe(value => {
       if (value !== null) {
@@ -57,6 +57,11 @@ export class MatrixViewComponent implements OnInit {
         this.onMatrixChange(matrix);
       }
     });
+    this.stateService.changedMatrixViewVisibility(true);
+  }
+
+  ngOnDestroy(): void {
+    this.stateService.changedMatrixViewVisibility(false);
   }
 
   private onChoseMatrixType(value: TypeMatrix) {
@@ -70,10 +75,12 @@ export class MatrixViewComponent implements OnInit {
     this.valuesOfFirstColumn = indexesToString;
   }
 
-
   onExpandTable() {
     this.useExpandButtonGradient = false;
   }
+}
 
-  protected readonly GraphOrientation = GraphOrientation;
+interface SelectMatrixTypeItem {
+  label: string;
+  value: TypeMatrix;
 }
