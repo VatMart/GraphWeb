@@ -1,11 +1,10 @@
 /* Toolbar styles */
 .toolbar-main-container {
   display: flex;
-  align-items: center;
   justify-content: flex-start;
-  padding-inline: 5px;
-  background-color: #e8e8e8; /* TODO CHANGE*/
-  /*margin-top: 2px;*/
+  flex-wrap: nowrap;
+  padding-inline: 4px;
+  background-color: #f2f2f2;
   border-block-width: 1px;
   border-block-style: solid;
   border-block-color: var(--main-border-color);
@@ -15,7 +14,6 @@
   display: inline-grid;
   padding-inline: 10px;
   width: 95px;
-  /*background-color: #dfdfff; !* TODO REMOVE*!*/
   border-width: 2px;
   border-color: black;
   border-style: dotted;
@@ -23,11 +21,17 @@
 
 /* Regular button styles */
 .graph-web-button, .graph-web-toggle-button {
+  display: flex;
+  align-items: center;
   background-color: transparent;
   color: black;
+  font-family: var(--font-family);
+  font-weight: bold;
+  font-size: 1rem;
   border: none;
-  margin: 3px;
+  margin: 4px;
   border-radius: 10px;
+  padding: 0 4px;
 }
 
 .graph-web-button:disabled, .graph-web-toggle-button:disabled {
@@ -36,6 +40,10 @@
 
 .graph-web-toggle-button:not(:disabled):hover, .graph-web-button:not(:disabled):hover {
   background-color: #DCDCDC;
+  color: #006FFF;
+}
+
+.graph-web-toggle-button:not(:disabled):hover, .graph-web-button:not(:disabled):hover i{
   color: #006FFF;
 }
 
@@ -56,26 +64,12 @@
   background-color: #adadad;
 }
 
-.dropdown-menu {
-  padding: 5px;
-  background-color: #fafafa;
-  min-width: fit-content;
+/* Dropdown styles */
+.dropdown-select-item-container {
+  padding-left: 8px;
+  padding-bottom: 4px;
 }
 
-.dropdown-menu .dropdown-header {
-  padding-left: 2px;
-}
-
-.dropdown-menu .dropdown-item {
-  padding: 4px;
-  width: fit-content;
-}
-
-.clr-form-control {
-  margin-top: 0;
-}
-
-option {
-  font-size: unset;
-  font-weight: normal;
+.dropdown-select-item-container:hover {
+  background: #f9f9f9 !important;
 }

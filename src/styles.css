@@ -1,23 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
 @import "primeicons/primeicons.css";
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.min.css";
 
 :root {
   --main-border-color: #d3d3d3;
+  --main-blue-color: #006FFF;
+  --main-blue-light-color: #4d9aff;
+  --main-hover-color: #DCDCDC;
 }
 
 body {
   margin: 0;
-}
-
-* {
-  font-family: 'Metropolis', sans-serif;
-  font-size: medium;
-  font-weight: bold;
-  --clr-toggle-bg-color-off: #adadad;
-  --clr-toggle-handle-border-color: black;
-  --clr-toggle-handle-border-color-on: black;
-  --clr-forms-focused-color: #006FFF;
-  --clr-toggle-bg-color-on: #006FFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  font-family: var(--font-family);
+  font-weight: normal;
 }
 
 .move-right {
@@ -25,6 +24,66 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+}
+
+/* PrimeNG customization */
+/* Menu customization*/
+.p-menu {
+  padding: 0;
+  background: #f9f9f9;
+  border-radius: 8px;
+  /*width: fit-content;*/
+  font-size: 14px;
+}
+
+.p-menu .p-submenu-header {
+  margin: 0;
+  color: #414e61;
+  padding: 0.50rem 1rem;
+  background: #f9f9f9;
+}
+
+.p-menu ul {
+  padding: 6px;
+}
+
+.p-menu .p-menuitem > .p-menuitem-content {
+  border-radius: 6px;
+}
+
+.p-menu .p-menuitem > .p-menuitem-content:hover {
+  background: #ededed;
+}
+
+.p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link {
+  padding: 0.5rem 0.5rem;
+}
+
+/* PrimeNG checkbox */
+.p-checkbox .p-checkbox-box.p-highlight {
+  border-color: var(--main-blue-color);
+  background: var(--main-blue-color);
+}
+
+.p-dropdown {
+  background: #f9f9f9;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  width: 2rem;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  padding: 0.5rem 0.5rem;
+  border-radius: 4px;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:first-child {
+  margin-top: 1px;
+}
+
+.p-inputtext {
+  padding: 0.5rem 0.5rem;
 }
 
 /* Style for the overall scrollbar */
@@ -50,6 +109,10 @@ body {
   border-radius: 10px; /* Rounded corners for the scrollbar track */
 }
 
+.black-icon {
+  color: black;
+}
+
 /* Mobile styles */
 .p-tabmenu .p-tabmenu-nav {
   background: #ffffff;
@@ -66,12 +129,25 @@ body {
   padding: 0.5rem 1rem;
 }
 
+.p-tabmenu-nav-content {
+  background: #f2f2f2;
+}
+
+.p-tabmenu .p-tabmenu-nav {
+  background: #f2f2f2;
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {
+  background: #f2f2f2;
+}
+
 .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link {
-  background: #ffffff;
+  background: #f2f2f2;
   border-color: #3B82F6;
   color: #3B82F6;
 }
 
-.black-icon {
-  color: black;
+.p-sidebar {
+  background-color: #f2f2f2;
+  border-right: 1px solid var(--main-border-color);
 }

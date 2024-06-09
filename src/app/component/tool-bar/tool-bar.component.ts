@@ -10,14 +10,15 @@ import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GraphOrientation} from "../../model/orientation";
 import {MenuModule} from "primeng/menu";
 import {ButtonModule} from "primeng/button";
-import {MenuItem} from "primeng/api";
-
-// ClarityIcons.addIcons(undoIcon, redoIcon);
+import {MenuItem, PrimeNGConfig} from "primeng/api";
+import {RippleModule} from "primeng/ripple";
+import {CheckboxModule} from "primeng/checkbox";
+import {DropdownModule} from "primeng/dropdown";
 
 @Component({
   selector: 'app-tool-bar',
   standalone: true,
-  imports: [NgIf, DecimalPipe, FormsModule, ReactiveFormsModule, MenuModule, ButtonModule],
+  imports: [NgIf, DecimalPipe, FormsModule, ReactiveFormsModule, MenuModule, ButtonModule, RippleModule, CheckboxModule, DropdownModule],
   templateUrl: './tool-bar.component.html',
   styleUrl: './tool-bar.component.css'
 })
@@ -31,11 +32,6 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   isAddVertexButtonPressed: boolean = false;
   isAddEdgesButtonActive: boolean = false;
   isAddEdgesButtonPressed: boolean = false;
-
-  // Dropdown components states
-  showWeights =  new FormControl(true); // TODO change to false by default
-  showGrid = new FormControl(false);
-  graphOrientation = new FormControl(GraphOrientation.ORIENTED);
 
   // Gradient state
   useAddVertexGradient: boolean = false;
@@ -56,6 +52,14 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   zoomItems: MenuItem[] | undefined;
   zoomPercentage: number = 100; // Default zoom percentage
 
+  // Settings button
+  settingsItems: MenuItem[] | undefined;
+  // Dropdown components states
+  showWeights =  new FormControl(true); // TODO change to false by default
+  showGrid = new FormControl(false);
+  orientations: SelectOrientationItem[] | undefined;
+  selectedOrientation = new FormControl<GraphOrientation | null>(GraphOrientation.ORIENTED);
+
   // Gradient colors
   gradientColorStart: string = '#FFC618';
   gradientColorEnd: string = '#ff0000';
@@ -63,11 +67,13 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   constructor(private stateService: StateService,
               private environmentService: EnvironmentService,
               private historyService: HistoryService,
-              private graphViewService: GraphViewService) {
+              private graphViewService: GraphViewService,
+              private primengConfig: PrimeNGConfig) {
     this.isMobileDevice = this.environmentService.isMobile();
   }
 
   ngOnInit(): void {
+    this.primengConfig.ripple = true;
     // Init subscriptions
     // Cursor coordinates
     this.subscriptions.add(this.stateService.currentCursorX.subscribe(state => this.xCursor = state));
@@ -90,14 +96,14 @@ export class ToolBarComponent implements OnInit, OnDestroy {
       }
     });
     // Graph orientation
-    this.subscriptions.add(this.graphOrientation.valueChanges.subscribe(value => {
+    this.subscriptions.add(this.selectedOrientation.valueChanges.subscribe(value => {
       if (value !== null) {
         this.onChoseGraphOrientation(value);
       }
     }));
     this.subscriptions.add(this.stateService.graphOrientationChanged$.subscribe(state => {
-      if (state !== this.graphOrientation.value) {
-        this.graphOrientation.setValue(state);
+      if (state !== this.selectedOrientation.value) {
+        this.selectedOrientation.setValue(state);
       }
     }));
     // Mode buttons
@@ -116,22 +122,49 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     if (showWeights) {
       this.onToggleShowWeights(showWeights); // Set initial state
     }
-    const orientation = this.graphOrientation.value;
-    if (orientation) {
-      this.onChoseGraphOrientation(orientation);
-    }
     // Init zooming button dropdown items
     this.zoomItems = [
       {
-        label: 'Options',
+        label: 'Zoom level',
+        items: [
+          {label: '300%', command: () => { this.onZoomDropdownItemClick(300); }},
+          {label: '200%', command: () => { this.onZoomDropdownItemClick(200); }},
+          {label: '150%', command: () => { this.onZoomDropdownItemClick(150); }},
+          {label: '125%', command: () => { this.onZoomDropdownItemClick(125); }},
+          {label: '100%', command: () => { this.onZoomDropdownItemClick(100); }},
+          {label: '75%', command: () => { this.onZoomDropdownItemClick(75); }},
+          {label: '50%', command: () => { this.onZoomDropdownItemClick(50); }}
+        ]
+      }
+    ];
+    // Init settings button dropdown items
+    this.orientations = [
+      {label: 'Directed', value: GraphOrientation.ORIENTED},
+      {label: 'Undirected', value: GraphOrientation.NON_ORIENTED},
+      {label: 'Mixed', value: GraphOrientation.MIXED}
+    ];
+    this.settingsItems = [
+      {
+        label: 'View options',
         items: [
           {
-            label: 'Refresh',
-            icon: 'pi pi-refresh'
+            id: 'showWeights',
+            label: 'Show weights',
           },
           {
-            label: 'Export',
-            icon: 'pi pi-upload'
+            id: 'showGrid',
+            label: 'Show grid',
+          },
+        ],
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Graph orientation',
+        items: [
+          {
+            id: 'selectOrientation'
           }
         ]
       }
@@ -195,6 +228,17 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.stateService.changeZoomTo(number);
   }
 
+  onCheckboxClick(event: Event, type: string) {
+    event.stopPropagation();
+    if (event.target?.constructor.name === "HTMLElement") { // Clicked on menu item, but not on checkbox directly
+      if (type === 'showWeights') {
+        this.showWeights.setValue(!this.showWeights.value);
+      } else if (type === 'showGrid') {
+        this.showGrid.setValue(!this.showGrid.value);
+      }
+    }
+  }
+
   buttonAddVertexMouseLeave() {
     if (this.isAddVertexButtonPressed) {
       if (!this.isAddVertexButtonActive) {
@@ -244,6 +288,9 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.gradientColorEnd = '#ff0000';
     this.useAddEdgesGradient = false;
   }
+}
 
-  protected readonly GraphOrientation = GraphOrientation;
+interface SelectOrientationItem {
+  label: string;
+  value: GraphOrientation;
 }

@@ -17,7 +17,7 @@
   </span>
 
   <!-- Toggle Button for Vertex Addition -->
-  <button id="buttonAddVertex" class="graph-web-toggle-button" [class.active]="isAddVertexButtonActive"
+  <button pRipple id="buttonAddVertex" class="graph-web-toggle-button" [class.active]="isAddVertexButtonActive"
           (click)="onToggleAddVertexButton()"
           (mouseleave)="buttonAddVertexMouseLeave()"
           (mousedown)="buttonAddVertexMouseDown()"
@@ -40,7 +40,7 @@
   </button>
 
   <!-- Toggle Button for Edge Addition -->
-  <button id="buttonAddEdge" class="graph-web-toggle-button" [class.active]="isAddEdgesButtonActive"
+  <button pRipple id="buttonAddEdge" class="graph-web-toggle-button" [class.active]="isAddEdgesButtonActive"
           (click)="onToggleAddEdgesButton()"
           (mouseleave)="buttonAddEdgesMouseLeave()"
           (mousedown)="buttonAddEdgesMouseDown()"
@@ -62,7 +62,7 @@
   </button>
 
   <!-- Button for Clear graph -->
-  <button class="graph-web-button"
+  <button pRipple class="graph-web-button"
           (click)="onClearGraph()"
           (mouseleave)="useClearGradient = false"
           (mousedown)="useClearGradient = true"
@@ -75,7 +75,7 @@
   </button>
 
   <!-- Undo/Redo Buttons -->
-  <button class="graph-web-button"
+  <button pRipple class="graph-web-button"
           (click)="undoAction()"
           (mouseleave)="useUndoGradient = false"
           (mousedown)="useUndoGradient = true"
@@ -90,7 +90,7 @@
     </svg>
   </button>
 
-  <button class="graph-web-button"
+  <button pRipple class="graph-web-button"
           (click)="redoAction()"
           (mouseleave)="useRedoGradient = false"
           (mousedown)="useRedoGradient = true"
@@ -107,9 +107,9 @@
 
   <div class="move-right">
     <div *ngIf="!isMobileDevice">
-      <p-menu #zoomMenu [model]="zoomItems" [popup]="true" />
-<!--      <p-button (click)="menu.toggle($event)" icon="pi pi-ellipsis-v"/>-->
-      <button class="graph-web-button" id="mbScale" style="padding-inline: 3px"
+      <!-- Zoom (lens) button -->
+      <p-menu #zoomMenu [model]="zoomItems" [popup]="true"/>
+      <button pRipple class="graph-web-button" id="mbScale" style="padding-inline: 3px"
               (click)="zoomMenu.toggle($event)">
         {{ zoomPercentage.toFixed() }}%
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="31" viewBox="-1 -0.5 7 7" fill="none">
@@ -117,77 +117,54 @@
             d="M2.142.151C1.272.134.454.802.294 1.657.11 2.48.56 3.385 1.324 3.738c.436.212.954.245 1.412.088a.83.83 0 0 0 .753.247c.375.41.742.825 1.12 1.23.247.244.688.017.694-.31.007-.248-.227-.389-.363-.566L4.1 3.5c.05-.248-.068-.496-.253-.657.375-.753.153-1.737-.505-2.26a1.9 1.9 0 0 0-1.2-.43m0 .693c.634-.016 1.181.568 1.165 1.194.016.626-.53 1.21-1.165 1.194-.634.015-1.18-.569-1.164-1.194C.966 1.41 1.502.834 2.142.846"
             fill="currentColor"/>
         </svg>
-<!--        <clr-icon shape="caret down"></clr-icon>-->
+        <i class="pi pi-angle-down black-icon" style="font-size: 1rem"></i>
       </button>
-
-      <!-- Zoom (lens) button -->
-<!--      <clr-dropdown>-->
-<!--        <button clrDropdownTrigger class="graph-web-button" id="mbScale" style="padding-inline: 3px">-->
-<!--          {{ zoomPercentage.toFixed() }}%-->
-<!--          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="31" viewBox="-1 -0.5 7 7" fill="none">-->
-<!--            <path-->
-<!--              d="M2.142.151C1.272.134.454.802.294 1.657.11 2.48.56 3.385 1.324 3.738c.436.212.954.245 1.412.088a.83.83 0 0 0 .753.247c.375.41.742.825 1.12 1.23.247.244.688.017.694-.31.007-.248-.227-.389-.363-.566L4.1 3.5c.05-.248-.068-.496-.253-.657.375-.753.153-1.737-.505-2.26a1.9 1.9 0 0 0-1.2-.43m0 .693c.634-.016 1.181.568 1.165 1.194.016.626-.53 1.21-1.165 1.194-.634.015-1.18-.569-1.164-1.194C.966 1.41 1.502.834 2.142.846"-->
-<!--              fill="currentColor"/>-->
-<!--          </svg>-->
-<!--          <clr-icon shape="caret down"></clr-icon>-->
-<!--        </button>-->
-<!--        <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>-->
-<!--          <a href="#" class="dropdown-item" (click)="onZoomDropdownItemClick(300)">300%</a>-->
-<!--          <a href="#" class="dropdown-item" (click)="onZoomDropdownItemClick(200)">200%</a>-->
-<!--          <a href="#" class="dropdown-item" (click)="onZoomDropdownItemClick(150)">150%</a>-->
-<!--          <a href="#" class="dropdown-item" (click)="onZoomDropdownItemClick(125)">125%</a>-->
-<!--          <a href="#" class="dropdown-item" (click)="onZoomDropdownItemClick(100)">100%</a>-->
-<!--          <a href="#" class="dropdown-item" (click)="onZoomDropdownItemClick(75)">75%</a>-->
-<!--          <a href="#" class="dropdown-item" (click)="onZoomDropdownItemClick(50)">50%</a>-->
-<!--        </clr-dropdown-menu>-->
-<!--      </clr-dropdown>-->
     </div>
 
-    <!-- Settings (cog) button -->
-<!--    <div>-->
-<!--      <clr-dropdown>-->
-<!--        <button clrDropdownTrigger class="graph-web-button" id="tbSettings">-->
-<!--          <svg xmlns="http://www.w3.org/2000/svg" width="35px" height="39px" viewBox="-0.5 -0.25 5 5">-->
-<!--            <path-->
-<!--              d="m1.89.035-.24.533a1.6 1.6 0 0 0-.297.123L.807.485l-.32.32.205.546a1.6 1.6 0 0 0-.123.3l-.532.24v.452l.532.24a1.6 1.6 0 0 0 .123.298l-.206.546.32.321.545-.206a1.6 1.6 0 0 0 .3.123l.24.533h.452l.24-.534a1.6 1.6 0 0 0 .297-.123l.548.208.32-.32-.207-.546a1.6 1.6 0 0 0 .124-.3l.532-.24v-.452l-.532-.24a1.6 1.6 0 0 0-.124-.298l.206-.546-.32-.321-.547.206a1.6 1.6 0 0 0-.297-.124l-.24-.533zm.227 1.28a.8.8 0 0 1 .799.8.8.8 0 0 1-.8.8.8.8 0 0 1-.799-.8.8.8 0 0 1 .8-.8"-->
-<!--              fill="currentColor"/>-->
-<!--            />-->
-<!--          </svg>-->
-<!--          <clr-icon shape="caret down"></clr-icon>-->
-<!--        </button>-->
-<!--        <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>-->
-<!--          <label class="dropdown-header" aria-hidden="true">View options</label>-->
-<!--          <div class="dropdown-item">-->
-<!--            <clr-toggle-container>-->
-<!--              <clr-toggle-wrapper>-->
-<!--                <input type="checkbox" clrToggle [formControl]="showWeights" name="show_weights"/>-->
-<!--                <label>Show edge weights</label>-->
-<!--              </clr-toggle-wrapper>-->
-<!--            </clr-toggle-container>-->
-<!--          </div>-->
-<!--          <div class="dropdown-item">-->
-<!--            <clr-toggle-container>-->
-<!--              <clr-toggle-wrapper>-->
-<!--                <input type="checkbox" clrToggle [formControl]="showGrid" name="show_grid"/>-->
-<!--                <label>Show grid</label>-->
-<!--              </clr-toggle-wrapper>-->
-<!--            </clr-toggle-container>-->
-<!--          </div>-->
-<!--          &lt;!&ndash; TODO add show/hid Index of vertexes &ndash;&gt;-->
-
-<!--          <label class="dropdown-header" aria-hidden="true">Graph orientation</label>-->
-<!--          <div class="dropdown-item">-->
-<!--            <clr-select-container>-->
-<!--              <select clrSelect name="graph-orientation" [formControl]="graphOrientation"-->
-<!--                      [value]="graphOrientation.defaultValue">-->
-<!--                <option [value]="GraphOrientation.ORIENTED">Directed</option>-->
-<!--                <option [value]="GraphOrientation.NON_ORIENTED">Undirected</option>-->
-<!--                <option [value]="GraphOrientation.MIXED">Mixed</option>-->
-<!--              </select>-->
-<!--            </clr-select-container>-->
-<!--          </div>-->
-<!--        </clr-dropdown-menu>-->
-<!--      </clr-dropdown>-->
-<!--    </div>-->
+    <div>
+      <p-menu #settingMenu [model]="settingsItems" [popup]="true">
+        <ng-template pTemplate="item" let-item>
+          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
+                      [formControl]="showWeights"
+                      [binary]="true" inputId="binary"
+                      (click)="onCheckboxClick($event, 'showWeights')"
+                      *ngIf="item.id === 'showWeights'">
+          </p-checkbox>
+          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
+                      [formControl]="showGrid"
+                      [binary]="true" inputId="binary"
+                      (click)="onCheckboxClick($event, 'showGrid')"
+                      *ngIf="item.id === 'showGrid'">
+          </p-checkbox>
+          <div class="dropdown-select-item-container" (click)="$event.stopPropagation();" *ngIf="item.id === 'selectOrientation'">
+            <p-dropdown class="custom-select"
+                        [options]="orientations"
+                        [formControl]="selectedOrientation"
+                        (click)="$event.stopPropagation();"
+                        optionValue="value"
+                        optionLabel="label">
+              <ng-template pTemplate="selectedItem">
+                <div *ngIf="selectedOrientation.value">
+                  <div>{{ selectedOrientation.value }}</div>
+                </div>
+              </ng-template>
+              <ng-template let-orientation pTemplate="item">
+                <div pRipple>{{ orientation.label }}</div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </ng-template>
+      </p-menu>
+      <button pRipple class="graph-web-button" id="tbSettings"
+              (click)="settingMenu.toggle($event)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="35px" height="39px" viewBox="-0.25 -0.5 5 5">
+          <path
+            d="m1.89.035-.24.533a1.6 1.6 0 0 0-.297.123L.807.485l-.32.32.205.546a1.6 1.6 0 0 0-.123.3l-.532.24v.452l.532.24a1.6 1.6 0 0 0 .123.298l-.206.546.32.321.545-.206a1.6 1.6 0 0 0 .3.123l.24.533h.452l.24-.534a1.6 1.6 0 0 0 .297-.123l.548.208.32-.32-.207-.546a1.6 1.6 0 0 0 .124-.3l.532-.24v-.452l-.532-.24a1.6 1.6 0 0 0-.124-.298l.206-.546-.32-.321-.547.206a1.6 1.6 0 0 0-.297-.124l-.24-.533zm.227 1.28a.8.8 0 0 1 .799.8.8.8 0 0 1-.8.8.8.8 0 0 1-.799-.8.8.8 0 0 1 .8-.8"
+            fill="currentColor"/>
+        </svg>
+        <i class="pi pi-angle-down black-icon" style="font-size: 1rem"></i>
+      </button>
+    </div>
+    <!-- TODO add show/hid Index of vertexes -->
   </div>
 </div>
