@@ -54,17 +54,20 @@ export class StateService {
   private matrixSource = new BehaviorSubject<GraphMatrix | null>(null);
   public currentMatrix$ = this.matrixSource.asObservable();
 
-  private needResizeCanvasSource = new BehaviorSubject<boolean>(false);
-  public needResizeCanvas$ = this.needResizeCanvasSource.asObservable();
-
   // --------------------------------------------------
   // UI component states. Canvas
   // --------------------------------------------------
+  private pixiStartedSource = new BehaviorSubject<boolean>(false);
+  public pixiStarted$ = this.pixiStartedSource.asObservable();
+
   // Canvas cursor coordinates
   private cursorXSource = new BehaviorSubject<number>(0);
   private cursorYSource = new BehaviorSubject<number>(0);
   public currentCursorX = this.cursorXSource.asObservable();
   public currentCursorY = this.cursorYSource.asObservable();
+
+  private needResizeCanvasSource = new BehaviorSubject<boolean>(false);
+  public needResizeCanvas$ = this.needResizeCanvasSource.asObservable();
 
   private rendererResizedSource = new BehaviorSubject<{width: number, height: number}>({width: 0, height: 0});
   public rendererResized$ = this.rendererResizedSource.asObservable();
@@ -74,6 +77,9 @@ export class StateService {
 
   private zoomChangedSource = new BehaviorSubject<number>(100);
   public zoomChanged$ = this.zoomChangedSource.asObservable();
+
+  private needCenterCanvasViewSource = new BehaviorSubject<boolean>(false);
+  public needCenterCanvasView$ = this.needCenterCanvasViewSource.asObservable();
 
   // --------------------------------------------------
   // Graph elements and graph states
@@ -210,6 +216,13 @@ export class StateService {
   }
 
   /**
+   * Notify that the PIXI renderer has been started.
+   */
+  pixiStarted() {
+    this.pixiStartedSource.next(true);
+  }
+
+  /**
    * Notify that the canvas needs to be resized.
    */
   needResizeCanvas() {
@@ -249,6 +262,13 @@ export class StateService {
    */
   changedZoomPercentage(value: number) {
     this.zoomChangedSource.next(value);
+  }
+
+  /**
+   * Notify that the canvas view needs to be centered.
+   */
+  needCenterCanvasView() {
+    this.needCenterCanvasViewSource.next(true);
   }
 
   /**

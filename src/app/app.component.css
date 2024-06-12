@@ -14,3 +14,16 @@
 .main-content-desktop-container {
   display: flex;
 }
+
+.pixi-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#pixi-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  flex-grow: 1;
+}

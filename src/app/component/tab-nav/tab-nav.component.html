@@ -68,11 +68,12 @@
              (onHide)="onBottomPanelHide()"
              [appendTo]="tabMenuContainer"
              autoZIndex="false"
-             [modal]="false">
+             [modal]="true">
     <ng-template pTemplate="headless">
       <div class="mobile-sidebar">
         <div class="mobile-sidebar-header">
-          <a pRipple class="pi pi-angle-double-left collapse-icon" style="font-size: 1.5rem"
+          <h3>{{ activeItem ? activeItem['header'] : "No header" }}</h3>
+          <a pRipple class="pi pi-angle-double-left collapse-icon move-right" style="font-size: 1.5rem"
              (click)="onCloseMobileSidebar($event)"></a>
         </div>
         <div class="mobile-sidebar-content">

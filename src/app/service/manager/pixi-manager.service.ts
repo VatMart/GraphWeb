@@ -39,11 +39,6 @@ export class PixiManagerService {
   private activeTouches: Map<number, { x: number; y: number }> = new Map();
 
   // Canvas zooming
-  // Initial scale values for calculating zoom percentage
-  private initialScaleX: number = 1.0;
-  private initialScaleY: number = 1.0;
-  private maxScale: number = 3.0;  // Maximum zoom level (300%)
-  private minScale: number = 0.5;  // Minimum zoom level (50%)
   // Touch screen zooming
   private initialPinchScale: number = 1.0;
 
@@ -77,8 +72,12 @@ export class PixiManagerService {
     await this.setUpDefaultPixiCanvas();
     this.pixiService.startRendering();
     console.log("Pixi initialized. Renderer: " + this.pixiService.renderer.constructor.name); // TODO remove
+    // Initialize pixi global listeners
     this.initPixiListeners();
-    this.modeManagerService.initialize(); // Initialize default mode listeners
+    // Initialize mode listeners
+    this.modeManagerService.initialize();
+    // Notify state service that PIXI is started
+    this.stateService.pixiStarted();
   }
 
   /**
@@ -174,6 +173,11 @@ export class PixiManagerService {
         this.pixiService.canvasVisualGrid.drawGrid();
       }
     });
+    this.stateService.needCenterCanvasView$.subscribe(value => {
+      if (value) {
+        this.pixiService.centerCanvasView();
+      }
+    });
   }
 
   private handleCursorMoving(event: FederatedPointerEvent): void {
@@ -226,30 +230,30 @@ export class PixiManagerService {
 
         const newPoint: Point = new Point(this.pixiService.mainContainer.x + dx, this.pixiService.mainContainer.y + dy);
 
-        const currentBoundaryMinPosition = this.pixiService.mainContainer.toLocal(this.pixiService.stage); // TODO Change back
-        const currentBoundaryMaxPosition = this.pixiService.mainContainer.toLocal(new Point(this.pixiService.renderer.screen.x+this.pixiService.renderer.screen.width, this.pixiService.renderer.screen.y + this.pixiService.renderer.screen.height), this.pixiService.stage); // TODO Change back
-        const newBoundaryMinPosition = new Point(currentBoundaryMinPosition.x + dx, currentBoundaryMinPosition.y + dy);
-        const newBoundaryMaxPosition = new Point(currentBoundaryMaxPosition.x + dx, currentBoundaryMaxPosition.y + dy);
-        //this.drawDebugBoundaries();
-        // console.log(`newPoint x: ${newPoint.x}, y: ${newPoint.y}`)
-        // console.log(`currentBoundaryMinPosition.x: ${currentBoundaryMinPosition.x}, y: ${currentBoundaryMinPosition.y}`)
-        if (newBoundaryMinPosition.x < this.pixiService.boundaryXMin) {
-          //console.log("Out of bounds left");
-          //newPoint.x = -currentBoundaryMinPosition.x - 2;
-        }
-        //console.log(`stage max position: ${newBoundaryMaxPosition.x}`)
-        if (newBoundaryMaxPosition.x > this.pixiService.boundaryXMax) {
-          //console.log("Out of bounds right");
-          //newPoint.x = -currentBoundaryMinPosition.x + 2;
-        }
-        if (newBoundaryMaxPosition.y > this.pixiService.boundaryYMax) {
-          //console.log("Out of bounds bottom");
-          //newPoint.y = -currentBoundaryMinPosition.y + 2;
-        }
-        if (newBoundaryMinPosition.y < this.pixiService.boundaryYMin) {
-          //console.log("Out of bounds top");
-          //newPoint.y = -currentBoundaryMinPosition.y - 2;
-        }
+        // const currentBoundaryMinPosition = this.pixiService.mainContainer.toLocal(this.pixiService.stage); // TODO Change back
+        // const currentBoundaryMaxPosition = this.pixiService.mainContainer.toLocal(new Point(this.pixiService.renderer.screen.x+this.pixiService.renderer.screen.width, this.pixiService.renderer.screen.y + this.pixiService.renderer.screen.height), this.pixiService.stage); // TODO Change back
+        // const newBoundaryMinPosition = new Point(currentBoundaryMinPosition.x + dx, currentBoundaryMinPosition.y + dy);
+        // const newBoundaryMaxPosition = new Point(currentBoundaryMaxPosition.x + dx, currentBoundaryMaxPosition.y + dy);
+        // //this.drawDebugBoundaries();
+        // // console.log(`newPoint x: ${newPoint.x}, y: ${newPoint.y}`)
+        // // console.log(`currentBoundaryMinPosition.x: ${currentBoundaryMinPosition.x}, y: ${currentBoundaryMinPosition.y}`)
+        // if (newBoundaryMinPosition.x < this.pixiService.boundaryXMin) {
+        //   //console.log("Out of bounds left");
+        //   //newPoint.x = -currentBoundaryMinPosition.x - 2;
+        // }
+        // //console.log(`stage max position: ${newBoundaryMaxPosition.x}`)
+        // if (newBoundaryMaxPosition.x > this.pixiService.boundaryXMax) {
+        //   //console.log("Out of bounds right");
+        //   //newPoint.x = -currentBoundaryMinPosition.x + 2;
+        // }
+        // if (newBoundaryMaxPosition.y > this.pixiService.boundaryYMax) {
+        //   //console.log("Out of bounds bottom");
+        //   //newPoint.y = -currentBoundaryMinPosition.y + 2;
+        // }
+        // if (newBoundaryMinPosition.y < this.pixiService.boundaryYMin) {
+        //   //console.log("Out of bounds top");
+        //   //newPoint.y = -currentBoundaryMinPosition.y - 2;
+        // }
 
         this.pixiService.mainContainer.x = newPoint.x;
         this.pixiService.mainContainer.y = newPoint.y;
@@ -275,30 +279,10 @@ export class PixiManagerService {
    */
   handleWheelZooming(event: WheelEvent): void {
     event.preventDefault();
+    console.log(event.deltaY);
     const scaleFactor = event.deltaY > 0 ? 1 / 1.1 : 1.1;
-    // Calculate potential new scales
-    const newScaleX = this.pixiService.mainContainer.scale.x * scaleFactor;
-    const newScaleY = this.pixiService.mainContainer.scale.y * scaleFactor;
-    // Check if the new scale exceeds maximum or minimum bounds
-    if (newScaleX < this.minScale || newScaleY < this.minScale || newScaleX > this.maxScale || newScaleY > this.maxScale) {
-      return;
-    }
-
-    const cursorPosition = this.pixiService.renderer.events.pointer.global;
-    const localPosition = this.pixiService.mainContainer.toLocal(cursorPosition, this.pixiService.stage);
-
-    // Set the pivot to the local cursor position
-    this.pixiService.mainContainer.pivot.set(localPosition.x, localPosition.y);
-    this.pixiService.mainContainer.position.set(cursorPosition.x, cursorPosition.y);
-    this.pixiService.mainContainer.scale.set(newScaleX, newScaleY);
-    // TODO update textures resolutions on zoom
-
-    // Scale boundaries
-    this.pixiService.canvasBoundaries.pivot.set(localPosition.x, localPosition.y);
-    this.pixiService.canvasBoundaries.position.set(cursorPosition.x, cursorPosition.y);
-    this.pixiService.canvasBoundaries.scale.set(newScaleX, newScaleY);
-
-    this.publishZoomPercentage();
+    const cursorPosition =  this.pixiService.renderer.events.pointer.global
+    this.pixiService.zoomCanvasView(scaleFactor, cursorPosition);
   }
 
   /**
@@ -306,23 +290,11 @@ export class PixiManagerService {
    * This method is used to set the zoom level from the outside.
    */
   private zoomCanvasTo(percentage: number) {
-    this.pixiService.mainContainer.pivot.set(this.pixiService.mainContainer.width/2, this.pixiService.stage.height/2); // Center of the canvas
-    const newScaleX = (percentage / 100) * this.initialScaleX;
-    const newScaleY = (percentage / 100) * this.initialScaleY;
-    this.pixiService.mainContainer.scale.x = newScaleX;
-    this.pixiService.mainContainer.scale.y = newScaleY;
-    // Scale boundaries
-    this.pixiService.canvasBoundaries.pivot.set(this.pixiService.mainContainer.width/2, this.pixiService.stage.height/2);
-    this.pixiService.canvasBoundaries.scale.set(newScaleX, newScaleY);
-    // TODO update textures resolutions on zoom
-
-    this.stateService.changedZoomPercentage(percentage);
-  }
-
-  private publishZoomPercentage() {
-    const zoomPercentage = (this.pixiService.mainContainer.scale.x / this.initialScaleX) * 100;
-    console.log(`Zoom Percentage: ${zoomPercentage.toFixed(2)}%`); // TODO remove
-    this.stateService.changedZoomPercentage(zoomPercentage);
+    const scaleFactor = percentage / 100;
+    // Center of the canvas
+    const scalePosition = {x: this.pixiService.renderer.width/2,
+      y: this.pixiService.renderer.height/2};
+    this.pixiService.zoomCanvasView(scaleFactor, scalePosition, 1.0);
   }
 
   private addTouchscreenListeners() {
@@ -354,31 +326,10 @@ export class PixiManagerService {
 
   private handlePinchZoom(event: HammerInput) {
     const scaleFactor = event.scale;
-    const newScaleX = this.initialPinchScale * scaleFactor;
-    const newScaleY = this.initialPinchScale * scaleFactor;
-
-    // Clamp the scale to prevent exceeding zoom limits
-    const clampedScaleX = Math.min(Math.max(newScaleX, this.minScale), this.maxScale);
-    const clampedScaleY = Math.min(Math.max(newScaleY, this.minScale), this.maxScale);
-
-    // Calculate the cursor position (average of the touches)
     const cursorPosition = {
       x: (event.pointers[0].pageX + event.pointers[1].pageX) / 2,
       y: (event.pointers[0].pageY + event.pointers[1].pageY) / 2,
     };
-
-    const localPosition = this.pixiService.mainContainer.toLocal(cursorPosition, this.pixiService.stage);
-
-    this.pixiService.mainContainer.pivot.set(localPosition.x, localPosition.y);
-    this.pixiService.mainContainer.position.set(cursorPosition.x, cursorPosition.y);
-    this.pixiService.mainContainer.scale.set(clampedScaleX, clampedScaleY);
-    // Scale boundaries
-    this.pixiService.canvasBoundaries.pivot.set(localPosition.x, localPosition.y);
-    this.pixiService.canvasBoundaries.position.set(cursorPosition.x, cursorPosition.y);
-    this.pixiService.canvasBoundaries.scale.set(clampedScaleX, clampedScaleY);
-
-    // TODO update textures resolutions on zoom
-
-    this.publishZoomPercentage();
+    this.pixiService.zoomCanvasView(scaleFactor, cursorPosition, this.initialPinchScale);
   }
 }

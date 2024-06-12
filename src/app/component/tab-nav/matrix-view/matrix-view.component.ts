@@ -2,9 +2,9 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SelectButtonModule} from 'primeng/selectbutton';
 import {TableModule} from 'primeng/table';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
+import {GraphMatrix, TypeMatrix} from "../../../model/graph-matrix";
 import {NgForOf, NgIf} from "@angular/common";
-import {StateService} from "../../service/state.service";
+import {StateService} from "../../../service/state.service";
 import {MenuModule} from "primeng/menu";
 import {DropdownModule} from "primeng/dropdown";
 
