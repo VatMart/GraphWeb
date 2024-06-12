@@ -1,0 +1,11 @@
+<div class="float-helper" *ngIf="showHelper" @fade>
+  <div class="float-helper-container">
+    <div class="float-helper-content">
+      <a>{{currentHelperItem.text}}</a>
+    </div>
+    <div class="close-button-container move-right"
+         (click)="onCloseHelper()">
+      <i pRipple class="pi pi-times-circle close-button" style="padding-left: 4px; font-size: 1rem"></i>
+    </div>
+  </div>
+</div>

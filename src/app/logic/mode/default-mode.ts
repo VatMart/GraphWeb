@@ -68,6 +68,7 @@ export class DefaultMode implements ModeBehavior {
     console.log("DefaultMode OFF"); // TODO remove
     this.selectableModeOff();
     this.moveableNodesOff();
+    this.graphViewService.clearSelection();
   }
 
   onAddedNode(nodeView: NodeView): void {

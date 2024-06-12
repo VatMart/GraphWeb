@@ -56,7 +56,8 @@
 
     <div class="matrix-vertical-bar-container">
       <!-- Open table in separate window button -->
-      <button class="graph-web-button"
+      <button pRipple pTooltip="Show in separate window" tooltipPosition="bottom" showDelay="200"
+              class="graph-web-button"
               (click)="onExpandTable()"
               (mouseleave)="useExpandButtonGradient = false"
               (mousedown)="useExpandButtonGradient = true"

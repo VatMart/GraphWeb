@@ -57,6 +57,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   // Dropdown components states
   showWeights =  new FormControl(true); // TODO change to false by default
   showGrid = new FormControl(false);
+  hideHelper = new FormControl(false);
   orientations: SelectOrientationItem[] | undefined;
   selectedOrientation = new FormControl<GraphOrientation | null>(GraphOrientation.ORIENTED);
 
@@ -93,6 +94,11 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.showGrid.valueChanges.subscribe(value => {
       if (value !== null) {
         this.onToggleShowGrid(value);
+      }
+    });
+    this.hideHelper.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onToggleAlwaysHideHelper(value);
       }
     });
     // Graph orientation
@@ -155,6 +161,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
             id: 'showGrid',
             label: 'Show grid',
           },
+          {
+            id: 'hideHelper',
+            label: 'Always hide hint text',
+          },
         ],
       },
       {
@@ -210,6 +220,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.stateService.changeShowGrid(value);
   }
 
+  private onToggleAlwaysHideHelper(value: boolean) {
+    this.stateService.changeAlwaysHideFloatHelperState(value);
+  }
+
   onChoseGraphOrientation(value: GraphOrientation) {
     this.stateService.changeGraphOrientation(value);
   }
@@ -231,10 +245,16 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   onCheckboxClick(event: Event, type: string) {
     event.stopPropagation();
     if (event.target?.constructor.name === "HTMLElement") { // Clicked on menu item, but not on checkbox directly
-      if (type === 'showWeights') {
-        this.showWeights.setValue(!this.showWeights.value);
-      } else if (type === 'showGrid') {
-        this.showGrid.setValue(!this.showGrid.value);
+      switch (type) {
+        case 'showWeights':
+          this.showWeights.setValue(!this.showWeights.value);
+          break;
+        case 'showGrid':
+          this.showGrid.setValue(!this.showGrid.value);
+          break;
+        case 'hideHelper':
+          this.hideHelper.setValue(!this.hideHelper.value);
+          break;
       }
     }
   }

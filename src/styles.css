@@ -38,7 +38,6 @@ body {
   padding: 0;
   background: #f9f9f9;
   border-radius: 8px;
-  /*width: fit-content;*/
   font-size: 14px;
 }
 
@@ -90,6 +89,16 @@ body {
 
 .p-inputtext {
   padding: 0.5rem 0.5rem;
+}
+
+/* PrimeNG tooltip */
+.p-tooltip-text {
+  background-color: #3b3b3b;
+  padding: 0.5rem 0.5rem;
+}
+
+.p-tooltip-arrow {
+  border-bottom-color: #3b3b3b;
 }
 
 /* Style for the overall scrollbar */
