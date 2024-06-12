@@ -7,6 +7,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {StateService} from "../../../service/state.service";
 import {MenuModule} from "primeng/menu";
 import {DropdownModule} from "primeng/dropdown";
+import {RippleModule} from "primeng/ripple";
 
 @Component({
   selector: 'app-matrix-view',
@@ -19,7 +20,8 @@ import {DropdownModule} from "primeng/dropdown";
     NgForOf,
     ReactiveFormsModule,
     MenuModule,
-    DropdownModule
+    DropdownModule,
+    RippleModule
   ],
   templateUrl: './matrix-view.component.html',
   styleUrls: ['./matrix-view.component.css']

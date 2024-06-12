@@ -17,7 +17,8 @@
   </span>
 
   <!-- Toggle Button for Vertex Addition -->
-  <button pRipple id="buttonAddVertex" class="graph-web-toggle-button" [class.active]="isAddVertexButtonActive"
+  <button pRipple pTooltip="Add/Remove vertexes" tooltipPosition="bottom" showDelay="200"
+          id="buttonAddVertex" class="graph-web-toggle-button" [class.active]="isAddVertexButtonActive"
           (click)="onToggleAddVertexButton()"
           (mouseleave)="buttonAddVertexMouseLeave()"
           (mousedown)="buttonAddVertexMouseDown()"
@@ -40,7 +41,8 @@
   </button>
 
   <!-- Toggle Button for Edge Addition -->
-  <button pRipple id="buttonAddEdge" class="graph-web-toggle-button" [class.active]="isAddEdgesButtonActive"
+  <button pRipple pTooltip="Add/Remove edges" tooltipPosition="bottom" showDelay="200"
+          id="buttonAddEdge" class="graph-web-toggle-button" [class.active]="isAddEdgesButtonActive"
           (click)="onToggleAddEdgesButton()"
           (mouseleave)="buttonAddEdgesMouseLeave()"
           (mousedown)="buttonAddEdgesMouseDown()"
@@ -62,7 +64,8 @@
   </button>
 
   <!-- Button for Clear graph -->
-  <button pRipple class="graph-web-button"
+  <button pRipple pTooltip="Clear graph" tooltipPosition="bottom" showDelay="200"
+          class="graph-web-button"
           (click)="onClearGraph()"
           (mouseleave)="useClearGradient = false"
           (mousedown)="useClearGradient = true"
@@ -75,7 +78,8 @@
   </button>
 
   <!-- Undo/Redo Buttons -->
-  <button pRipple class="graph-web-button"
+  <button pRipple pTooltip="Undo" tooltipPosition="bottom" showDelay="200"
+          class="graph-web-button"
           (click)="undoAction()"
           (mouseleave)="useUndoGradient = false"
           (mousedown)="useUndoGradient = true"
@@ -90,7 +94,8 @@
     </svg>
   </button>
 
-  <button pRipple class="graph-web-button"
+  <button pRipple pTooltip="Redo" tooltipPosition="bottom" showDelay="200"
+          class="graph-web-button"
           (click)="redoAction()"
           (mouseleave)="useRedoGradient = false"
           (mousedown)="useRedoGradient = true"
@@ -109,7 +114,8 @@
     <div *ngIf="!isMobileDevice">
       <!-- Zoom (lens) button -->
       <p-menu #zoomMenu [model]="zoomItems" [popup]="true"/>
-      <button pRipple class="graph-web-button" id="mbScale" style="padding-inline: 3px"
+      <button pRipple pTooltip="Zoom level" tooltipPosition="bottom" showDelay="200"
+              class="graph-web-button" id="mbScale" style="padding-inline: 3px"
               (click)="zoomMenu.toggle($event)">
         {{ zoomPercentage.toFixed() }}%
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="31" viewBox="-1 -0.5 7 7" fill="none">
@@ -136,6 +142,12 @@
                       (click)="onCheckboxClick($event, 'showGrid')"
                       *ngIf="item.id === 'showGrid'">
           </p-checkbox>
+          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
+                      [formControl]="hideHelper"
+                      [binary]="true" inputId="binary"
+                      (click)="onCheckboxClick($event, 'hideHelper')"
+                      *ngIf="item.id === 'hideHelper'">
+          </p-checkbox>
           <div class="dropdown-select-item-container" (click)="$event.stopPropagation();" *ngIf="item.id === 'selectOrientation'">
             <p-dropdown class="custom-select"
                         [options]="orientations"
@@ -155,7 +167,8 @@
           </div>
         </ng-template>
       </p-menu>
-      <button pRipple class="graph-web-button" id="tbSettings"
+      <button pRipple pTooltip="Settings" tooltipPosition="left" showDelay="200"
+              class="graph-web-button" id="tbSettings"
               (click)="settingMenu.toggle($event)">
         <svg xmlns="http://www.w3.org/2000/svg" width="35px" height="39px" viewBox="-0.25 -0.5 5 5">
           <path

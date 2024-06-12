@@ -5,6 +5,7 @@ import {NodeView} from "../model/graphical-model/node/node-view";
 import {EdgeView} from "../model/graphical-model/edge/edge-view";
 import {GraphOrientation} from "../model/orientation";
 import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
+import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../component/canvas/float-helper/float-helper.component";
 
 /**
  * Service for managing the state of the application.
@@ -80,6 +81,15 @@ export class StateService {
 
   private needCenterCanvasViewSource = new BehaviorSubject<boolean>(false);
   public needCenterCanvasView$ = this.needCenterCanvasViewSource.asObservable();
+
+  // --------------------------------------------------
+  // UI component states. Canvas Float helper
+  // --------------------------------------------------
+  private alwaysHideFloatHelperSource = new BehaviorSubject<boolean>(false);
+  public alwaysHideFloatHelper$ = this.alwaysHideFloatHelperSource.asObservable();
+
+  private currentFloatHelperItemSource = new BehaviorSubject<FloatHelperItem>(DEFAULT_HELPER_ITEM);
+  public currentFloatHelperItem$ = this.currentFloatHelperItemSource.asObservable();
 
   // --------------------------------------------------
   // Graph elements and graph states
@@ -269,6 +279,20 @@ export class StateService {
    */
   needCenterCanvasView() {
     this.needCenterCanvasViewSource.next(true);
+  }
+
+  /**
+   * Change the visibility of the float helper.
+   */
+  changeAlwaysHideFloatHelperState(value: boolean) {
+    this.alwaysHideFloatHelperSource.next(value);
+  }
+
+  /**
+   * Change the current float helper item.
+   */
+  changeFloatHelperItem(item: FloatHelperItem) {
+    this.currentFloatHelperItemSource.next(item);
   }
 
   /**

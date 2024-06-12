@@ -7,13 +7,14 @@ import {TabNavComponent} from "./component/tab-nav/tab-nav.component";
 import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix-view-state-manager.service";
 import {EnvironmentService} from "./service/environment.service";
 import {NgClass, NgIf} from "@angular/common";
-import {FloatToolBarComponent} from "./component/float-tool-bar/float-tool-bar.component";
+import {FloatToolBarComponent} from "./component/canvas/float-tool-bar/float-tool-bar.component";
 import {StateService} from "./service/state.service";
+import {FloatHelperComponent} from "./component/canvas/float-helper/float-helper.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass, FloatToolBarComponent, NgIf],
+  imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass, FloatToolBarComponent, NgIf, FloatHelperComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -22,6 +23,7 @@ export class AppComponent implements OnInit {
 
   isMobileDevice: boolean;
   showFloatToolBar: boolean = false;
+  showFloatHelper: boolean = false;
 
   constructor(private modeManagerService: ModeManagerService,
               private graphStateManager: GraphStateManagerService,
@@ -33,9 +35,19 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Subscribe to pixi started event
     this.stateService.pixiStarted$.subscribe(() => {
       this.cdr.detectChanges();
+      // Show float toolbar and helper
       this.showFloatToolBar = true;
+      this.showFloatHelper = true;
+    });
+
+    // Subscribe to changes of float helper visibility
+    this.stateService.alwaysHideFloatHelper$.subscribe((value) => {
+      if (this.showFloatHelper === value) {
+        this.showFloatHelper = !value;
+      }
     });
     // TODO implement handling for pixi stop event
   }

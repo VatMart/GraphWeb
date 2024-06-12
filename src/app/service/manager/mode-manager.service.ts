@@ -11,6 +11,10 @@ import {NodeViewFabricService} from "../node-view-fabric.service";
 import {HistoryService} from "../history.service";
 import {EdgeViewFabricService} from "../edge-view-fabric.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {
+  ADD_REMOVE_EDGE_MODE_HELPER_ITEM,
+  ADD_REMOVE_VERTEX_MODE_HELPER_ITEM, DEFAULT_HELPER_ITEM
+} from "../../component/canvas/float-helper/float-helper.component";
 
 /**
  * Service for managing the modes of the application.
@@ -50,8 +54,8 @@ export class ModeManagerService {
     // Subscribe to the currentMode$ mode state
     this.stateService.currentMode$.subscribe(mode => {
       if (this.currentModeState !== mode) {
-        this.graphViewService.clearSelection();
         this.updateModeState(mode);
+        this.updateHelperItem(mode);
       }
     });
 
@@ -107,6 +111,20 @@ export class ModeManagerService {
     this.currentModeState = newState;
   }
 
+  private updateHelperItem(mode: ModeState) {
+    switch (mode) {
+      case 'AddRemoveVertex':
+        this.stateService.changeFloatHelperItem(ADD_REMOVE_VERTEX_MODE_HELPER_ITEM);
+        break;
+      case 'AddRemoveEdge':
+        this.stateService.changeFloatHelperItem(ADD_REMOVE_EDGE_MODE_HELPER_ITEM);
+        break;
+      case 'default':
+        this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM);
+    }
+
+  }
+
   /**
    * On added node handling, while mode is active
    */
@@ -155,7 +173,6 @@ export class ModeManagerService {
   public onRedoInvoked() {
     this.modeStateActions[this.currentModeState].onRedoInvoked();
   }
-
 }
 
 export interface ModeBehavior {
