@@ -1,0 +1,15 @@
+<div class="toolbar-container">
+  <ng-container *ngFor="let item of items; let i = index">
+    <div pRipple class="toolbar-item" (click)="item.command(i)">
+      <ng-container *ngIf="item.customIcon; else defaultIcon">
+        <span class="custom-icon-container">
+          <span [class]="item.icon" appSvgIcon [appSvgIcon]="item.icon"></span>
+        </span>
+      </ng-container>
+      <!-- Find icon in primeng icons -->
+      <ng-template #defaultIcon>
+        <span class="black-icon" [class]="item.icon"></span>
+      </ng-template>
+    </div>
+  </ng-container>
+</div>

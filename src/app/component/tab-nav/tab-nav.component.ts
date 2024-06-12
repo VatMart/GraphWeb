@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {CommonModule, NgClass, NgForOf, NgIf} from "@angular/common";
-import {MatrixViewComponent} from "../matrix-view/matrix-view.component";
+import {MatrixViewComponent} from "./matrix-view/matrix-view.component";
 import {StateService} from "../../service/state.service";
 import {EnvironmentService} from "../../service/environment.service";
 import {TabMenuModule} from "primeng/tabmenu";

@@ -1,31 +1,17 @@
 <main class="main">
   <body>
   <!--  TODO REMAKE HEADER-->
-  <!--  <header class="header-6">-->
-  <!--    <div class="branding">-->
-  <!--      <a>-->
-  <!--        <img class="logo" ngSrc="assets/logo_white.png" priority alt="logo" height="251" width="249"/>-->
-  <!--        <span class="title">{{title}}</span>-->
-  <!--      </a>-->
-  <!--    </div>-->
-  <!--    <div class="header-nav">-->
-  <!--      <a href="" class="active nav-link nav-text">Test</a>-->
-  <!--      <a href="" class="nav-link nav-text">About</a>-->
-  <!--    </div>-->
-  <!--    <div class="header-actions">-->
-  <!--      <a href="" class="nav-link nav-icon" aria-label="help">-->
-  <!--        <cds-icon shape="help"></cds-icon>-->
-  <!--      </a>-->
-  <!--    </div>-->
-  <!--  </header>-->
-    <div [ngClass]="isMobileDevice ? 'main-body-mobile-container' : 'main-body-desktop-container'">
-      <div>
-        <app-tool-bar id="toolbar"/>
-      </div>
-      <div [ngClass]="isMobileDevice ? 'main-content-mobile-container' : 'main-content-desktop-container'">
-        <app-tab-nav id="navbar"/>
-        <app-canvas/>
+  <div [ngClass]="isMobileDevice ? 'main-body-mobile-container' : 'main-body-desktop-container'">
+    <div>
+      <app-tool-bar id="toolbar"/>
+    </div>
+    <div [ngClass]="isMobileDevice ? 'main-content-mobile-container' : 'main-content-desktop-container'">
+      <app-tab-nav id="navbar"/>
+      <div class="pixi-container">
+        <app-float-tool-bar *ngIf="showFloatToolBar"/>
+        <app-canvas id="pixi-canvas"/>
       </div>
     </div>
+  </div>
   </body>
 </main>
