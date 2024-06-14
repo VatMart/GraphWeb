@@ -68,6 +68,6 @@ export interface FloatHelperItem {
   text: string;
 }
 
-export const DEFAULT_HELPER_ITEM: FloatHelperItem = {text: 'Use toolbar to add vertexes and edges'};
+export const DEFAULT_HELPER_ITEM: FloatHelperItem = {text: 'Use toolbar to add vertices and edges'};
 export const ADD_REMOVE_VERTEX_MODE_HELPER_ITEM: FloatHelperItem = {text: 'Click on canvas to add vertex. Click on vertex to remove it'};
-export const ADD_REMOVE_EDGE_MODE_HELPER_ITEM: FloatHelperItem = {text: 'Click on two vertexes in sequence to add edge. Click on edge to remove it'};
+export const ADD_REMOVE_EDGE_MODE_HELPER_ITEM: FloatHelperItem = {text: 'Click on two vertices in sequence to add edge. Click on edge to remove it'};

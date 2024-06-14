@@ -94,11 +94,25 @@ body {
 /* PrimeNG tooltip */
 .p-tooltip-text {
   background-color: #3b3b3b;
-  padding: 0.5rem 0.5rem;
+  padding: 0.25rem 0.25rem;
 }
 
 .p-tooltip-arrow {
   border-bottom-color: #3b3b3b;
+}
+
+/* PrimeNG notification messages */
+.p-toast {
+  width: auto;
+}
+
+.p-toast .p-toast-message .p-toast-message-content {
+  padding: 0.25rem;
+}
+
+.p-toast .p-toast-message .p-toast-message-content .p-toast-message-text {
+  margin: 0;
+  padding-right: 4px;
 }
 
 /* Style for the overall scrollbar */
@@ -165,5 +179,5 @@ body {
 .p-sidebar {
   background-color: var(--main-bg-color);
   border-right: 1px solid var(--main-border-color);
-  z-index: 1001;
+  z-index: 1;
 }

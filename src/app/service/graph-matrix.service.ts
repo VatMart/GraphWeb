@@ -48,6 +48,7 @@ export class GraphMatrixService {
       console.log("Building adjacency matrix"); // TODO remove
       return new AdjacencyMatrixBuilder();
     } else if (matrixType === TypeMatrix.INCIDENCE) {
+      console.log("Building incidence matrix"); // TODO remove
       return new IncidenceMatrixBuilder();
     }
     throw new Error("Matrix type not supported: " + matrixType); // TODO change

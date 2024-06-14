@@ -30,6 +30,13 @@ export class Edge {
     this._orientation = orientation ? orientation : EdgeOrientation.ORIENTED; // default value
   }
 
+  /**
+   * If edge is loop (edge with equals nodes)
+   */
+  isLoop(): boolean {
+    return this._firstNode.index === this._secondNode.index;
+  }
+
   get firstNode(): Node {
     return this._firstNode;
   }

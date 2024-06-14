@@ -8,6 +8,11 @@ import {StateService} from "../../../service/state.service";
 import {MenuModule} from "primeng/menu";
 import {DropdownModule} from "primeng/dropdown";
 import {RippleModule} from "primeng/ripple";
+import {Subscription} from "rxjs";
+import {MessageService} from "primeng/api";
+import {ToastModule} from "primeng/toast";
+import {DialogModule} from "primeng/dialog";
+import {MatrixTableComponent} from "./matrix-table/matrix-table.component";
 
 @Component({
   selector: 'app-matrix-view',
@@ -21,24 +26,31 @@ import {RippleModule} from "primeng/ripple";
     ReactiveFormsModule,
     MenuModule,
     DropdownModule,
-    RippleModule
+    RippleModule,
+    ToastModule,
+    DialogModule,
+    MatrixTableComponent
   ],
+  providers: [MessageService],
   templateUrl: './matrix-view.component.html',
   styleUrls: ['./matrix-view.component.css']
 })
 export class MatrixViewComponent implements OnInit, OnDestroy {
+  private subscriptions: Subscription = new Subscription();
 
-  useExpandButtonGradient: boolean = false;
-
-  protected readonly TypeMatrix = TypeMatrix;
   matrixTypes: SelectMatrixTypeItem[] | undefined;
   matrixType = new FormControl(TypeMatrix.ADJACENCY);
+  fullScreen = false;
 
+  // Table data
   columns: string[] = [];
   valuesOfFirstColumn: string[] = [];
   matrix: number[][] = [];
 
-  constructor(private stateService: StateService) {
+  graphMatrix: GraphMatrix | undefined;
+
+  constructor(private stateService: StateService,
+              private messageService: MessageService) {
   }
 
   ngOnInit(): void {
@@ -47,23 +59,28 @@ export class MatrixViewComponent implements OnInit, OnDestroy {
       {label: 'Incidence', value: TypeMatrix.INCIDENCE}
     ];
     // On matrix type change
-    this.matrixType.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onChoseMatrixType(value);
-      }
-    });
+    this.subscriptions.add(
+      this.matrixType.valueChanges.subscribe(value => {
+        if (value !== null) {
+          this.onChoseMatrixType(value);
+        }
+      })
+    );
 
     // On matrix change
-    this.stateService.currentMatrix$.subscribe(matrix => {
-      if (matrix !== null) {
-        this.onMatrixChange(matrix);
-      }
-    });
+    this.subscriptions.add(
+      this.stateService.currentMatrix$.subscribe(matrix => {
+        if (matrix !== null) {
+          this.onMatrixChange(matrix);
+        }
+      })
+    );
     this.stateService.changedMatrixViewVisibility(true);
   }
 
   ngOnDestroy(): void {
     this.stateService.changedMatrixViewVisibility(false);
+    this.subscriptions.unsubscribe(); // Unsubscribe from all subscriptions
   }
 
   private onChoseMatrixType(value: TypeMatrix) {
@@ -71,14 +88,74 @@ export class MatrixViewComponent implements OnInit, OnDestroy {
   }
 
   private onMatrixChange(matrix: GraphMatrix) {
+    this.graphMatrix = matrix;
     this.matrix = matrix.matrix;
-    let indexesToString = matrix.vertexIndexes.map(index => index.toString());
-    this.columns = indexesToString;
-    this.valuesOfFirstColumn = indexesToString;
+    let vertexIndexesToString = matrix.vertexIndexes.map(index => index.toString());
+    this.columns = matrix.type === TypeMatrix.ADJACENCY ? vertexIndexesToString : matrix.edgeIndexes;
+    this.valuesOfFirstColumn = vertexIndexesToString;
   }
 
   onExpandTable() {
-    this.useExpandButtonGradient = false;
+    this.fullScreen = true;
+  }
+
+  onCopyToClipboard() {
+    if (!this.graphMatrix || this.graphMatrix.matrix.length === 0) {
+      return;
+    }
+    const textToCopy = this.graphMatrix.toString();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        this.showSuccessCopy();
+      }).catch(err => {
+        this.showErrorCopy('Could not copy text: ' + err);
+      });
+    } else {
+      // Fallback method for browsers that do not support Clipboard API
+      this.fallbackCopyTextToClipboard(textToCopy);
+    }
+  }
+
+  fallbackCopyTextToClipboard(textToCopy: string) {
+    const textArea = document.createElement('textarea');
+    textArea.value = textToCopy;
+    // Ensure the text area is invisible and doesn't disrupt layout
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    textArea.style.opacity = '0';
+    textArea.style.pointerEvents = 'none';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      const msg = successful ? 'successful' : 'unsuccessful';
+      console.log('Fallback: Copying text command was ' + msg);
+    } catch (err) {
+      this.showErrorCopy('Could not copy text: ' + err);
+      return;
+    }
+
+    document.body.removeChild(textArea);
+    this.showSuccessCopy();
+  }
+
+  showSuccessCopy() {
+    this.messageService.add({ severity: 'contrast', summary: 'Copied', detail: 'Matrix copied to clipboard!' });
+  }
+
+  showErrorCopy(message: string) {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 }
 
