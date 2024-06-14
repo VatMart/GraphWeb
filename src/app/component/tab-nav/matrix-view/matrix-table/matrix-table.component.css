@@ -1,0 +1,24 @@
+.th-first {
+  width: 5px;
+}
+
+.td-first {
+  font-weight: bold;
+  font-family: Calibri,serif;
+  font-size: 18px;
+  background-color: #F9FAFB;
+}
+
+th {
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Calibri,serif;
+  font-size: 18px
+}
+
+td {
+  text-align: center;
+  vertical-align: middle;
+  font-weight: normal;
+}

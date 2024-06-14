@@ -77,7 +77,7 @@
              (click)="onCloseMobileSidebar($event)"></a>
         </div>
         <div class="mobile-sidebar-content">
-          <app-matrix-view/>
+          <app-matrix-view *ngIf="activeItem?.id === 'matrices'"/>
         </div>
       </div>
     </ng-template>

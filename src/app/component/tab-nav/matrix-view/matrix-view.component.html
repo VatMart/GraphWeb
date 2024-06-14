@@ -1,4 +1,6 @@
 <div class="matrix-type-container">
+  <!-- Notification p-toast -->
+  <p-toast position="top-center"/>
   <label class="matrix-type-label">Matrix type:</label>
   <p-dropdown
     [options]="matrixTypes"
@@ -10,89 +12,35 @@
 <div class="matrix-content-container">
   <div class="matrix-table-container">
     <div class="matrix-table-wrapper">
-      <div *ngIf="matrixType.value === TypeMatrix.ADJACENCY">
-        <ng-container *ngIf="columns.length > 0; else emptyState">
-          <p-table [value]="matrix" styleClass="p-datatable-sm p-datatable-gridlines "
-                   [scrollable]="true"
-                   scrollHeight="200px"
-                   [tableStyle]="{'min-width': '215px', 'min-height': '200px', 'background-color': '#F5F5F5'}">
-            <ng-template pTemplate="header">
-              <tr>
-                <th class="th-first">#</th>
-                <th *ngFor="let col of columns">{{ col }}</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
-              <tr>
-                <td class="td-first">{{ valuesOfFirstColumn[rowIndex] }}</td>
-                <td *ngFor="let cell of row">{{ cell }}</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </ng-container>
-        <!-- If table content is empty, show table place holder -->
-        <ng-template #emptyState>
-          <p-table [value]="['string']" styleClass="p-datatable-sm p-datatable-gridlines"
-                   [scrollable]="true"
-                   scrollHeight="200px"
-                   [tableStyle]="{'min-width': '215px', 'min-height': '200px', 'background-color': '#F5F5F5'}">
-            <ng-template pTemplate="header">
-              <tr>
-                <th class="th-first">Graph is empty</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body">
-              <tr>
-                <td>Add a vertex to see actual matrix</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </ng-template>
-      </div>
-      <div *ngIf="matrixType.value === TypeMatrix.INCIDENCE">
-        <!-- TODO Implement-->
-      </div>
+      <app-matrix-table [matrix]="matrix" [columns]="columns" [valuesOfFirstColumn]="valuesOfFirstColumn" [scrollHeight]="'300px'"></app-matrix-table>
     </div>
 
     <div class="matrix-vertical-bar-container">
       <!-- Open table in separate window button -->
-      <button pRipple pTooltip="Show in separate window" tooltipPosition="bottom" showDelay="200"
-              class="graph-web-button"
-              (click)="onExpandTable()"
-              (mouseleave)="useExpandButtonGradient = false"
-              (mousedown)="useExpandButtonGradient = true"
-              (mouseup)="useExpandButtonGradient = false">
-        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="-0.35 -0.65 5 5"
-             [attr.fill]="useExpandButtonGradient ? 'url(#grad1)' : 'currentColor'">
-          <ng-container *ngIf="useExpandButtonGradient">
-            <defs>
-              <linearGradient id="grad1" x1="100%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stop-color="#ff0000"/>
-                <stop offset="100%" stop-color="#FFC618"/>
-              </linearGradient>
-            </defs>
-          </ng-container>
-          <path
-            d="M.536.054A.494.494 0 0 0 .041.55v3.16c0 .274.221.495.495.495h3.16c.275 0 .496-.22.496-.495V.55a.495.495 0 0 0-.496-.496zM.586.6h.944v.398H.984v.576H.587Zm2.117 0h.943v.974H3.25V.998h-.546ZM.587 2.686h.397v.55h.546v.424H.587Zm2.662 0h.397v.974h-.943v-.424h.546z"/>
-        </svg>
-      </button>
-
-      <!-- Open matrix as text button -->
-      <button class="graph-web-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24"
-             [attr.fill]="'currentColor'">
-          <ng-container>
-            <defs>
-              <linearGradient id="grad2" x1="100%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stop-color="#ff0000"/>
-                <stop offset="100%" stop-color="#FFC618"/>
-              </linearGradient>
-            </defs>
-          </ng-container>
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-5h2v-2h-2v2zm0-3h2V9h-2v3z"/>
-        </svg>
-      </button>
+      <i pRipple pTooltip="Show in separate window" tooltipPosition="bottom" showDelay="200"
+              class="pi pi-window-maximize graph-web-button" style="font-size: 1.75rem; padding-bottom: 4px"
+              (click)="onExpandTable()">
+      </i>
+      <!-- Copy to clipboard button -->
+      <i pRipple pTooltip="Copy to clipboard" tooltipPosition="bottom" showDelay="200"
+         class="pi pi-clipboard graph-web-button" style="font-size: 1.75rem"
+         (click)="onCopyToClipboard()">
+      </i>
+      <!-- TODO Open matrix as text button -->
     </div>
   </div>
+
+  <!-- Fullscreen matrix window -->
+  <p-dialog header="Full screen matrix"
+            [modal]="true"
+            [(visible)]="fullScreen"
+            [style]="{ width: '95vw', height: '95vh'}"
+            [appendTo]="'body'"
+            [closeOnEscape]="true"
+            dismissableMask="true"
+            resizable="false" >
+    <div class="full-size-matrix-table-wrapper">
+      <app-matrix-table [matrix]="matrix" [columns]="columns" [valuesOfFirstColumn]="valuesOfFirstColumn"></app-matrix-table>
+    </div>
+  </p-dialog>
 </div>

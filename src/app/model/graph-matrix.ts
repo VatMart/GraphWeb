@@ -1,13 +1,24 @@
+/**
+ * Graph matrix model.
+ */
 export class GraphMatrix {
-  // TODO implement
+
   /**
    * Graph matrix. Do not modify matrix directly.
    */
   public matrix: number[][];
 
+  private _type: TypeMatrix;
+
   private _vertexIndexes: number[] = [];
 
-  constructor(matrix?: number[][], type?: TypeMatrix) {
+  /**
+   * Edge indexes. Should be filled if matrix is incidence matrix.
+   */
+  private _edgeIndexes: string[] = [];
+
+  constructor(type: TypeMatrix, matrix?: number[][]) {
+    this._type = type;
     matrix ? this.matrix = matrix : this.matrix = [];
   }
 
@@ -23,8 +34,19 @@ export class GraphMatrix {
   }
 
   set vertexIndexes(value: number[]) {
-    console.log('Setting vertex indexes: ' + value);
     this._vertexIndexes = value;
+  }
+
+  get edgeIndexes(): string[] {
+    return this._edgeIndexes;
+  }
+
+  set edgeIndexes(value: string[]) {
+    this._edgeIndexes = value;
+  }
+
+  get type(): TypeMatrix {
+    return this._type;
   }
 }
 
