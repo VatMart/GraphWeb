@@ -1,7 +1,10 @@
 <div class="toolbar-container">
   <ng-container *ngFor="let item of items; let i = index">
-    <div pRipple pTooltip="Center on canvas" tooltipPosition="left" showDelay="200"
-         class="toolbar-item" (click)="item.command(i)">
+    <div pRipple [pTooltip]="item.tooltip" tooltipPosition="left" showDelay="200"
+         class="toolbar-item"
+         [class.active]="item.isActive"
+         [class.disabled]="item.disabled"
+         (click)="!item.disabled && item.command(i)">
       <ng-container *ngIf="item.customIcon; else defaultIcon">
         <span class="custom-icon-container">
           <span [class]="item.icon" appSvgIcon [appSvgIcon]="item.icon"></span>

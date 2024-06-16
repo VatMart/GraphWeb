@@ -12,6 +12,7 @@ import {HistoryService} from "../../service/history.service";
 import {RemoveEdgeViewCommand} from "../command/remove-edge-view-command";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 import {EventUtils} from "../../utils/event-utils";
+import {StateService} from "../../service/state.service";
 
 /**
  * Mode to add or remove edges between nodes.
@@ -37,7 +38,8 @@ export class AddRemoveEdgeMode implements ModeBehavior {
               private nodeFabric: NodeViewFabricService,
               private edgeFabric: EdgeViewFabricService,
               private historyService: HistoryService,
-              private graphService: GraphViewService) {
+              private graphService: GraphViewService,
+              private stateService: StateService) {
     this.boundSelectableNodePointerDown = this.onAddRemoveEdge.bind(this);
     // Register event handlers
     this.eventBus.registerHandler(HandlerNames.CANVAS_ADD_REMOVE_EDGE, this.boundSelectableNodePointerDown);
@@ -49,6 +51,8 @@ export class AddRemoveEdgeMode implements ModeBehavior {
   }
 
   modeOn(): void {
+    this.stateService.changeForceModeState(false);
+    this.stateService.changeForceModeDisabledState(true);
     this.selectableElementsOn();
   }
 

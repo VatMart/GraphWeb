@@ -1,14 +1,17 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {StateService} from "../state.service";
 import {HistoryService} from "../history.service";
 import {GraphViewService} from "../graph-view.service";
 import {GraphMatrixService} from "../graph-matrix.service";
 import {TypeMatrix} from "../../model/graph-matrix";
+import {ServiceManager} from "../../logic/service-manager";
+import {Subscription} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
-export class GraphMatrixViewStateManagerService {
+export class GraphMatrixViewStateManagerService implements ServiceManager {
+  private subscriptions: any = new Subscription();
 
   isMatrixViewVisible: boolean = false;
 
@@ -18,26 +21,40 @@ export class GraphMatrixViewStateManagerService {
               private historyService: HistoryService,
               private graphService: GraphViewService,
               private matrixService: GraphMatrixService) {
+    this.initSubscriptions();
+  }
+
+  initSubscriptions(): void {
     // Subscribe to state changes
     // Matrix view visibility
-    this.stateService.matrixViewVisibility$.subscribe(value => {
-      if (value === this.isMatrixViewVisible) {
-        return;
-      }
-      this.isMatrixViewVisible = value;
+    this.subscriptions.add(
+      this.stateService.matrixViewVisibility$.subscribe(value => {
+        if (value === this.isMatrixViewVisible) {
+          return;
+        }
+        this.isMatrixViewVisible = value;
         this.buildAndShowMatrixView(); // if matrix view is visible then build and show matrix
-    });
+      })
+    );
     // Change matrix type on changes in the matrix view
-    this.stateService.currentMatrixType$.subscribe(value => {
-      if (value !== this.currentMatrixType) {
-        this.currentMatrixType = value;
-        this.buildAndShowMatrixView();
-      }
-    });
+    this.subscriptions.add(
+      this.stateService.currentMatrixType$.subscribe(value => {
+        if (value !== this.currentMatrixType) {
+          this.currentMatrixType = value;
+          this.buildAndShowMatrixView();
+        }
+      })
+    );
     // Change matrix type on changes in the graph
-    this.stateService.graphChanged$.subscribe(() => { // TODO find a way to optimize this (removing of node will lead to removing of its edges, so it unnecessary will called more than once)
-      this.buildAndShowMatrixView();
-    });
+    this.subscriptions.add(
+      this.stateService.graphChanged$.subscribe(() => { // TODO find a way to optimize this (removing of node will lead to removing of its edges, so it unnecessary will called more than once)
+        this.buildAndShowMatrixView();
+      })
+    );
+  }
+
+  destroySubscriptions(): void {
+    this.subscriptions.unsubscribe();
   }
 
   private buildAndShowMatrixView() {

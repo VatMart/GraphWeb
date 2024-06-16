@@ -80,8 +80,18 @@ export class StateService {
   private zoomChangedSource = new BehaviorSubject<number>(100);
   public zoomChanged$ = this.zoomChangedSource.asObservable();
 
+  // --------------------------------------------------
+  // UI component states. Canvas Float toolbar
+  // --------------------------------------------------
+
   private needCenterCanvasViewSource = new BehaviorSubject<boolean>(false);
   public needCenterCanvasView$ = this.needCenterCanvasViewSource.asObservable();
+
+  private forceModeDisabledSource = new BehaviorSubject<boolean>(false);
+  public forceModeDisabled$ = this.forceModeDisabledSource.asObservable();
+
+  private forceModeStateSource = new BehaviorSubject<boolean | null>(null);
+  public forceModeState$ = this.forceModeStateSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas Float helper
@@ -289,6 +299,20 @@ export class StateService {
    */
   needCenterCanvasView() {
     this.needCenterCanvasViewSource.next(true);
+  }
+
+  /**
+   * Change the force mode disabled state.
+   */
+  changeForceModeDisabledState(state: boolean) {
+    this.forceModeDisabledSource.next(state);
+  }
+
+  /**
+   * Change force the mode state.
+   */
+  changeForceModeState(state: boolean) {
+    this.forceModeStateSource.next(state);
   }
 
   /**

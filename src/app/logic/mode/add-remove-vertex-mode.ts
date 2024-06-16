@@ -10,6 +10,7 @@ import {HistoryService} from "../../service/history.service";
 import {RemoveNodeViewCommand} from "../command/remove-node-view-command";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {EventUtils} from "../../utils/event-utils";
+import {StateService} from "../../service/state.service";
 
 /**
  * Mode to add or remove vertices from the graph.
@@ -24,20 +25,24 @@ export class AddRemoveVertexMode implements ModeBehavior {
               private eventBus: EventBusService,
               private nodeFabric: NodeViewFabricService,
               private historyService: HistoryService,
-              private graphViewService: GraphViewService) {
+              private graphViewService: GraphViewService,
+              private stateService: StateService) {
     this.boundHandlePointerDown = this.handlePointerDown.bind(this);
     // Register event handlers
     this.eventBus.registerHandler(HandlerNames.CANVAS_ADD_REMOVE_NODE, this.boundHandlePointerDown);
   }
 
   modeOn(): void {
-    console.log("AddRemoveVertexMode ON");
+    console.log("AddRemoveVertexMode ON"); // TODO remove
+    // Disable force mode
+    this.stateService.changeForceModeState(false);
+    this.stateService.changeForceModeDisabledState(true);
     this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }
 
   modeOff(): void {
-    console.log("AddRemoveVertexMode OFF");
+    console.log("AddRemoveVertexMode OFF"); // TODO remove
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }

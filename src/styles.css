@@ -5,6 +5,13 @@
 /* Nunito Sans font */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 :root {
   --main-border-color: #d3d3d3;
   --main-blue-color: #006FFF;
@@ -19,7 +26,6 @@
 }
 
 body {
-  margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
@@ -97,6 +103,7 @@ body {
 .p-tooltip-text {
   background-color: #3b3b3b;
   padding: 0.25rem 0.25rem;
+  text-align: center;
 }
 
 .p-tooltip-arrow {

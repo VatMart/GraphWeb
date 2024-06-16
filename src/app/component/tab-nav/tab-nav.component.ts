@@ -29,7 +29,7 @@ export class TabNavComponent implements OnInit {
 
   // Desktop
   @Input() activeIndex: number | null = null;
-  verticalNavExpanded: boolean = true;
+  verticalNavExpanded: boolean = false;
 
   // Mobile
   @ViewChild('sidebarRef') sidebarRef!: Sidebar;
