@@ -2,6 +2,8 @@
 @import "primeicons/primeicons.css";
 @import "primeng/resources/themes/lara-light-blue/theme.css";
 @import "primeng/resources/primeng.min.css";
+/* Nunito Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
 :root {
   --main-border-color: #d3d3d3;
@@ -112,7 +114,7 @@ body {
 
 .p-toast .p-toast-message .p-toast-message-content .p-toast-message-text {
   margin: 0;
-  padding-right: 4px;
+  padding-inline: 4px;
 }
 
 /* Style for the overall scrollbar */

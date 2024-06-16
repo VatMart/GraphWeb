@@ -43,11 +43,12 @@ export class ModeManagerService {
    */
   initialize(): void {
     this.modeStateActions = {
-      'default': new DefaultMode(this.pixiService, this.eventBus, this.historyService, this.graphViewService),
-      'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.nodeViewFabricService,this.historyService,
-        this.graphViewService),
-      'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.nodeViewFabricService, this.edgeViewFabricService, this.historyService,
-        this.graphViewService)
+      'default': new DefaultMode(this.pixiService, this.eventBus, this.historyService, this.graphViewService,
+        this.stateService),
+      'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.nodeViewFabricService,
+        this.historyService, this.graphViewService),
+      'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.nodeViewFabricService,
+        this.edgeViewFabricService, this.historyService, this.graphViewService)
       // TODO Add selection mode for mobile devices (for multiple selection)
     };
 

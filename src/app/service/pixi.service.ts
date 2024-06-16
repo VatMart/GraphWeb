@@ -121,6 +121,13 @@ export class PixiService {
   }
 
   /**
+   * Get the current zoom scale.
+   */
+  public getZoomScale(): number {
+    return this.mainContainer.scale.x;
+  }
+
+  /**
    * Zoom the canvas view.
    * @param scaleFactor - scale factor
    * @param scalePosition - scale position

@@ -1,0 +1,9 @@
+<p-toast position="top-center"/>
+<div #floatingInputContainer class="float-edge-weight-input-container">
+  <input #floatingInput type="text"
+         (input)="onInput($event)"
+         (keydown)="onKeyDown($event)"
+         (blur)="hideInput()"
+         [value]="currentWeightValue"/>
+  <span #mirrorSpan class="mirror-span">{{ currentWeightValue }}</span>
+</div>

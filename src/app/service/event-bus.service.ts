@@ -107,6 +107,47 @@ export class EventBusService {
     }
   }
 
+  public registerHammerEvent(target: HammerManager, recognizer: Recognizer, event: string, handlerName: string, handler?: any) {
+    if (!handler) {
+      if (!this.hasHandler(handlerName)) {
+        console.error(`Can't register handler. Handler: ${handlerName} is not registered.`); // TODO throw exception
+        return;
+      } else {
+        handler = this.getHandler(handlerName); // Get the handler from the map
+      }
+    } else if (!this.hasHandler(handlerName)) {
+      this.registerHandler(handlerName, handler);
+    }
+    target.add(recognizer);
+    target.on(event, handler);  // Attach handler to the Hammer object
+    let sub = this.getEventSubject(event).subscribe(handler);  // Subscribe handler to the Subject
+    if (!this.eventSubscriptions.has(event)) {
+      this.eventSubscriptions.set(event, new Map<any, Subscription>());
+    }
+    this.eventSubscriptions.get(event)?.set(handler, sub);  // Store the subscription
+  }
+
+  public unregisterHammerEvent(target: HammerManager, recognizer: Recognizer, event: string, handler: any | string) {
+    let handlerFunction;
+    if (typeof handler === 'string' && this.hasHandler(handler)) {
+      handlerFunction = this.getHandler(handler);
+    } else {
+      handlerFunction = handler;
+    }
+    target.remove(recognizer);
+    target.off(event, handlerFunction);  // Detach handler from the Hammer object
+    let subs = this.eventSubscriptions.get(event);
+    if (subs?.has(handlerFunction)) {
+      subs.get(handlerFunction)?.unsubscribe();  // Unsubscribe the handler
+      subs.delete(handlerFunction);  // Remove the handler from the map
+      if (subs.size === 0) {
+        this.eventSubjects.get(event)?.complete();  // Complete the subject if no more subscribers
+        this.eventSubjects.delete(event);
+        this.eventSubscriptions.delete(event);
+      }
+    }
+  }
+
   /**
    * Emits data to all subscribers of the specified event.
    */
@@ -178,6 +219,7 @@ export const HandlerNames = {
   NODE_DRAG_MOVE: 'nodeDragMove', // Handler for the node drag move event
 
   // Edge handlers
+  EDGE_WEIGHT_CHANGE: 'edgeWeightChange', // Handler for the edge weight change event
 
   // Selection handlers
   ELEMENT_SELECT: 'elementSelect', // Handler for the element select event
@@ -194,4 +236,7 @@ export const HandlerNames = {
   CANVAS_DRAG_MOVE: 'canvasDragMove', // Handler for the canvas drag move event
   CANVAS_DRAG_END: 'canvasDragEnd', // Handler for the canvas drag end event
   CANVAS_ZOOM: 'canvasZoom', // Handler for the canvas zooming event
+  // Canvas touchscreen handlers
+  CANVAS_PINCH_START: 'canvasPinchStart', // Handler for the canvas pinch start event
+  CANVAS_PINCH_ZOOM: 'canvasPinchZoom', // Handler for the canvas pinch zoom event
 }

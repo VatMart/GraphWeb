@@ -10,6 +10,10 @@ import {EdgeView, SELECTED_EDGE_STYLE} from "../model/graphical-model/edge/edge-
 import {EdgeViewFabricService} from "./edge-view-fabric.service";
 import {Point} from "../utils/graphical-utils";
 import {EdgeOrientation, GraphOrientation} from "../model/orientation";
+import {
+  DEFAULT_HELPER_ITEM,
+  EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM
+} from "../component/canvas/float-helper/float-helper.component";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -135,8 +139,14 @@ export class GraphViewService extends GraphModelService {
     });
   }
 
+  /**
+   * Changes the weight of the given edge view.
+   */
   public changeEdgeViewWeight(edgeView: EdgeView, weight: number) {
-    // TODO implement
+    edgeView.changeEdgeWeight(weight);
+    this.edgeFabric.updateEdgeViewWeightTexture(edgeView); // Update texture, to resize text box
+    console.log('Edge weight changed: edge: '+ edgeView.getIndex() + '; weight: ' + weight); // TODO remove
+    this.stateService.edgeWeightChanged(edgeView);
   }
 
   /**
@@ -211,6 +221,7 @@ export class GraphViewService extends GraphModelService {
       this.nodeFabric.changeToStyle(element, SELECTED_NODE_STYLE);
     } else if (element instanceof EdgeView) {
       this.edgeFabric.changeToStyle(element, SELECTED_EDGE_STYLE);
+      this.stateService.changeFloatHelperItem(EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM); // Change float helper item
     }
   }
 
@@ -229,6 +240,8 @@ export class GraphViewService extends GraphModelService {
       this.nodeFabric.changeToPreviousStyle(element);
     } else if (element instanceof EdgeView) {
       this.edgeFabric.changeToPreviousStyle(element);
+      // TODO Create helperService to manage helper items
+      this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM); // Change float helper item
     }
   }
 
@@ -244,6 +257,7 @@ export class GraphViewService extends GraphModelService {
       }
     });
     this._selectedElements = [];
+    this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM); // Change float helper item
   }
 
   /**

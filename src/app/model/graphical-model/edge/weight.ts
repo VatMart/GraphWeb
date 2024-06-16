@@ -4,7 +4,10 @@ import {TextStyleFontWeight} from "pixi.js/lib/scene/text/TextStyle";
 
 export class Weight extends Sprite {
 
-  private value: number;
+  public static readonly MAX_WEIGHT: number = 1000;
+  public static readonly MIN_WEIGHT: number = 1;
+
+  private _value: number;
 
   private _text: Text;
 
@@ -13,9 +16,10 @@ export class Weight extends Sprite {
   constructor(value: number, weightStyle?: WeightStyle) {
     super();
     this.anchor.set(0.5);
-    this.value = value;
+    this._value = value;
     this._text = new Text({text: value.toString(), anchor: 0.5});
     this._weightStyle = weightStyle ? weightStyle : DEFAULT_WEIGHT_STYLE;
+    this.interactive = true;
     this.applyTextStyle(this._weightStyle.text);
     this.addChild(this.text);
   }
@@ -26,8 +30,20 @@ export class Weight extends Sprite {
     this.y = midpoint.y;
   }
 
+  get value(): number {
+    return this._value;
+  }
+
+  set value(value: number) {
+    this._value = value;
+  }
+
   get text(): Text {
     return this._text;
+  }
+
+  set text(value: Text) {
+    this._text = value;
   }
 
   get weightStyle(): WeightStyle {
@@ -52,14 +68,14 @@ export class Weight extends Sprite {
 export const DEFAULT_TEXT_STYLE: TextStyle = {
   size: 20,
   labelColor: 'black',
-  labelFontFamily: 'Calibri', // Calibri bold
+  labelFontFamily: 'Nunito Sans',
   labelFontWeight: 'bold'
 }
 
 export const SELECTED_TEXT_STYLE: TextStyle = {
   size: 20,
   labelColor: '#006FFF',
-  labelFontFamily: 'Calibri', // Calibri bold
+  labelFontFamily: 'Nunito Sans',
   labelFontWeight: 'bold'
 }
 

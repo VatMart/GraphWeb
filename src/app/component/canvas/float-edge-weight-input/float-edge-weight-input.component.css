@@ -1,0 +1,39 @@
+:host {
+  position: absolute;
+}
+
+.float-edge-weight-input-container {
+  display: none;
+  position: absolute;
+  transform: translateX(-50%) translateY(-50%);
+  width: auto;
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+}
+
+input {
+  font-size: 16px; /* Prevent zoom on focus for mobile devices */
+  font-family: 'Nunito Sans', sans-serif;
+  min-width: 16px;
+  max-width: 100%;
+  width: auto;
+  border: 0.2em solid #006FFF;
+  box-sizing: content-box;
+  border-radius: 5px;
+  padding: 0.2em 0.3em;
+  text-align: center;
+  visibility: hidden; /* Initially hide the input */
+}
+
+input:focus {
+  outline: none;
+}
+
+.mirror-span {
+  position: absolute;
+  visibility: hidden;
+  white-space: pre;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 16px;
+}

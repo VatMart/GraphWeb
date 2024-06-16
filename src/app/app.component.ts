@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {ToolBarComponent} from "./component/tool-bar/tool-bar.component";
 import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/manager/mode-manager.service";
@@ -10,15 +10,22 @@ import {NgClass, NgIf} from "@angular/common";
 import {FloatToolBarComponent} from "./component/canvas/float-tool-bar/float-tool-bar.component";
 import {StateService} from "./service/state.service";
 import {FloatHelperComponent} from "./component/canvas/float-helper/float-helper.component";
+import {
+  FloatEdgeWeightInputComponent
+} from "./component/canvas/float-edge-weight-input/float-edge-weight-input.component";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass, FloatToolBarComponent, NgIf, FloatHelperComponent],
+  imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass, FloatToolBarComponent, NgIf,
+    FloatHelperComponent, FloatEdgeWeightInputComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
+  private subscriptions: Subscription = new Subscription();
+  @ViewChild('floatingEdgeWeightInput') floatingEdgeWeightInput!: FloatEdgeWeightInputComponent;
   title = 'GraphWeb';
 
   isMobileDevice: boolean;
@@ -36,19 +43,32 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     // Subscribe to pixi started event
-    this.stateService.pixiStarted$.subscribe(() => {
-      this.cdr.detectChanges();
-      // Show float toolbar and helper
-      this.showFloatToolBar = true;
-      this.showFloatHelper = true;
-    });
+    this.subscriptions.add(
+      this.stateService.pixiStarted$.subscribe(() => {
+        this.cdr.detectChanges();
+        // Show float toolbar and helper
+        this.showFloatToolBar = true;
+        this.showFloatHelper = true;
+      })
+    );
 
     // Subscribe to changes of float helper visibility
-    this.stateService.alwaysHideFloatHelper$.subscribe((value) => {
-      if (this.showFloatHelper === value) {
-        this.showFloatHelper = !value;
-      }
-    });
+    this.subscriptions.add(
+      this.stateService.alwaysHideFloatHelper$.subscribe((value) => {
+        if (this.showFloatHelper === value) {
+          this.showFloatHelper = !value;
+        }
+      })
+    );
+
+    // Subscribe to changes of float change edge weight input visibility
+    this.subscriptions.add(
+      this.stateService.showEditEdgeWeight$.subscribe((value) => {
+        if (value !== null) {
+          this.floatingEdgeWeightInput.showInput(value);
+        }
+      })
+    );
     // TODO implement handling for pixi stop event
   }
 }

@@ -11,11 +11,14 @@ import {AddEdgeViewCommand} from "../command/add-edge-view-command";
 import {HistoryService} from "../../service/history.service";
 import {RemoveEdgeViewCommand} from "../command/remove-edge-view-command";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
+import {EventUtils} from "../../utils/event-utils";
 
 /**
  * Mode to add or remove edges between nodes.
  */
 export class AddRemoveEdgeMode implements ModeBehavior {
+
+  // TODO refactor to move all event handlers to separate classes
 
   private boundSelectableNodePointerDown: (event: FederatedPointerEvent) => void;
 
@@ -85,7 +88,7 @@ export class AddRemoveEdgeMode implements ModeBehavior {
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
-    if (event.target instanceof NodeView) {
+    if (EventUtils.isNodeView(event.target)) {
       let nodeView: NodeView = event.target as NodeView;
       if (!this.startNode) {
         console.log("Start node selected"); // TODO remove
@@ -108,7 +111,7 @@ export class AddRemoveEdgeMode implements ModeBehavior {
         // Clear selected nodes
         this.clearSelectedNodes();
       }
-    } else if (event.target instanceof EdgeView) {
+    } else if (EventUtils.isEdgeView(event.target)) {
       this.clearSelectedNodes();
       console.log("Edge remove event"); // TODO remove
       // Remove edge

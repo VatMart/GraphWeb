@@ -6,6 +6,7 @@ import {EdgeView} from "../model/graphical-model/edge/edge-view";
 import {GraphOrientation} from "../model/orientation";
 import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
 import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../component/canvas/float-helper/float-helper.component";
+import {Weight} from "../model/graphical-model/edge/weight";
 
 /**
  * Service for managing the state of the application.
@@ -107,6 +108,15 @@ export class StateService {
 
   private edgeDeletedSource = new BehaviorSubject<EdgeView | null>(null);
   public edgeDeleted$ = this.edgeDeletedSource.asObservable();
+
+  private showEditEdgeWeightSource = new BehaviorSubject<Weight | null>(null);
+  public showEditEdgeWeight$ = this.showEditEdgeWeightSource.asObservable();
+
+  private edgeWeightToChangeSource = new BehaviorSubject<WeightToChange | null>(null);
+  public edgeWeightToChange$ = this.edgeWeightToChangeSource.asObservable();
+
+  private edgeWeightChangedSource = new BehaviorSubject<EdgeView | null>(null);
+  public edgeWeightChanged$ = this.edgeWeightChangedSource.asObservable();
 
   // Graph related events
   /**
@@ -340,4 +350,30 @@ export class StateService {
     this.edgeDeletedSource.next(edgeView);
     this.graphChangedSource.next(true);
   }
+
+  /**
+   * Show the edit edge weight input.
+   */
+  showEditEdgeWeight(weight: Weight) {
+    this.showEditEdgeWeightSource.next(weight);
+  }
+
+  /**
+   * Change the edge weight.
+   */
+  changeEdgeWeight(weightToChange: WeightToChange) {
+    this.edgeWeightToChangeSource.next(weightToChange);
+  }
+
+  /**
+   * Notify that the edge weight has been changed for the edge.
+   */
+  edgeWeightChanged(edgeView: EdgeView) {
+    this.edgeWeightChangedSource.next(edgeView);
+  }
+}
+
+export interface WeightToChange {
+  weight: Weight;
+  changeValue: number;
 }
