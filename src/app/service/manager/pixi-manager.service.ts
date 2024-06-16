@@ -7,6 +7,7 @@ import {StateService} from "../state.service";
 import {VisualGrid} from "../../model/graphical-model/visual-grid";
 import {CanvasBorder} from "../../model/graphical-model/canvas-border";
 import {CanvasEventHandler} from "../../logic/handlers/canvas-event-handler";
+import {ServiceManager} from "../../logic/service-manager";
 
 /**
  * Service to manage the PIXI canvas
@@ -14,7 +15,7 @@ import {CanvasEventHandler} from "../../logic/handlers/canvas-event-handler";
 @Injectable({
   providedIn: 'root'
 })
-export class PixiManagerService {
+export class PixiManagerService implements ServiceManager {
 
   private canvasEventHandler!: CanvasEventHandler;
 
@@ -33,7 +34,7 @@ export class PixiManagerService {
     this.pixiService.startRendering();
     console.log("Pixi initialized. Renderer: " + this.pixiService.renderer.constructor.name); // TODO remove
     // Initialize pixi global listeners
-    this.initPixiListeners();
+    this.initSubscriptions();
     // Initialize mode listeners
     this.modeManagerService.initialize();
     // Notify state service that PIXI is started
@@ -45,7 +46,7 @@ export class PixiManagerService {
    */
   public stopPixi() {
     // TODO implement
-    //this.canvasEventHandler.destroyEventHandlers();
+    this.destroySubscriptions();
   }
 
   // Set up the default PIXI canvas
@@ -95,7 +96,7 @@ export class PixiManagerService {
    * Initialize global listeners related with pixi.
    * Resizing window, cursor move, etc.
    */
-  initPixiListeners() {
+  initSubscriptions() {
     // Initialize canvas event handlers
     try {
       this.canvasEventHandler = CanvasEventHandler.initialize(this.pixiService, this.eventBus, this.stateService);
@@ -103,5 +104,9 @@ export class PixiManagerService {
     } catch (e) {
       console.error("Error initializing canvas event handlers: " + e);
     }
+  }
+
+  destroySubscriptions(): void {
+    this.canvasEventHandler.destroyEventHandlers();
   }
 }

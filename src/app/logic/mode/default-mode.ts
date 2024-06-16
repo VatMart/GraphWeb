@@ -74,6 +74,7 @@ export class DefaultMode implements ModeBehavior {
 
   modeOn(): void {
     console.log("DefaultMode ON"); // TODO remove
+    this.stateService.changeForceModeDisabledState(false);
     this.selectableModeOn();
     this.moveableNodesOn();
     this.editableEdgesWeightOn();

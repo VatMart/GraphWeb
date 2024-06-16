@@ -15,6 +15,8 @@ import {
   ADD_REMOVE_EDGE_MODE_HELPER_ITEM,
   ADD_REMOVE_VERTEX_MODE_HELPER_ITEM, DEFAULT_HELPER_ITEM
 } from "../../component/canvas/float-helper/float-helper.component";
+import {Subscription} from "rxjs";
+import {ServiceManager} from "../../logic/service-manager";
 
 /**
  * Service for managing the modes of the application.
@@ -22,7 +24,9 @@ import {
 @Injectable({
   providedIn: 'root'
 })
-export class ModeManagerService {
+export class ModeManagerService implements ServiceManager {
+  // TODO call unsubscribe on destroy app
+  private subscriptions = new Subscription();
 
   private modeStateActions!: { [key in ModeState]: ModeBehavior };
 
@@ -46,60 +50,96 @@ export class ModeManagerService {
       'default': new DefaultMode(this.pixiService, this.eventBus, this.historyService, this.graphViewService,
         this.stateService),
       'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.nodeViewFabricService,
-        this.historyService, this.graphViewService),
+        this.historyService, this.graphViewService, this.stateService),
       'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.nodeViewFabricService,
-        this.edgeViewFabricService, this.historyService, this.graphViewService)
+        this.edgeViewFabricService, this.historyService, this.graphViewService, this.stateService)
       // TODO Add selection mode for mobile devices (for multiple selection)
     };
-
-    // Subscribe to the currentMode$ mode state
-    this.stateService.currentMode$.subscribe(mode => {
-      if (this.currentModeState !== mode) {
-        this.updateModeState(mode);
-        this.updateHelperItem(mode);
-      }
-    });
-
-    // Subscribe to the currentAddVertexState mode state
-    this.stateService.currentAddVertexState.subscribe(state => {
-      const newState: ModeState = state ? 'AddRemoveVertex' : 'default';
-      this.stateService.changeMode(newState);
-    });
-    this.stateService.currentAddEdgesState.subscribe(state => {
-      const newState: ModeState = state ? 'AddRemoveEdge' : 'default';
-      this.stateService.changeMode(newState);
-    });
-    this.stateService.nodeAdded$.subscribe(nodeView => {
-      if (nodeView) {
-        this.onAddedNode(nodeView);
-      }
-    });
-    this.stateService.nodeDeleted$.subscribe(nodeView => {
-      if (nodeView) {
-        this.onRemovedNode(nodeView);
-      }
-    });
-    this.stateService.edgeAdded$.subscribe(edgeView => {
-      if (edgeView) {
-        this.onAddedEdge(edgeView);
-      }
-    });
-    this.stateService.edgeDeleted$.subscribe(edgeView => {
-      if (edgeView) {
-        this.onRemovedEdge(edgeView);
-      }
-    });
-    this.stateService.graphCleared$.subscribe(() => {
-      this.onGraphCleared();
-    });
-    this.stateService.undoInvoked$.subscribe(() => {
-      this.onUndoInvoked();
-    });
-    this.stateService.redoInvoked$.subscribe(() => {
-      this.onRedoInvoked();
-    });
+    this.initSubscriptions();
     // Set default mode
     this.currentModeState = 'default';
+  }
+
+  initSubscriptions(): void {
+    // Subscribe to the currentMode$ mode state
+    this.subscriptions.add(
+      this.stateService.currentMode$.subscribe(mode => {
+        if (this.currentModeState !== mode) {
+          this.updateModeState(mode);
+          this.updateHelperItem(mode);
+        }
+      })
+    );
+
+    // Subscribe to mode states
+    this.subscriptions.add(
+      this.stateService.currentAddVertexState.subscribe(state => {
+        const newState: ModeState = state ? 'AddRemoveVertex' : 'default';
+        this.stateService.changeMode(newState);
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.currentAddEdgesState.subscribe(state => {
+        const newState: ModeState = state ? 'AddRemoveEdge' : 'default';
+        this.stateService.changeMode(newState);
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.forceModeState$.subscribe(mode => {
+        if (mode !== null) {
+          // TODO implement force mode state
+          console.log('Force mode state: ' + mode);
+        }
+      })
+    );
+    // Subscribe to changes in the graph
+    this.subscriptions.add(
+      this.stateService.nodeAdded$.subscribe(nodeView => {
+        if (nodeView) {
+          this.onAddedNode(nodeView);
+        }
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.nodeDeleted$.subscribe(nodeView => {
+        if (nodeView) {
+          this.onRemovedNode(nodeView);
+        }
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.edgeAdded$.subscribe(edgeView => {
+        if (edgeView) {
+          this.onAddedEdge(edgeView);
+        }
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.edgeDeleted$.subscribe(edgeView => {
+        if (edgeView) {
+          this.onRemovedEdge(edgeView);
+        }
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.graphCleared$.subscribe(() => {
+        this.onGraphCleared();
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.undoInvoked$.subscribe(() => {
+        this.onUndoInvoked();
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.redoInvoked$.subscribe(() => {
+        this.onRedoInvoked();
+      })
+    );
+  }
+
+  destroySubscriptions(): void {
+    this.subscriptions.unsubscribe();
   }
 
   private updateModeState(newState: ModeState) {
@@ -123,7 +163,6 @@ export class ModeManagerService {
       case 'default':
         this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM);
     }
-
   }
 
   /**

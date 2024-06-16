@@ -6,6 +6,7 @@ import {ChangeGraphOrientationCommand} from "../../logic/command/change-graph-or
 import {HistoryService} from "../history.service";
 import {Subscription} from "rxjs";
 import {ChangeEdgeWeightCommand} from "../../logic/command/change-edge-weight-command";
+import {ServiceManager} from "../../logic/service-manager";
 
 /**
  * Service for managing the state of the graph.
@@ -13,13 +14,17 @@ import {ChangeEdgeWeightCommand} from "../../logic/command/change-edge-weight-co
 @Injectable({
   providedIn: 'root'
 })
-export class GraphStateManagerService {
-  // TODO manage unsubscribe on destroy
+export class GraphStateManagerService implements ServiceManager {
+  // TODO call unsubscribe on destroy app
   private subscriptions: Subscription = new Subscription();
 
   constructor(private stateService: StateService,
               private historyService: HistoryService,
               private graphService: GraphViewService) {
+    this.initSubscriptions();
+  }
+
+  initSubscriptions(): void {
     // Subscribe to state changes
     // Change edge weights visibility
     this.subscriptions.add(
@@ -59,5 +64,9 @@ export class GraphStateManagerService {
         this.historyService.execute(command);
       })
     );
+  }
+
+  destroySubscriptions(): void {
+    this.subscriptions.unsubscribe();
   }
 }
