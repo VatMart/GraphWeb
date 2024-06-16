@@ -1,13 +1,12 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {FederatedPointerEvent} from "pixi.js";
+import {AfterViewInit, Component} from '@angular/core';
+import * as PIXI from "pixi.js";
 import {StateService} from "../../service/state.service";
 import {PixiService} from "../../service/pixi.service";
 import {GraphViewService} from "../../service/graph-view.service";
 import {Graph} from "../../model/graph";
-import {EventBusService, HandlerNames} from "../../service/event-bus.service";
+import {EventBusService} from "../../service/event-bus.service";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
 import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
-import * as PIXI from "pixi.js";
 import {PixiManagerService} from "../../service/manager/pixi-manager.service";
 
 /**
@@ -32,20 +31,31 @@ export class CanvasComponent implements AfterViewInit {
   }
 
   async ngAfterViewInit(): Promise<void> {
-    // Start PIXI after the view is initialized
+    // Start PIXI after the view canvas container is initialized
     await this.pixiManager.startPixi();
 
-    // TODO Remove below. Its only for development
+
+    // ----------------- TODO Remove below -----------------
     let graph: Graph = new Graph(); // TODO create graph via graph model service
     this.graphViewService.currentGraph = graph; // TODO Change creating graph behaviour
 
-    let screenCenter = {x: this.pixiService.renderer.screen.width/2, y: this.pixiService.renderer.screen.height/2};
+    let screenCenter = {x: this.pixiService.renderer.screen.width / 2,
+      y: this.pixiService.renderer.screen.height / 2};
 
-    let node1 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: screenCenter.x + 100, y: screenCenter.y - 100});
+    let node1 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {
+      x: screenCenter.x + 100,
+      y: screenCenter.y - 100
+    });
     this.graphViewService.addNodeToGraphView(graph, node1);
-    let node2 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: screenCenter.x + 100 , y: screenCenter.y + 100 });
+    let node2 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {
+      x: screenCenter.x + 100,
+      y: screenCenter.y + 100
+    });
     this.graphViewService.addNodeToGraphView(graph, node2);
-    let node3 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {x: screenCenter.x - 100, y: screenCenter.y - 100});
+    let node3 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {
+      x: screenCenter.x - 100,
+      y: screenCenter.y - 100
+    });
     this.graphViewService.addNodeToGraphView(graph, node3);
     // Create edges
     let edge1 = this.edgeFabric.createDefaultEdgeView(graph, node1, node2);

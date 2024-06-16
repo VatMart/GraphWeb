@@ -125,7 +125,7 @@ export const DEFAULT_NODE_STYLE: NodeStyle = {
 export const DEFAULT_NODE_LABEL_STYLE: NodeLabelStyle = {
   labelColor: '#000000',
   labelFontSize: 24,
-  labelFontFamily: 'Calibri', // Calibri bold
+  labelFontFamily: 'Nunito Sans',
   labelFontWeight: 'bold'
 };
 

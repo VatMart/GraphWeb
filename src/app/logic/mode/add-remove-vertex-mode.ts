@@ -9,11 +9,15 @@ import {AddNodeViewCommand} from "../command/add-node-view-command";
 import {HistoryService} from "../../service/history.service";
 import {RemoveNodeViewCommand} from "../command/remove-node-view-command";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {EventUtils} from "../../utils/event-utils";
 
 /**
  * Mode to add or remove vertices from the graph.
  */
 export class AddRemoveVertexMode implements ModeBehavior {
+
+  // TODO refactor to move all event handlers to separate classes
+
   private boundHandlePointerDown: (event: FederatedPointerEvent) => void;
 
   constructor(private pixiService: PixiService,
@@ -76,7 +80,7 @@ export class AddRemoveVertexMode implements ModeBehavior {
       let command = new AddNodeViewCommand(newNodeView, this.graphViewService);
       this.historyService.execute(command);
       //this.graphViewService.addNodeToCurrentGraphView(mode.globalX, mode.globalY);
-    } else if (event.target instanceof NodeView) {
+    } else if (EventUtils.isNodeView(event.target)) {
       let nodeView: NodeView = event.target as NodeView;
       let command = new RemoveNodeViewCommand(nodeView, this.graphViewService);
       this.historyService.execute(command);

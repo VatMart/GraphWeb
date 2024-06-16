@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
-import {Graphics, RenderTexture, Text, Texture} from "pixi.js";
+import {Graphics, Rectangle, RenderTexture, Text, Texture} from "pixi.js";
 import {Graph} from "../model/graph";
 import {NodeView} from "../model/graphical-model/node/node-view";
 import {Edge} from "../model/edge";
 import {EdgeStyle, EdgeView} from "../model/graphical-model/edge/edge-view";
 import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";
-import {WeightStyle} from "../model/graphical-model/edge/weight";
+import {Weight, WeightStyle} from "../model/graphical-model/edge/weight";
 import {PixiService} from "./pixi.service";
 import {EdgeOrientation, GraphOrientation} from "../model/orientation";
 
@@ -25,7 +25,7 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
   }
 
   private getOrCreateWeightTexture(text: Text, weightStyle: WeightStyle): Texture {
-    const key = `${weightStyle.text.size}_${weightStyle.color}_${weightStyle.text.labelColor}
+    const key = `${text.width}_${weightStyle.text.size}_${weightStyle.color}_${weightStyle.text.labelColor}
     _${weightStyle.strokeColor}_${weightStyle.strokeWidth}_${weightStyle.text.labelFontWeight}
     _${weightStyle.text.labelFontFamily}`;
     if (!this.textureWeightCache.has(key)) {
@@ -52,12 +52,20 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
+    result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
     return result;
+  }
+
+  public updateEdgeViewWeightTexture(edge: EdgeView): void {
+    const weightTexture: Texture = <Texture>this.getOrCreateWeightTexture(edge.weightView.text, edge.edgeStyle.weight);
+    edge.weightView.texture = weightTexture;
+    edge.weightView.hitArea = this.calculateWeightHitArea(edge.weightView);
+    edge.move();
   }
 
   changeToStyle(edge: EdgeView, style: EdgeStyle): void {
     // Save current style to cache before changing
-    this.styleCache.set(edge.getIndex(), edge.nodeStyle);
+    this.styleCache.set(edge.getIndex(), edge.edgeStyle);
     this.switchEdgeStyle(edge, style);
     edge.move(); // Move edge to new position by redraw
   }
@@ -76,6 +84,13 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
   private switchEdgeStyle(edgeView: EdgeView, style: EdgeStyle) {
     const weightTexture: Texture = <Texture>this.getOrCreateWeightTexture(edgeView.weightView.text, style.weight);
     edgeView.weightView.texture = weightTexture;
-    edgeView.nodeStyle = style;
+    edgeView.edgeStyle = style;
+  }
+
+  private calculateWeightHitArea(weightView: Weight): Rectangle {
+    const weightViewBounds = weightView.getLocalBounds();
+    const hitAreaPadding = Math.round(EdgeView.HIT_AREA_PADDING/2);
+    return new Rectangle(weightViewBounds.x - hitAreaPadding, weightViewBounds.y - hitAreaPadding,
+      weightViewBounds.width + hitAreaPadding*2, weightViewBounds.height + hitAreaPadding*2);
   }
 }

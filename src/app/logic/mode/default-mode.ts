@@ -9,11 +9,16 @@ import {HistoryService} from "../../service/history.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {GraphicalUtils, Point, Rectangle} from "../../utils/graphical-utils";
 import {SelectRectangle} from "../../model/graphical-model/select-rectangle";
+import {Weight} from "../../model/graphical-model/edge/weight";
+import {StateService} from "../../service/state.service";
+import {EventUtils} from "../../utils/event-utils";
 
 /**
  * Default mode for the application
  */
 export class DefaultMode implements ModeBehavior {
+
+  // TODO refactor to move all event handlers to separate classes
 
   private onDragStartBound: (event: FederatedPointerEvent) => void;
   private onDragMoveBound: (event: FederatedPointerEvent) => void;
@@ -22,6 +27,8 @@ export class DefaultMode implements ModeBehavior {
   private onSelectionElementBound: (event: FederatedPointerEvent) => void;
   private onRectangleSelectionMoveBound: (event: FederatedPointerEvent) => void;
   private onRectangleSelectionEndBound: (event: FederatedPointerEvent) => void;
+
+  private onEdgeWeightEditStartBound: (event: FederatedPointerEvent) => void;
 
   // Dragging
   private dragTarget: NodeMove[] | null = null;
@@ -35,16 +42,22 @@ export class DefaultMode implements ModeBehavior {
   private rectangleSelectionStart: Point | null = null;
   private rectangleSelectionThreshold = 2; // Pixels the mouse must move to start rectangle selection
 
+  // Double-click detection
+  private clickTimeout: number | null = null;
+  private clickDelay = 300; // Time in milliseconds to distinguish single and double clicks
+
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
               private historyService: HistoryService,
-              private graphViewService: GraphViewService) {
+              private graphViewService: GraphViewService,
+              private stateService: StateService) {
     this.onDragStartBound = this.onDragStart.bind(this);
     this.onDragMoveBound = this.onDragMove.bind(this);
     this.onDragEndBound = this.onDragEnd.bind(this);
     this.onSelectionElementBound = this.onSelectElement.bind(this);
     this.onRectangleSelectionMoveBound = this.onRectangleSelectionMove.bind(this);
     this.onRectangleSelectionEndBound = this.onRectangleSelectionEnd.bind(this);
+    this.onEdgeWeightEditStartBound = this.onEdgeWeightEditStart.bind(this);
     // Register event handlers
     this.eventBus.registerHandler(HandlerNames.ELEMENT_SELECT, this.onSelectionElementBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_START, this.onDragStartBound);
@@ -52,6 +65,7 @@ export class DefaultMode implements ModeBehavior {
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_END, this.onDragEndBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_MOVE, this.onRectangleSelectionMoveBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_END, this.onRectangleSelectionEndBound);
+    this.eventBus.registerHandler(HandlerNames.EDGE_WEIGHT_CHANGE, this.onEdgeWeightEditStartBound);
     // Init rectangle selection
     this.rectangleSelection = new SelectRectangle();
     this.rectangleSelection.visible = false;
@@ -62,12 +76,14 @@ export class DefaultMode implements ModeBehavior {
     console.log("DefaultMode ON"); // TODO remove
     this.selectableModeOn();
     this.moveableNodesOn();
+    this.editableEdgesWeightOn();
   }
 
   modeOff(): void {
     console.log("DefaultMode OFF"); // TODO remove
     this.selectableModeOff();
     this.moveableNodesOff();
+    this.editableEdgesWeightOff()
     this.graphViewService.clearSelection();
   }
 
@@ -231,11 +247,7 @@ export class DefaultMode implements ModeBehavior {
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
-    const selectedElement = event.target instanceof NodeView
-      ? event.target as NodeView
-      : event.target instanceof EdgeView
-        ? event.target as EdgeView
-        : null;
+    let selectedElement = EventUtils.getGraphElement(event.target);
 
     if (!selectedElement) { // Canvas clicked (no selection before - clear selection, else - rectangle selection)
       // Rectangle selection
@@ -335,5 +347,40 @@ export class DefaultMode implements ModeBehavior {
       'pointerup', HandlerNames.RECTANGLE_SELECTION_END);
     this.eventBus.unregisterPixiEvent(this.pixiService.stage,
       'pointerupoutside', HandlerNames.RECTANGLE_SELECTION_END);
+  }
+
+  private editableEdgesWeightOn() {
+    this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown',
+      HandlerNames.EDGE_WEIGHT_CHANGE);
+  }
+
+  private editableEdgesWeightOff() {
+    this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerdown',
+      HandlerNames.EDGE_WEIGHT_CHANGE);
+  }
+
+  // Edit edge weight handlers
+  private onEdgeWeightEditStart(event: FederatedPointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
+    const selectedElement = EventUtils.isEdgeViewWeight(event.target)
+      ? event.target as Weight : null;
+    if (selectedElement === null) {
+      return;
+    }
+    if (this.clickTimeout) {
+      clearTimeout(this.clickTimeout);
+      this.clickTimeout = null;
+      this.onEdgeDoubleClick(selectedElement);
+    } else {
+      this.clickTimeout = setTimeout(() => {
+        this.clickTimeout = null;
+      }, this.clickDelay);
+    }
+  }
+
+  private onEdgeDoubleClick(weight: Weight): void {
+    this.stateService.showEditEdgeWeight(weight);
   }
 }

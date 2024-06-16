@@ -2,7 +2,7 @@ import {GraphElement} from "../graph-element";
 import {Edge} from "../../edge";
 import {GraphicalUtils, Point} from "../../../utils/graphical-utils";
 import {NodeView} from "../node/node-view";
-import {Graphics} from "pixi.js";
+import {Graphics, Polygon} from "pixi.js";
 import {EdgeOrientation} from "../../orientation";
 import {Arrow, ArrowStyle, DEFAULT_ARROW_STYLE, SELECTED_ARROW_STYLE} from "./arrow";
 import {DEFAULT_WEIGHT_STYLE, SELECTED_WEIGHT_STYLE, Weight, WeightStyle} from "./weight";
@@ -29,7 +29,9 @@ export class EdgeView extends Graphics implements GraphElement {
   private _startCoordinates: Point;
   private _endCoordinates: Point;
 
-  private _nodeStyle: EdgeStyle = DEFAULT_EDGE_STYLE;
+  private _edgeStyle: EdgeStyle = DEFAULT_EDGE_STYLE;
+
+  public static HIT_AREA_PADDING: number = 15;
 
   public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView) : EdgeView {
     let edgeGraphical = new EdgeView(edge, startNode, endNode, DEFAULT_EDGE_STYLE);
@@ -54,7 +56,7 @@ export class EdgeView extends Graphics implements GraphElement {
     const points = this.resolveConnectors();
     this._startCoordinates = points[0];
     this._endCoordinates = points[1];
-    this._nodeStyle = nodeStyle;
+    this._edgeStyle = nodeStyle;
   }
 
   /**
@@ -68,8 +70,38 @@ export class EdgeView extends Graphics implements GraphElement {
     }
     this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
       .lineTo(this._endCoordinates.x, this._endCoordinates.y)
-      .stroke({width: this._nodeStyle.strokeWidth, color: this._nodeStyle.strokeColor, cap: 'round'});
+      .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round'});
+    // Draw the hit area
+    this.hitArea = this.calculateHitArea(this._startCoordinates, this._endCoordinates);
     this.zIndex = 0;
+  }
+
+  /**
+   * Calculate the hit area of the edge.
+   * Hit area should be larger than the edge itself, so it is easier to click on it.
+   */
+  private calculateHitArea(startPoint: Point, endPoint: Point) {
+    const padding = EdgeView.HIT_AREA_PADDING;
+    // Calculate the direction vector
+    const dx = endPoint.x - startPoint.x;
+    const dy = endPoint.y - startPoint.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const unitX = dx / length;
+    const unitY = dy / length;
+
+    // Perpendicular vectors
+    const perpX = -unitY * padding;
+    const perpY = unitX * padding;
+
+    // Create the expanded polygon
+    const polygonPoints = [
+      startPoint.x + perpX, startPoint.y + perpY,
+      startPoint.x - perpX, startPoint.y - perpY,
+      endPoint.x - perpX, endPoint.y - perpY,
+      endPoint.x + perpX, endPoint.y + perpY
+    ];
+
+    return new Polygon(polygonPoints);
   }
 
   private drawArrow() {
@@ -116,8 +148,10 @@ export class EdgeView extends Graphics implements GraphElement {
     this.move();
   }
 
-  public changeEdgeWeight(weight: number) {
-    // TODO implement change edge weight
+  public changeEdgeWeight(value: number) {
+    this._edge.weight = value;
+    this._weightView.value = value;
+    this._weightView.text.text = value.toString();
   }
 
   public changeWeightVisible(bool: boolean) {
@@ -166,12 +200,12 @@ export class EdgeView extends Graphics implements GraphElement {
     return this._weightVisible;
   }
 
-  get nodeStyle(): EdgeStyle {
-    return this._nodeStyle;
+  get edgeStyle(): EdgeStyle {
+    return this._edgeStyle;
   }
 
-  set nodeStyle(value: EdgeStyle) {
-    this._nodeStyle = value;
+  set edgeStyle(value: EdgeStyle) {
+    this._edgeStyle = value;
     this._weightView.weightStyle = value.weight;
     if (this.arrow !== undefined && value.arrow !== undefined) {
       this.arrow.arrowStyle = value.arrow;
