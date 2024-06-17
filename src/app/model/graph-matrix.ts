@@ -28,7 +28,6 @@ export class GraphMatrix {
       .join(';\n') + ';';
   }
 
-
   get vertexIndexes(): number[] {
     return this._vertexIndexes;
   }

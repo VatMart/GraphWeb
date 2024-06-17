@@ -8,6 +8,12 @@ import {VisualGrid} from "../../model/graphical-model/visual-grid";
 import {CanvasBorder} from "../../model/graphical-model/canvas-border";
 import {CanvasEventHandler} from "../../logic/handlers/canvas-event-handler";
 import {ServiceManager} from "../../logic/service-manager";
+import {NodeEventHandler} from "../../logic/handlers/node-event-handler";
+import {GraphViewService} from "../graph-view.service";
+import {HistoryService} from "../history.service";
+import {EdgeEventHandler} from "../../logic/handlers/edge-event-handler";
+import {NodeViewFabricService} from "../node-view-fabric.service";
+import {EdgeViewFabricService} from "../edge-view-fabric.service";
 
 /**
  * Service to manage the PIXI canvas
@@ -18,11 +24,17 @@ import {ServiceManager} from "../../logic/service-manager";
 export class PixiManagerService implements ServiceManager {
 
   private canvasEventHandler!: CanvasEventHandler;
+  private nodeEventHandler!: NodeEventHandler;
+  private edgeEventHandler!: EdgeEventHandler;
 
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
               private stateService: StateService,
-              private modeManagerService: ModeManagerService) {
+              private modeManagerService: ModeManagerService,
+              private graphViewService: GraphViewService,
+              private historyService: HistoryService,
+              private nodeFabric: NodeViewFabricService,
+              private edgeFabric: EdgeViewFabricService) {
   }
 
   /**
@@ -33,7 +45,7 @@ export class PixiManagerService implements ServiceManager {
     // Render the PIXI canvas
     this.pixiService.startRendering();
     console.log("Pixi initialized. Renderer: " + this.pixiService.renderer.constructor.name); // TODO remove
-    // Initialize pixi global listeners
+    // Initialize pixi global listeners. Init all handlers
     this.initSubscriptions();
     // Initialize mode listeners
     this.modeManagerService.initialize();
@@ -97,16 +109,22 @@ export class PixiManagerService implements ServiceManager {
    * Resizing window, cursor move, etc.
    */
   initSubscriptions() {
-    // Initialize canvas event handlers
     try {
-      this.canvasEventHandler = CanvasEventHandler.initialize(this.pixiService, this.eventBus, this.stateService);
-      this.canvasEventHandler.initializeEventHandlers();
+      // Initialize all event handlers
+      this.canvasEventHandler = CanvasEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
+        this.graphViewService);
+      this.nodeEventHandler = NodeEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
+        this.graphViewService, this.historyService, this.nodeFabric);
+      this.edgeEventHandler = EdgeEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
+        this.graphViewService, this.historyService, this.nodeFabric, this.edgeFabric);
+      // Initialize default canvas event handlers (zoom, drag canvas etc)
+      this.canvasEventHandler.initializeDefaultEventHandlers();
     } catch (e) {
-      console.error("Error initializing canvas event handlers: " + e);
+      console.error("Error initializing event handlers: " + e);
     }
   }
 
   destroySubscriptions(): void {
-    this.canvasEventHandler.destroyEventHandlers();
+    this.canvasEventHandler.destroyDefaultEventHandlers();
   }
 }

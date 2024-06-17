@@ -28,7 +28,7 @@
 }
 
 .toolbar-item.active {
-  /*background-color: var(--main-hover-color);*/
+  background-color: var(--main-hover-color);
 }
 
 .toolbar-item.disabled {

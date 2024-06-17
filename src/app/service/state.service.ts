@@ -395,6 +395,14 @@ export class StateService {
   edgeWeightChanged(edgeView: EdgeView) {
     this.edgeWeightChangedSource.next(edgeView);
   }
+
+  /**
+   * Get current force mode state.
+   */
+  isForceModeEnabled(): boolean {
+    const value = this.forceModeStateSource.getValue();
+    return value !== null ? value : false;
+  }
 }
 
 export interface WeightToChange {
