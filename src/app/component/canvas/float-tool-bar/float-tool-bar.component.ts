@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {RippleModule} from "primeng/ripple";
 import {SvgIconService} from "../../../service/svg-icon.service";
 import {SvgIconDirective} from "../../../directive/svg-icon.directive";
@@ -27,7 +27,9 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
   items!: FloatToolBarItem[];
 
   constructor(protected svgIconService: SvgIconService,
-              private stateService: StateService) {
+              private stateService: StateService,
+              private renderer: Renderer2,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -89,13 +91,20 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
     this.items[1].isActive = state; // Toggle the active state
     const isActive: boolean = state;
 
-    // Force toggle the icon gradient fill
-    const svgIcon = document.querySelectorAll('.toolbar-item')[1].querySelector('svg path');
-    if (isActive) {
-      svgIcon?.setAttribute('fill', 'url(#grad1)');
-    } else {
-      svgIcon?.setAttribute('fill', 'currentColor');
+    // Force toggle the icon gradient fill using temporary removal and re-addition (needed for mobile version)
+    const svgIconContainer = document.getElementById('icon-1');
+    const svgIcon = svgIconContainer?.querySelector('svg path');
+    if (svgIconContainer && svgIcon) {
+      const parentNode = svgIconContainer.parentNode;
+      parentNode?.removeChild(svgIconContainer); // Temporarily remove the SVG container
+      if (isActive) {
+        this.renderer.setAttribute(svgIcon, 'fill', 'url(#grad1)');
+      } else {
+        this.renderer.setAttribute(svgIcon, 'fill', 'currentColor');
+      }
+      parentNode?.appendChild(svgIconContainer); // Add the SVG container back
     }
+    this.cdr.detectChanges();
     return isActive;
   }
 }

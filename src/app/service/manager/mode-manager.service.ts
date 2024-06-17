@@ -28,6 +28,7 @@ export class ModeManagerService implements ServiceManager {
   // TODO call unsubscribe on destroy app
   private subscriptions = new Subscription();
 
+  private defaultMode!: DefaultMode;
   private modeStateActions!: { [key in ModeState]: ModeBehavior };
 
   private currentModeState!: ModeState;
@@ -46,13 +47,14 @@ export class ModeManagerService implements ServiceManager {
    * Should be called after all ui components are initialized (including Pixi canvas)
    */
   initialize(): void {
+    this.defaultMode = new DefaultMode(
+      this.pixiService, this.eventBus, this.historyService,
+      this.graphViewService, this.stateService
+    );
     this.modeStateActions = {
-      'default': new DefaultMode(this.pixiService, this.eventBus, this.historyService, this.graphViewService,
-        this.stateService),
-      'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.nodeViewFabricService,
-        this.historyService, this.graphViewService, this.stateService),
-      'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.nodeViewFabricService,
-        this.edgeViewFabricService, this.historyService, this.graphViewService, this.stateService)
+      'default': this.defaultMode,
+      'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.stateService),
+      'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.stateService)
       // TODO Add selection mode for mobile devices (for multiple selection)
     };
     this.initSubscriptions();
@@ -78,17 +80,22 @@ export class ModeManagerService implements ServiceManager {
         this.stateService.changeMode(newState);
       })
     );
+    // Subscribe to edge mode state
     this.subscriptions.add(
       this.stateService.currentAddEdgesState.subscribe(state => {
         const newState: ModeState = state ? 'AddRemoveEdge' : 'default';
         this.stateService.changeMode(newState);
       })
     );
+    // Subscribe to force mode state
     this.subscriptions.add(
       this.stateService.forceModeState$.subscribe(mode => {
         if (mode !== null) {
-          // TODO implement force mode state
-          console.log('Force mode state: ' + mode);
+          if (mode) {
+            this.defaultMode.forceModeOn();
+          } else {
+            this.defaultMode.forceModeOff();
+          }
         }
       })
     );
