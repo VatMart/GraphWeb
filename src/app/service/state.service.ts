@@ -93,6 +93,9 @@ export class StateService {
   private forceModeStateSource = new BehaviorSubject<boolean | null>(null);
   public forceModeState$ = this.forceModeStateSource.asObservable();
 
+  private forceModeStateChangedSource = new BehaviorSubject<boolean>(false);
+  public forceModeStateChanged$ = this.forceModeStateChangedSource.asObservable();
+
   // --------------------------------------------------
   // UI component states. Canvas Float helper
   // --------------------------------------------------
@@ -313,6 +316,13 @@ export class StateService {
    */
   changeForceModeState(state: boolean) {
     this.forceModeStateSource.next(state);
+  }
+
+  /**
+   * Notify that the force mode state has been changed.
+   */
+  forceModeStateChanged() {
+    this.forceModeStateChangedSource.next(true);
   }
 
   /**

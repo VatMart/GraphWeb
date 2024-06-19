@@ -51,7 +51,8 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
         customIcon: true,
         isActive: FloatToolBarComponent.DEFAULT_FORCE_MODE_ACTIVE,
         command: (index: number) => {
-          this.toggleForceMode(index);
+          // Change force mode state
+          this.stateService.changeForceModeState(!this.items[index].isActive!);
         },
         tooltip: 'Toggle force mode on/off', // TODO replace to PrimeNG OverlayPanel
         disabled: false,
@@ -65,9 +66,9 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
     );
     // Subscribe to force mode state changes
     this.subscriptions.add(
-      this.stateService.forceModeState$.subscribe((value) => {
-        if (value !== null) {
-          this.onForceToggleButton(value);
+      this.stateService.forceModeStateChanged$.subscribe((value) => {
+        if (value) {
+          this.toggleForceMode();
         }
       })
     );
@@ -81,10 +82,8 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
     this.stateService.needCenterCanvasView();
   }
 
-  private toggleForceMode(index: number) {
-    const isActive: boolean = this.onForceToggleButton(!this.items[index].isActive!);
-    // Change force mode state
-    this.stateService.changeForceModeState(isActive);
+  private toggleForceMode() {
+    this.onForceToggleButton(!this.items[1].isActive!);
   }
 
   private onForceToggleButton(state: boolean) : boolean {
