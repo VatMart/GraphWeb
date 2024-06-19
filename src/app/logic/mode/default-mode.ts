@@ -12,6 +12,7 @@ import {ForceMode} from "./force-mode";
  * Default mode for the application
  */
 export class DefaultMode implements ModeBehavior {
+  public static readonly GRID_SIZE: number = 150; // TODO move to separate class
   private forceMode: ForceMode;
 
   constructor(private pixiService: PixiService,
@@ -19,7 +20,8 @@ export class DefaultMode implements ModeBehavior {
               private historyService: HistoryService,
               private graphViewService: GraphViewService,
               private stateService: StateService) {
-    this.forceMode = new ForceMode(pixiService, eventBus, historyService, graphViewService, stateService);
+    this.forceMode = new ForceMode(pixiService, eventBus, historyService, graphViewService, stateService,
+      DefaultMode.GRID_SIZE);
   }
 
   modeOn(): void {
@@ -35,33 +37,54 @@ export class DefaultMode implements ModeBehavior {
 
   modeOff(): void {
     console.log("DefaultMode OFF"); // TODO remove
+    this.forceMode.modeOff(); // If force mode is enabled
     this.selectableModeOff();
     this.moveableNodesOff();
     this.editableEdgesWeightOff()
     this.graphViewService.clearSelection();
-    this.forceMode.modeOff();
   }
 
   onAddedNode(nodeView: NodeView): void {
     this.moveableNodeOn(nodeView);
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onAddedNode(nodeView);
+    }
   }
 
   onAddedEdge(edgeView: EdgeView): void {
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onAddedEdge(edgeView);
+    }
   }
 
   onRemovedNode(nodeView: NodeView): void {
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onRemovedNode(nodeView);
+    }
   }
 
   onRemovedEdge(edgeView: EdgeView): void {
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onRemovedEdge(edgeView);
+    }
   }
 
   onGraphCleared(): void {
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onGraphCleared();
+    }
   }
 
   onUndoInvoked(): void {
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onUndoInvoked();
+    }
   }
 
   onRedoInvoked(): void {
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onRedoInvoked();
+    }
   }
 
   public forceModeOn(): void {

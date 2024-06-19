@@ -11,6 +11,7 @@ import {AddNodeViewCommand} from "../command/add-node-view-command";
 import {EventUtils} from "../../utils/event-utils";
 import {RemoveNodeViewCommand} from "../command/remove-node-view-command";
 import {NodeViewFabricService} from "../../service/node-view-fabric.service";
+import {InternalGrid} from "../../model/internal-grid";
 
 /**
  * Handles all events related to the node views.
@@ -32,15 +33,19 @@ export class NodeEventHandler {
   }
 
   private onDragStartBound: (event: FederatedPointerEvent) => void;
-  private onDragMoveBound: (event: FederatedPointerEvent) => void;
+  public static onDragMoveBound: (event: FederatedPointerEvent) => void;
   private onDragEndBound: () => void;
   private boundHandlePointerDown: (event: FederatedPointerEvent) => void;
+  // Force dragging
+  public static boundForceDragMove: (event: FederatedPointerEvent) => void;
 
   // Dragging
-  private dragTarget: NodeMove[] | null = null;
+  public static dragTarget: NodeMove[] | null = null;
   private isDragging = false;
   private dragThreshold = 2; // Pixels the mouse must move to start drag
   private moveCommand: MoveNodeViewCommand | null = null;
+  // Force Dragging
+  public static grid: InternalGrid<NodeView> | null = null;
 
   private constructor(private pixiService: PixiService,
                       private eventBus: EventBusService,
@@ -49,12 +54,13 @@ export class NodeEventHandler {
                       private historyService: HistoryService,
                       private nodeFabric: NodeViewFabricService) {
     this.onDragStartBound = this.onDragStart.bind(this);
-    this.onDragMoveBound = this.onDragMove.bind(this);
+    NodeEventHandler.onDragMoveBound = this.onDragMove.bind(this);
     this.onDragEndBound = this.onDragEnd.bind(this);
     this.boundHandlePointerDown = this.handlePointerDown.bind(this);
+    NodeEventHandler.boundForceDragMove = this.onForceDragMove.bind(this);
     // Register event handlers
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_START, this.onDragStartBound);
-    this.eventBus.registerHandler(HandlerNames.NODE_DRAG_MOVE, this.onDragMoveBound);
+    this.eventBus.registerHandler(HandlerNames.NODE_DRAG_MOVE, NodeEventHandler.onDragMoveBound);
     this.eventBus.registerHandler(HandlerNames.NODE_DRAG_END, this.onDragEndBound);
     this.eventBus.registerHandler(HandlerNames.CANVAS_ADD_REMOVE_NODE, this.boundHandlePointerDown);
   }
@@ -98,7 +104,7 @@ export class NodeEventHandler {
     }
     this.moveCommand = new MoveNodeViewCommand(this.graphViewService, nodesMove);
 
-    this.dragTarget = nodesMove;  // Store the targets being dragged
+    NodeEventHandler.dragTarget = nodesMove;  // Store the targets being dragged
     this.isDragging = false;
 
     this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);
@@ -107,11 +113,11 @@ export class NodeEventHandler {
   }
 
   private onDragMove(event: FederatedPointerEvent): void {
-    if (this.dragTarget) {
+    if (NodeEventHandler.dragTarget) {
       const newPosition = event.getLocalPosition(this.pixiService.mainContainer);
       // Check if the drag has moved beyond the threshold
       if (!this.isDragging) {
-        let nodeMove = this.dragTarget[0]
+        let nodeMove = NodeEventHandler.dragTarget[0];
         const dx = Math.abs((newPosition.x - nodeMove.offset.x) - nodeMove.oldPosition.x);
         const dy = Math.abs((newPosition.y - nodeMove.offset.y) - nodeMove.oldPosition.y);
         if (dx > this.dragThreshold || dy > this.dragThreshold) {
@@ -121,12 +127,12 @@ export class NodeEventHandler {
       // Perform vertex dragging
       if (this.isDragging) {
         // Check selected elements to remove from drag target
-        if (this.graphViewService.selectedElements.length !== this.dragTarget.length) {
-          this.dragTarget = this.dragTarget
+        if (this.graphViewService.selectedElements.length !== NodeEventHandler.dragTarget.length) {
+          NodeEventHandler.dragTarget = NodeEventHandler.dragTarget
             .filter(nm => this.graphViewService.isElementSelected(nm.node));
         }
         // Move each selected node
-        this.dragTarget.forEach(element => {
+        NodeEventHandler.dragTarget.forEach(element => {
           const targetX = newPosition.x - element.offset.x;
           const targetY = newPosition.y - element.offset.y;
 
@@ -146,21 +152,68 @@ export class NodeEventHandler {
     }
   }
 
+  /**
+   * Handle moving nodes on the canvas, if the force mode is enabled.
+   * Saves position of node in the grid.
+   */
+  public onForceDragMove(event: FederatedPointerEvent): void {
+    if (NodeEventHandler.dragTarget && NodeEventHandler.grid !== null) {
+      const newPosition = event.getLocalPosition(this.pixiService.mainContainer);
+      // Check if the drag has moved beyond the threshold
+      if (!this.isDragging) {
+        let nodeMove = NodeEventHandler.dragTarget[0];
+        const dx = Math.abs((newPosition.x - nodeMove.offset.x) - nodeMove.oldPosition.x);
+        const dy = Math.abs((newPosition.y - nodeMove.offset.y) - nodeMove.oldPosition.y);
+        if (dx > this.dragThreshold || dy > this.dragThreshold) {
+          this.isDragging = true; // Start dragging if moved beyond threshold
+        }
+      }
+      // Perform vertex dragging
+      if (this.isDragging) {
+        // Check selected elements to remove from drag target
+        if (this.graphViewService.selectedElements.length !== NodeEventHandler.dragTarget.length) {
+          NodeEventHandler.dragTarget = NodeEventHandler.dragTarget
+            .filter(nm => this.graphViewService.isElementSelected(nm.node));
+        }
+        // Move each selected node
+        NodeEventHandler.dragTarget.forEach(element => {
+          const targetX = newPosition.x - element.offset.x;
+          const targetY = newPosition.y - element.offset.y;
+
+          // Apply canvas boundary constraints
+          const constrainedX = Math.max(this.pixiService.canvasBoundaries.boundaryXMin,
+            Math.min(targetX, this.pixiService.canvasBoundaries.boundaryXMax - element.node.width));
+          const constrainedY = Math.max(this.pixiService.canvasBoundaries.boundaryYMin,
+            Math.min(targetY, this.pixiService.canvasBoundaries.boundaryYMax - element.node.height));
+
+          element.node.alpha = 0.5;
+          // Update the node position in the grid
+          NodeEventHandler.grid!.updateNode(element.node, element.node.x, element.node.y, constrainedX, constrainedY);
+          // Move the node
+          this.graphViewService.moveNodeView(element.node, {
+            x: constrainedX,
+            y: constrainedY
+          });
+        });
+      }
+    }
+  }
+
   private onDragEnd(): void {
-    if (this.dragTarget) {
+    if (NodeEventHandler.dragTarget) {
       if (this.moveCommand && this.isDragging) {
-        this.dragTarget.forEach(element => {
+        NodeEventHandler.dragTarget.forEach(element => {
           element.newPosition = element.node.coordinates;
         });
         // Execute the move command
         this.historyService.execute(this.moveCommand);
       }
       // Reset the alpha of the nodes being dragged
-      this.dragTarget.forEach(element => {
+      NodeEventHandler.dragTarget.forEach(element => {
         element.node.alpha = 1;
       });
       // Clear the drag target
-      this.dragTarget = null;
+      NodeEventHandler.dragTarget = null;
       this.isDragging = false;
     }
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);

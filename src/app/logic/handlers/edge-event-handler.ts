@@ -137,11 +137,11 @@ export class EdgeEventHandler {
         // Clear selected nodes
         this.clearSelectedNodes();
       }
-    } else if (EventUtils.isEdgeView(event.target)) {
+    } else if (EventUtils.isEdgeView(event.target) || EventUtils.isEdgeViewWeight(event.target)) {
       this.clearSelectedNodes();
       console.log("Edge remove event"); // TODO remove
       // Remove edge
-      let edgeView: EdgeView = event.target as EdgeView;
+      let edgeView: EdgeView = EventUtils.getGraphElement(event.target) as EdgeView;
       let command = new RemoveEdgeViewCommand(this.graphViewService, edgeView);
       this.historyService.execute(command);
     } else { // Clicked on empty space

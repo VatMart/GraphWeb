@@ -172,7 +172,7 @@ export class EventBusService {
    */
   public registerHandler(handlerName: string, handler: any): void {
     if (this.handlers.has(handlerName)) {
-      console.log(`Can't register handler. Handler: ${handler}  already registered.`);
+      console.log(`Can't register handler. Handler: ${handlerName}  already registered.`);
       return;
     }
     this.handlers.set(handlerName, handler);

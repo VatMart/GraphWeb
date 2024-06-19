@@ -17,6 +17,7 @@ import {
 } from "../../component/canvas/float-helper/float-helper.component";
 import {Subscription} from "rxjs";
 import {ServiceManager} from "../../logic/service-manager";
+import {ChangeForceModeCommand, NodePosition} from "../../logic/command/change-force-mode-command";
 
 /**
  * Service for managing the modes of the application.
@@ -62,6 +63,9 @@ export class ModeManagerService implements ServiceManager {
     this.currentModeState = 'default';
   }
 
+  /**
+   * Initialize subscriptions for the mode manager service
+   */
   initSubscriptions(): void {
     // Subscribe to the currentMode$ mode state
     this.subscriptions.add(
@@ -90,13 +94,14 @@ export class ModeManagerService implements ServiceManager {
     // Subscribe to force mode state
     this.subscriptions.add(
       this.stateService.forceModeState$.subscribe(mode => {
-        if (mode !== null) {
-          if (mode) {
-            this.defaultMode.forceModeOn();
-          } else {
-            this.defaultMode.forceModeOff();
-          }
+        if (mode === null) {
+          return;
         }
+        const nodePositions: NodePosition[] = [...this.graphViewService.nodeViews.values()]
+          .map(node => new NodePosition(node, node.coordinates));
+        const command = new ChangeForceModeCommand(this.graphViewService, this.stateService, this.defaultMode,
+          nodePositions, mode)
+        this.historyService.execute(command);
       })
     );
     // Subscribe to changes in the graph
@@ -145,6 +150,9 @@ export class ModeManagerService implements ServiceManager {
     );
   }
 
+  /**
+   * Destroy all subscriptions
+   */
   destroySubscriptions(): void {
     this.subscriptions.unsubscribe();
   }
