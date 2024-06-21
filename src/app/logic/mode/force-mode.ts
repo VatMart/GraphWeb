@@ -17,6 +17,13 @@ export class ForceMode {
   // Static property to keep track of the mode state (Don't change this property directly,
   // use modeOn() and modeOff() methods)
   public static isActive: boolean;
+  // Used to remember state of force mode when change default mode on other modes and back
+  public static activatedByUserMemory: boolean = false;
+
+  // TODO make these properties configurable
+  public centerSpringForceEnabled: boolean = true;
+  public linkSpringForceEnabled: boolean = true;
+
   private grid: InternalGrid<NodeView>;
   private forceNodes: Map<NodeView, ForceNodeView>;
 
@@ -25,6 +32,8 @@ export class ForceMode {
   private maxDistance: number = NodeView.DEFAULT_RADIUS * 6; // Maximum distance to apply repulsive force
   // Center-spring force
   private springForceConstant: number = 1;
+  // Link-spring force
+  private linkSpringForceConstant: number = 0.4;
 
   // For debugging
   private lastTime: number = 0;
@@ -112,20 +121,16 @@ export class ForceMode {
       y: totalY / nodeCount
     };
     // Calculate the dynamic equilibrium distance
-    const equilibriumDistance = this.calculateEquilibriumDistance(draggedNodes);
-    this.applySpringForce(centerOfMass, equilibriumDistance, draggedNodes);
-  }
+    if (this.centerSpringForceEnabled) {
+      const equilibriumDistance = this.calculateEquilibriumDistance(draggedNodes);
+      // Center-spring force
+      this.applySpringForce(centerOfMass, equilibriumDistance, draggedNodes);
+    }
 
-  private calculateEquilibriumDistance(draggedNodes?: NodeView[]): number {
-    const totalNodes = draggedNodes ? this.forceNodes.size - draggedNodes.length : this.forceNodes.size;
-    const nodeRadius = NodeView.DEFAULT_RADIUS; // Assuming NodeView has a DEFAULT_RADIUS
-    const minimumDistance = NodeView.DEFAULT_RADIUS * 4; // Minimum distance between nodes to prevent overlap
-    // Calculate the required area for each node including its minimum spacing
-    const areaPerNode = (2 * nodeRadius + minimumDistance) ** 2;
-    // Calculate the total area needed for all nodes
-    const totalArea = areaPerNode * totalNodes;
-    // Assuming the nodes are placed in a roughly circular layout, calculate the radius of this circle
-    return Math.sqrt(totalArea / Math.PI);
+    // Link-spring force
+    if (this.linkSpringForceEnabled) {
+      this.applySpringForceBetweenConnectedNodes(draggedNodes);
+    }
   }
 
   private disableForces(): void {
@@ -186,7 +191,7 @@ export class ForceMode {
   }
 
   /**
-   * Apply spring-like force to all nodes to keep them at an equilibrium distance from the center of mass.
+   * Apply center-spring force to all nodes to keep them at an equilibrium distance from the center of mass.
    * TODO: optimize force by placing in same loop as repulsive force (if center of mass is already calculated)
    */
   private applySpringForce(centerOfMass: Point, equilibriumDistance: number, draggedNodes?: NodeView[]): void {
@@ -206,6 +211,42 @@ export class ForceMode {
         const fy = (dy / distance) * forceMagnitude;
         forceNode.applyForce(fx, fy);
       }
+    });
+  }
+
+  /**
+   * Apply link-spring force between connected nodes to keep connected nodes close to each other.
+   */
+  private applySpringForceBetweenConnectedNodes(draggedNodes?: NodeView[]): void {
+    this.graphViewService.edgeViews.forEach(edgeView => {
+      const forceNodeA = this.forceNodes.get(edgeView.startNode)!;
+      const forceNodeB = this.forceNodes.get(edgeView.endNode)!;
+
+      const posA = forceNodeA.node.centerCoordinates();
+      const posB = forceNodeB.node.centerCoordinates();
+      const dx = posB.x - posA.x;
+      const dy = posB.y - posA.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      const restLength = NodeView.DEFAULT_RADIUS * 6; // Desired distance between connected nodes
+      const springForceMagnitude = this.linkSpringForceConstant * (distance - restLength);
+
+      const fx = (dx / distance) * springForceMagnitude;
+      const fy = (dy / distance) * springForceMagnitude;
+
+      let applyOnA = true;
+      let applyOnB = true;
+      if (draggedNodes) {
+        if (draggedNodes.includes(forceNodeA.node)) {
+          applyOnA = false;
+        }
+        if (draggedNodes.includes(forceNodeB.node)) {
+          applyOnB = false;
+        }
+      }
+
+      if (applyOnA) forceNodeA.applyForce(fx, fy);
+      if (applyOnB) forceNodeB.applyForce(-fx, -fy); // Apply equal and opposite force
     });
   }
 
@@ -241,6 +282,22 @@ export class ForceMode {
   }
 
   /**
+   * Calculate the equilibrium distance between nodes based on the number of nodes in the graph,
+   * default radius of node. This distance is used to apply spring-like forces to keep nodes at a certain distance.
+   */
+  private calculateEquilibriumDistance(draggedNodes?: NodeView[]): number {
+    const totalNodes = draggedNodes ? this.forceNodes.size - draggedNodes.length : this.forceNodes.size;
+    const nodeRadius = NodeView.DEFAULT_RADIUS; // Assuming NodeView has a DEFAULT_RADIUS
+    const minimumDistance = NodeView.DEFAULT_RADIUS * 4; // Minimum distance between nodes to prevent overlap
+    // Calculate the required area for each node including its minimum spacing
+    const areaPerNode = (2 * nodeRadius + minimumDistance) ** 2;
+    // Calculate the total area needed for all nodes
+    const totalArea = areaPerNode * totalNodes;
+    // Assuming the nodes are placed in a roughly circular layout, calculate the radius of this circle
+    return Math.sqrt(totalArea / Math.PI);
+  }
+
+  /**
    * Constrain node position within the canvas boundaries.
    */
   private constrainToBounds(node: NodeView, position: Point): Point {
@@ -252,7 +309,7 @@ export class ForceMode {
       this.pixiService.canvasBoundaries.boundaryYMin,
       Math.min(position.y, this.pixiService.canvasBoundaries.boundaryYMax - node.height)
     );
-    return { x: constrainedX, y: constrainedY };
+    return {x: constrainedX, y: constrainedY};
   }
 
   /**

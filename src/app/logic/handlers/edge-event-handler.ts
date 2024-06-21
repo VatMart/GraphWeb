@@ -19,7 +19,6 @@ import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
  * Handles all events related to the edge views.
  */
 export class EdgeEventHandler {
-  // TODO move all edge related event handling here
   private static instance: EdgeEventHandler | undefined = undefined
 
   /**

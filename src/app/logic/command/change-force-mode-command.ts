@@ -4,6 +4,7 @@ import {Point} from "../../utils/graphical-utils";
 import {GraphViewService} from "../../service/graph-view.service";
 import {DefaultMode} from "../mode/default-mode";
 import {StateService} from "../../service/state.service";
+import {ForceMode} from "../mode/force-mode";
 
 /**
  * Command to change the force mode state.
@@ -20,20 +21,24 @@ export class ChangeForceModeCommand implements Command {
     if (this.forceMode) {
       if (!this.stateService.isForceModeDisabled()) {
         this.defaultMode.forceModeOn();
+        ForceMode.activatedByUserMemory = true;
       }
     } else {
       this.defaultMode.forceModeOff();
+      ForceMode.activatedByUserMemory = false;
     }
   }
 
   undo(): void {
     if (this.forceMode) {
       this.defaultMode.forceModeOff();
+      ForceMode.activatedByUserMemory = false;
       this.nodePositions.forEach(nodePosition => {
         this.graphViewService.moveNodeView(nodePosition.node, nodePosition.position);
       });
     } else if (!this.stateService.isForceModeDisabled()) {
       this.defaultMode.forceModeOn();
+      ForceMode.activatedByUserMemory = true;
     }
   }
 
