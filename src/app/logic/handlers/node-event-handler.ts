@@ -17,7 +17,6 @@ import {InternalGrid} from "../../model/internal-grid";
  * Handles all events related to the node views.
  */
 export class NodeEventHandler {
-  // TODO move all node related event handling here
   private static instance: NodeEventHandler | undefined = undefined
 
   /**
