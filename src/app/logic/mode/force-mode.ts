@@ -14,12 +14,17 @@ import {Point} from "../../utils/graphical-utils";
  * Submode of 'Default Mode' for applying forces to the graph elements.
  */
 export class ForceMode {
+  // Static property to keep track of the mode state (Don't change this property directly,
+  // use modeOn() and modeOff() methods)
+  public static isActive: boolean;
   private grid: InternalGrid<NodeView>;
   private forceNodes: Map<NodeView, ForceNodeView>;
 
   // Repulsive force
-  private repulsionConstant: number = 2500;
+  private repulsionConstant: number = 5000;
   private maxDistance: number = NodeView.DEFAULT_RADIUS * 6; // Maximum distance to apply repulsive force
+  // Center-spring force
+  private springForceConstant: number = 1;
 
   // For debugging
   private lastTime: number = 0;
@@ -29,7 +34,8 @@ export class ForceMode {
               private eventBus: EventBusService,
               private historyService: HistoryService,
               private graphViewService: GraphViewService,
-              private stateService: StateService, gridCellSize: number) {
+              private stateService: StateService,
+              gridCellSize: number) {
     this.grid = new InternalGrid<NodeView>(gridCellSize);
     this.forceNodes = new Map<NodeView, ForceNodeView>();
   }
@@ -37,11 +43,13 @@ export class ForceMode {
   modeOn(): void {
     this.initializeForceNodes();
     this.enableForces();
+    ForceMode.isActive = true;
   }
 
   modeOff(): void {
     this.disableForces();
     this.destroyForceNodes();
+    ForceMode.isActive = false;
   }
 
   onAddedNode(nodeView: NodeView): void {
@@ -88,9 +96,36 @@ export class ForceMode {
 
   private updateForces(): void {
     const processedPairs = new Set<string>();
+    let totalX = 0;
+    let totalY = 0;
+    let nodeCount = this.forceNodes.size;
+    const draggedNodes = NodeEventHandler.dragTarget?.map(nm => nm.node);
     this.forceNodes.forEach((forceNode) => {
-      this.applyRepulsiveForces(forceNode, processedPairs);
+      this.applyRepulsiveForces(forceNode, processedPairs, draggedNodes);
+      // Calculate the center of mass
+      const center = forceNode.node.centerCoordinates();
+      totalX += center.x;
+      totalY += center.y;
     });
+    const centerOfMass = {
+      x: totalX / nodeCount,
+      y: totalY / nodeCount
+    };
+    // Calculate the dynamic equilibrium distance
+    const equilibriumDistance = this.calculateEquilibriumDistance(draggedNodes);
+    this.applySpringForce(centerOfMass, equilibriumDistance, draggedNodes);
+  }
+
+  private calculateEquilibriumDistance(draggedNodes?: NodeView[]): number {
+    const totalNodes = draggedNodes ? this.forceNodes.size - draggedNodes.length : this.forceNodes.size;
+    const nodeRadius = NodeView.DEFAULT_RADIUS; // Assuming NodeView has a DEFAULT_RADIUS
+    const minimumDistance = NodeView.DEFAULT_RADIUS * 4; // Minimum distance between nodes to prevent overlap
+    // Calculate the required area for each node including its minimum spacing
+    const areaPerNode = (2 * nodeRadius + minimumDistance) ** 2;
+    // Calculate the total area needed for all nodes
+    const totalArea = areaPerNode * totalNodes;
+    // Assuming the nodes are placed in a roughly circular layout, calculate the radius of this circle
+    return Math.sqrt(totalArea / Math.PI);
   }
 
   private disableForces(): void {
@@ -129,14 +164,15 @@ export class ForceMode {
   /**
    * Apply repulsive forces between neighboring nodes.
    */
-  private applyRepulsiveForces(forceNode: ForceNodeView, processedPairs: Set<string>): void {
+  private applyRepulsiveForces(forceNode: ForceNodeView, processedPairs: Set<string>,
+                               draggedNodes?: NodeView[]): void {
     const centerPosition = forceNode.node.centerCoordinates();
     const neighbors = this.grid.getNeighbors(forceNode.node, centerPosition.x, centerPosition.y, 1);
     neighbors.forEach((neighbor) => {
       const forceNeighbor = this.forceNodes.get(neighbor)!;
       const pairKey = this.getPairKey(forceNode.node, neighbor);
       if (!processedPairs.has(pairKey)) {
-        this.applyForceBetweenNodes(forceNode, forceNeighbor);
+        this.applyForceBetweenNodes(forceNode, forceNeighbor, draggedNodes);
         processedPairs.add(pairKey);
       }
     });
@@ -150,16 +186,40 @@ export class ForceMode {
   }
 
   /**
+   * Apply spring-like force to all nodes to keep them at an equilibrium distance from the center of mass.
+   * TODO: optimize force by placing in same loop as repulsive force (if center of mass is already calculated)
+   */
+  private applySpringForce(centerOfMass: Point, equilibriumDistance: number, draggedNodes?: NodeView[]): void {
+    this.forceNodes.forEach(forceNode => {
+      if (draggedNodes && draggedNodes.includes(forceNode.node)) {
+        return; // Skip if node is being dragged
+      }
+      const nodeCenter = forceNode.node.centerCoordinates();
+      const dx = centerOfMass.x - nodeCenter.x;
+      const dy = centerOfMass.y - nodeCenter.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const boundaryDistance = distance - equilibriumDistance;
+
+      if (boundaryDistance > 0) {
+        const forceMagnitude = this.springForceConstant * (1 - Math.exp(-boundaryDistance));
+        const fx = (dx / distance) * forceMagnitude;
+        const fy = (dy / distance) * forceMagnitude;
+        forceNode.applyForce(fx, fy);
+      }
+    });
+  }
+
+  /**
    * Apply repulsive force between two nodes.
    */
-  private applyForceBetweenNodes(nodeA: ForceNodeView, nodeB: ForceNodeView): void {
+  private applyForceBetweenNodes(nodeA: ForceNodeView, nodeB: ForceNodeView, draggedNodes?: NodeView[]): void {
     const posA = nodeA.node.centerCoordinates();
     const posB = nodeB.node.centerCoordinates();
     const dx = posB.x - posA.x;
     const dy = posB.y - posA.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance === 0 || distance > this.maxDistance) return; // Skip if distance is zero or greater than maxDistance
-    const minimumDistance = 10; // Minimum distance to prevent nodes from getting too close
+    const minimumDistance = NodeView.DEFAULT_RADIUS * 2; // Minimum distance to prevent nodes from getting too close
     const clampedDistance = Math.max(distance, minimumDistance);
     const forceMagnitude = this.repulsionConstant / (clampedDistance * clampedDistance); // Adjust the force calculation
     const fx = (dx / clampedDistance) * forceMagnitude;
@@ -168,12 +228,11 @@ export class ForceMode {
     let applyOnA = true;
     let applyOnB = true;
     // Nodes that are being dragged should not be affected by repulsive forces
-    if (NodeEventHandler.dragTarget) {
-      const dragArr = NodeEventHandler.dragTarget.map(nm => nm.node);
-      if (dragArr.includes(nodeA.node)) {
+    if (draggedNodes) {
+      if (draggedNodes.includes(nodeA.node)) {
         applyOnA = false;
       }
-      if (dragArr.includes(nodeB.node)) {
+      if (draggedNodes.includes(nodeB.node)) {
         applyOnB = false;
       }
     }

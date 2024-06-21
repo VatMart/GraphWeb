@@ -30,14 +30,12 @@ export class DefaultMode implements ModeBehavior {
     this.selectableModeOn();
     this.moveableNodesOn();
     this.editableEdgesWeightOn();
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.modeOn();
-    }
   }
 
   modeOff(): void {
     console.log("DefaultMode OFF"); // TODO remove
-    this.forceMode.modeOff(); // If force mode is enabled
+    this.forceModeOff(); // Off force mode if it is enabled
+    this.stateService.changeForceModeDisabledState(true);
     this.selectableModeOff();
     this.moveableNodesOff();
     this.editableEdgesWeightOff()
@@ -88,11 +86,19 @@ export class DefaultMode implements ModeBehavior {
   }
 
   public forceModeOn(): void {
+    if (this.stateService.isForceModeEnabled()) {
+      return;
+    }
     this.forceMode.modeOn();
+    this.stateService.forceModeStateChanged();
   }
 
   public forceModeOff(): void {
+    if (!this.stateService.isForceModeEnabled()) {
+      return;
+    }
     this.forceMode.modeOff();
+    this.stateService.forceModeStateChanged();
   }
 
   /**

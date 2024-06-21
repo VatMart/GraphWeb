@@ -17,11 +17,6 @@ export class AddRemoveVertexMode implements ModeBehavior {
 
   modeOn(): void {
     console.log("AddRemoveVertexMode ON"); // TODO remove
-    // Disable force mode
-    if (this.stateService.isForceModeEnabled()) {
-      this.stateService.changeForceModeState(false);
-    }
-    this.stateService.changeForceModeDisabledState(true);
     this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.CANVAS_ADD_REMOVE_NODE);
   }

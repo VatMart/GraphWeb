@@ -11,8 +11,9 @@ export class ForceNodeView {
   ax: number = 0; // Acceleration in x direction
   ay: number = 0; // Acceleration in y direction
   mass: number = 1; // Optional: Mass of the node
-  damping: number = 0.90; // Damping factor to simulate friction
+  damping: number = 0.9; // Damping factor to simulate friction
   maxVelocity: number = 10; // Maximum velocity that can be achieved
+  forceThreshold: number = 0.01; // Threshold to consider a node at rest
 
   constructor(node: NodeView) {
     this.node = node;
@@ -33,9 +34,19 @@ export class ForceNodeView {
    * @returns New position of the node.
    */
   updatePosition() : Point {
+    const totalForce = Math.sqrt(this.ax * this.ax + this.ay * this.ay);
+    // If the total force is less than the threshold, stop the node
+    if (totalForce < this.forceThreshold) {
+      this.ax = 0;
+      this.ay = 0;
+      this.vx = 0;
+      this.vy = 0;
+      return {x: this.node.x, y: this.node.y};
+    }
+    // Apply damping and limit the velocity
     this.vx = (this.vx + this.ax) * this.damping;
     this.vy = (this.vy + this.ay) * this.damping;
-    const velocity = Math.sqrt(this.vx * this.vy + this.vy * this.vy);
+    const velocity = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
     if (velocity > this.maxVelocity) {
       const scale = this.maxVelocity / velocity;
       this.vx *= scale;

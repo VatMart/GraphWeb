@@ -21,10 +21,6 @@ export class AddRemoveEdgeMode implements ModeBehavior {
   }
 
   modeOn(): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.stateService.changeForceModeState(false);
-    }
-    this.stateService.changeForceModeDisabledState(true);
     this.selectableElementsOn();
   }
 

@@ -7,6 +7,7 @@ import {GraphOrientation} from "../model/orientation";
 import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
 import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../component/canvas/float-helper/float-helper.component";
 import {Weight} from "../model/graphical-model/edge/weight";
+import {ForceMode} from "../logic/mode/force-mode";
 
 /**
  * Service for managing the state of the application.
@@ -410,8 +411,11 @@ export class StateService {
    * Get current force mode state.
    */
   isForceModeEnabled(): boolean {
-    const value = this.forceModeStateSource.getValue();
-    return value !== null ? value : false;
+    return ForceMode.isActive;
+  }
+
+  isForceModeDisabled(): boolean {
+    return this.forceModeDisabledSource.value;
   }
 }
 
