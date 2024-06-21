@@ -21,7 +21,6 @@ import {Subscription} from "rxjs";
   styleUrl: './float-tool-bar.component.css'
 })
 export class FloatToolBarComponent implements OnInit, OnDestroy {
-  public static readonly DEFAULT_FORCE_MODE_ACTIVE: boolean = false; // TODO move to separate service // TODO set to true by default
   private subscriptions = new Subscription();
 
   items!: FloatToolBarItem[];
@@ -49,7 +48,7 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
       {
         icon: 'force-icon',
         customIcon: true,
-        isActive: FloatToolBarComponent.DEFAULT_FORCE_MODE_ACTIVE,
+        isActive: false,
         command: (index: number) => {
           // Change force mode state
           this.stateService.changeForceModeState(!this.items[index].isActive!);

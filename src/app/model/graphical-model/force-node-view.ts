@@ -13,7 +13,7 @@ export class ForceNodeView {
   mass: number = 1; // Optional: Mass of the node
   damping: number = 0.9; // Damping factor to simulate friction
   maxVelocity: number = 10; // Maximum velocity that can be achieved
-  forceThreshold: number = 0.1; // Threshold to consider a node at rest
+  forceThreshold: number = 0.2; // Threshold to consider a node at rest
 
   constructor(node: NodeView) {
     this.node = node;

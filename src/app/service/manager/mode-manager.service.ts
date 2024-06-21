@@ -104,6 +104,22 @@ export class ModeManagerService implements ServiceManager {
         this.historyService.execute(command);
       })
     );
+    // Subscribe to center force mode state
+    this.subscriptions.add(
+      this.stateService.centerForceState$.subscribe(value => {
+        if (value !== null) {
+          this.defaultMode.centerForceToggle(value)
+        }
+      })
+    );
+    // Subscribe to link force mode state
+    this.subscriptions.add(
+      this.stateService.linkForceState$.subscribe(value => {
+        if (value !== null) {
+          this.defaultMode.linkForceToggle(value)
+        }
+      })
+    );
     // Subscribe to changes in the graph
     this.subscriptions.add(
       this.stateService.nodeAdded$.subscribe(nodeView => {

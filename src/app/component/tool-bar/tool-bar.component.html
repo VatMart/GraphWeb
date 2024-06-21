@@ -148,6 +148,18 @@
                       (click)="onCheckboxClick($event, 'hideHelper')"
                       *ngIf="item.id === 'hideHelper'">
           </p-checkbox>
+          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
+                      [formControl]="enableCenterForce"
+                      [binary]="true" inputId="binary"
+                      (click)="onCheckboxClick($event, 'enableCenterForce')"
+                      *ngIf="item.id === 'enableCenterForce'">
+          </p-checkbox>
+          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
+                      [formControl]="enableLinkForce"
+                      [binary]="true" inputId="binary"
+                      (click)="onCheckboxClick($event, 'enableLinkForce')"
+                      *ngIf="item.id === 'enableLinkForce'">
+          </p-checkbox>
           <div class="dropdown-select-item-container" (click)="$event.stopPropagation();" *ngIf="item.id === 'selectOrientation'">
             <p-dropdown class="custom-select"
                         [options]="orientations"

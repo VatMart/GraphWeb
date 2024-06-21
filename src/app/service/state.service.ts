@@ -97,6 +97,12 @@ export class StateService {
   private forceModeStateChangedSource = new BehaviorSubject<boolean>(false);
   public forceModeStateChanged$ = this.forceModeStateChangedSource.asObservable();
 
+  private centerForceStateSource = new BehaviorSubject<boolean | null>(null);
+  public centerForceState$ = this.centerForceStateSource.asObservable();
+
+  private linkForceStateSource = new BehaviorSubject<boolean | null>(null);
+  public linkForceState$ = this.linkForceStateSource.asObservable();
+
   // --------------------------------------------------
   // UI component states. Canvas Float helper
   // --------------------------------------------------
@@ -324,6 +330,20 @@ export class StateService {
    */
   forceModeStateChanged() {
     this.forceModeStateChangedSource.next(true);
+  }
+
+  /**
+   * Change the center force state.
+   */
+  changeCenterForceState(state: boolean) {
+    this.centerForceStateSource.next(state);
+  }
+
+  /**
+   * Change the link force state.
+   */
+  changeLinkForceState(state: boolean) {
+    this.linkForceStateSource.next(state);
   }
 
   /**
