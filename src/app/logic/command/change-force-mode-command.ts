@@ -5,6 +5,9 @@ import {GraphViewService} from "../../service/graph-view.service";
 import {DefaultMode} from "../mode/default-mode";
 import {StateService} from "../../service/state.service";
 
+/**
+ * Command to change the force mode state.
+ */
 export class ChangeForceModeCommand implements Command {
 
   constructor(private graphViewService: GraphViewService,
@@ -15,11 +18,12 @@ export class ChangeForceModeCommand implements Command {
   }
   execute(): void {
     if (this.forceMode) {
-      this.defaultMode.forceModeOn();
+      if (!this.stateService.isForceModeDisabled()) {
+        this.defaultMode.forceModeOn();
+      }
     } else {
       this.defaultMode.forceModeOff();
     }
-    this.stateService.forceModeStateChanged(); // Notify that force mode state has changed
   }
 
   undo(): void {
@@ -28,10 +32,9 @@ export class ChangeForceModeCommand implements Command {
       this.nodePositions.forEach(nodePosition => {
         this.graphViewService.moveNodeView(nodePosition.node, nodePosition.position);
       });
-    } else {
+    } else if (!this.stateService.isForceModeDisabled()) {
       this.defaultMode.forceModeOn();
     }
-    this.stateService.forceModeStateChanged();
   }
 
   redo(): void {
