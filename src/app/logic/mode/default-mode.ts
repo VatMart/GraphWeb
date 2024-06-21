@@ -105,6 +105,20 @@ export class DefaultMode implements ModeBehavior {
   }
 
   /**
+   * Toggle center force
+   */
+  public centerForceToggle(value: boolean) {
+    this.forceMode.centerForceToggle(value);
+  }
+
+  /**
+   * Toggle link force
+   */
+  public linkForceToggle(value: boolean) {
+    this.forceMode.linkForceToggle(value);
+  }
+
+  /**
    * Add listeners for moving nodes to all nodes
    */
   public moveableNodesOn() {

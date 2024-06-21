@@ -18,7 +18,7 @@ export class ForceMode {
   // use modeOn() and modeOff() methods)
   public static isActive: boolean;
   // Used to remember state of force mode when change default mode on other modes and back
-  public static activatedByUserMemory: boolean = false;
+  public static activatedByUserMemory: boolean = true; // This field is used as default value for force mode
 
   // TODO make these properties configurable
   public centerSpringForceEnabled: boolean = true;
@@ -28,12 +28,12 @@ export class ForceMode {
   private forceNodes: Map<NodeView, ForceNodeView>;
 
   // Repulsive force
-  private repulsionConstant: number = 5000;
+  private repulsionConstant: number = 15000;
   private maxDistance: number = NodeView.DEFAULT_RADIUS * 6; // Maximum distance to apply repulsive force
   // Center-spring force
   private springForceConstant: number = 1;
   // Link-spring force
-  private linkSpringForceConstant: number = 0.4;
+  private linkSpringForceConstant: number = 0.04;
 
   // For debugging
   private lastTime: number = 0;
@@ -328,5 +328,19 @@ export class ForceMode {
     this.lastTime = now;
     this.fps = 1000 / elapsed;
     console.log(`FPS: ${this.fps.toFixed(2)}`);
+  }
+
+  /**
+   * Switch center-spring force on or off.
+   */
+  centerForceToggle(value: boolean) {
+    this.centerSpringForceEnabled = value;
+  }
+
+  /**
+   * Switch link-spring force on or off.
+   */
+  linkForceToggle(value: boolean) {
+    this.linkSpringForceEnabled = value;
   }
 }

@@ -58,6 +58,9 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   showWeights =  new FormControl(true); // TODO change to false by default
   showGrid = new FormControl(false);
   hideHelper = new FormControl(false);
+  // Force options
+  enableCenterForce = new FormControl(true);
+  enableLinkForce = new FormControl(true);
   orientations: SelectOrientationItem[] | undefined;
   selectedOrientation = new FormControl<GraphOrientation | null>(GraphOrientation.ORIENTED);
 
@@ -99,6 +102,17 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.hideHelper.valueChanges.subscribe(value => {
       if (value !== null) {
         this.onToggleAlwaysHideHelper(value);
+      }
+    });
+    // Force options
+    this.enableCenterForce.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onCenterForceToggle(value);
+      }
+    });
+    this.enableLinkForce.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onLinkForceToggle(value)
       }
     });
     // Graph orientation
@@ -177,7 +191,23 @@ export class ToolBarComponent implements OnInit, OnDestroy {
             id: 'selectOrientation'
           }
         ]
-      }
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Force mode options',
+        items: [
+          {
+            id: 'enableCenterForce',
+            label: 'Enable center force',
+          },
+          {
+            id: 'enableLinkForce',
+            label: 'Enable link force',
+          },
+        ],
+      },
     ];
   }
 
@@ -228,6 +258,14 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.stateService.changeGraphOrientation(value);
   }
 
+  private onCenterForceToggle(value: boolean) {
+    this.stateService.changeCenterForceState(value);
+  }
+
+  private onLinkForceToggle(value: boolean) {
+    this.stateService.changeLinkForceState(value);
+  }
+
   undoAction() {
     this.historyService.undo();
     this.stateService.undoInvoked();
@@ -254,6 +292,12 @@ export class ToolBarComponent implements OnInit, OnDestroy {
           break;
         case 'hideHelper':
           this.hideHelper.setValue(!this.hideHelper.value);
+          break;
+        case 'enableCenterForce':
+          this.enableCenterForce.setValue(!this.enableCenterForce.value);
+          break;
+        case 'enableLinkForce':
+          this.enableLinkForce.setValue(!this.enableLinkForce.value);
           break;
       }
     }
