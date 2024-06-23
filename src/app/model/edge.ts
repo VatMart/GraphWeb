@@ -15,6 +15,12 @@ export class Edge {
 
   private _edgeIndex: EdgeIndex;
 
+  /**
+   * Label of node. Replace index in representations if set
+   * TODO implement label
+   */
+  private _label: string = "";
+
   // If you use oriented edge, remember that order of nodes is important.
   // First node is always one which initiate direction: firstNode -> secondNode
   private _orientation: EdgeOrientation;
@@ -47,6 +53,14 @@ export class Edge {
 
   get edgeIndex(): EdgeIndex {
     return this._edgeIndex;
+  }
+
+  get label(): string {
+    return this._label;
+  }
+
+  set label(value: string) {
+    this._label = value;
   }
 
   get orientation(): EdgeOrientation {

@@ -27,14 +27,14 @@
     <div #leftSideContentContainer>
       <div class="left-side-content-container" *ngIf="activeIndex !== null">
         <div class="left-side-content-header">
-          <h3>{{ items ? items[activeIndex]['header'] : "No header" }}</h3>
+          <h2>{{ items ? items[activeIndex]['header'] : "No header" }}</h2>
           <i pRipple class="pi pi-times-circle close-button move-right" style="font-size: 1.5rem"
              (click)="onCloseLeftSideContainer()">
           </i>
         </div>
         <div class="content-separator"></div>
         <!-- TODO -->
-        <app-matrix-view *ngIf="activeIndex === 0"/>
+        <app-output-view *ngIf="activeIndex === 0"/>
       </div>
     </div>
   </div>
@@ -43,7 +43,7 @@
 <!-- Mobile version of nav bar -->
 <ng-template #bottomNavTab>
   <div #tabMenuContainer></div>
-  <div id="mobile-navbar" class="mobile-tab-menu">
+  <div #mobileTabNav id="mobile-navbar" class="mobile-tab-menu">
     <p-tabMenu [model]="items" [(activeItem)]="activeItem">
       <ng-template pTemplate="item" let-item let-i="index">
         <a pRipple class="p-menuitem-link" (click)="onMobileTabMenuActiveItemChange(i)">
@@ -64,20 +64,19 @@
     </p-tabMenu>
   </div>
   <p-sidebar #sidebarRef [visible]="bottomPanelVisible"
-             (visibleChange)="onBottomPanelVisible($event)"
-             (onHide)="onBottomPanelHide()"
+             (onHide)="onBottomPanelHide($event)"
              [appendTo]="tabMenuContainer"
              autoZIndex="false"
              [modal]="true">
     <ng-template pTemplate="headless">
       <div class="mobile-sidebar">
-        <div class="mobile-sidebar-header">
-          <h3>{{ activeItem ? activeItem['header'] : "No header" }}</h3>
+        <div class="mobile-sidebar-header" #mobileSidebarHeader>
+          <h2>{{ activeItem ? activeItem['header'] : "No header" }}</h2>
           <a pRipple class="pi pi-angle-double-left collapse-icon move-right" style="font-size: 1.5rem"
              (click)="onCloseMobileSidebar($event)"></a>
         </div>
-        <div class="mobile-sidebar-content">
-          <app-matrix-view *ngIf="activeItem?.id === 'matrices'"/>
+        <div class="mobile-sidebar-content" #mobileSidebarContent>
+          <app-output-view *ngIf="activeItem?.id === 'output'"/>
         </div>
       </div>
     </ng-template>

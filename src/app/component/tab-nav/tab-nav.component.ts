@@ -1,6 +1,6 @@
-import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {CommonModule, NgClass, NgForOf, NgIf} from "@angular/common";
-import {MatrixViewComponent} from "./matrix-view/matrix-view.component";
+import {OutputViewComponent} from "./matrix-view/output-view.component";
 import {StateService} from "../../service/state.service";
 import {EnvironmentService} from "../../service/environment.service";
 import {TabMenuModule} from "primeng/tabmenu";
@@ -17,7 +17,7 @@ import {Sidebar, SidebarModule} from "primeng/sidebar";
 @Component({
   selector: 'app-tab-nav',
   standalone: true,
-  imports: [CommonModule, NgClass, NgIf, NgForOf, MatrixViewComponent, TabMenuModule, RippleModule,
+  imports: [CommonModule, NgClass, NgIf, NgForOf, OutputViewComponent, TabMenuModule, RippleModule,
     SvgIconDirective, SidebarModule],
   templateUrl: './tab-nav.component.html',
   styleUrl: './tab-nav.component.css'
@@ -33,6 +33,9 @@ export class TabNavComponent implements OnInit {
 
   // Mobile
   @ViewChild('sidebarRef') sidebarRef!: Sidebar;
+  @ViewChild('mobileTabNav') bottomNavbar!: ElementRef;
+  @ViewChild('mobileSidebarHeader') header!: ElementRef;
+  @ViewChild('mobileSidebarContent') content!: ElementRef;
   activeItem: MenuItem | undefined;
   bottomPanelVisible: boolean = false;
 
@@ -41,14 +44,15 @@ export class TabNavComponent implements OnInit {
   constructor(private stateService: StateService,
               private environmentService: EnvironmentService,
               protected svgIconService: SvgIconService,
-              private cdr: ChangeDetectorRef) {
+              private cdr: ChangeDetectorRef,
+              private renderer: Renderer2) {
     this.isMobileDevice = this.environmentService.isMobile();
   }
 
   ngOnInit(): void {
     this.svgIconService.addIcon('matrix-icon', '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="2 0 20 20"><path fill="currentColor" d="M3 4v16h3v-2H5V6h1V4zm15 0v2h1v12h-1v2h3V4zm-3.248 4.424c-.499-.01-1.002.113-1.406.39-.26.18-.484.408-.74.627-.392-.777-1.098-.984-1.905-.998-.818-.013-1.451.358-2.02 1.036V8.64H7v6.347h1.787s-.003-2.38.002-3.554c.001-.21.012-.422.055-.627.132-.628.67-1.015 1.314-.963.613.05.892.383.922 1.107.005.126.008 4.033.008 4.033h1.81s-.007-2.471.004-3.521c.003-.271.03-.549.096-.81.148-.589.625-.876 1.273-.805.572.062.859.378.9 1V15h1.804s.029-3.12 0-4.602a2.2 2.2 0 0 0-.24-.902c-.333-.667-1.152-1.055-1.983-1.072"/></svg>');
     this.items = [
-      {label: 'Matrices', id: 'matrices', icon: 'matrix-icon', header: 'Matrix view', customIcon: true},
+      {label: 'Output view', id: 'output', icon: 'matrix-icon', header: 'Output view', customIcon: true},
       {label: 'Test1', icon: 'pi pi-chart-line'},
       {label: 'Test2', icon: 'pi pi-list'},
       {label: 'Test3', icon: 'pi pi-inbox'}
@@ -58,7 +62,7 @@ export class TabNavComponent implements OnInit {
   onCloseLeftSideContainer() {
     this.activeIndex = null;
     this.useCloseButtonGradient = false;
-    this.stateService.changedMatrixViewVisibility(false); // TODO change when more components will be added
+    this.stateService.changedOutputViewVisibility(false); // TODO change when more components will be added
     // Resize canvas on UI changes
     this.cdr.detectChanges();
     this.stateService.needResizeCanvas();
@@ -82,6 +86,10 @@ export class TabNavComponent implements OnInit {
   // Mobile UI logic
   // ----------------
   onCloseMobileSidebar(e: MouseEvent) {
+    this.bottomPanelVisible = false;
+    if (this.items) {
+      this.activeItem = undefined;
+    }
     this.sidebarRef.close(e);
   }
 
@@ -91,20 +99,24 @@ export class TabNavComponent implements OnInit {
     }
     if (this.activeItem !== this.items[index]) {
       this.bottomPanelVisible = true;
+      this.cdr.detectChanges();
+      this.setContentHeight();
     }
   }
 
-  onBottomPanelVisible($event: boolean) {
-    this.bottomPanelVisible = $event;
-    this.stateService.changedMatrixViewVisibility($event); // TODO CHANGE
+  onBottomPanelHide(event: any) {
+    this.bottomPanelVisible = false;
     if (this.items) {
       this.activeItem = undefined;
     }
   }
 
-  onBottomPanelHide() {
-    if (this.items) {
-      //console.log('hide:');
-    }
+  private setContentHeight() {
+    const headerHeight = this.header.nativeElement.offsetHeight;
+    const bottomNavbarHeight = this.bottomNavbar.nativeElement.offsetHeight;
+    console.log('headerHeight:', headerHeight);
+    const windowHeight = window.innerHeight;
+    const contentHeight = windowHeight - headerHeight - bottomNavbarHeight - 8;
+    this.renderer.setStyle(this.content.nativeElement, 'max-height', `${contentHeight}px`);
   }
 }

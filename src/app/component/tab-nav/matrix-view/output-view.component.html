@@ -1,0 +1,98 @@
+<div class="output-view-container">
+  <div class="matrix-container">
+    <h3>Graph matrix</h3>
+    <p-message *ngIf="!isMobileDevice" severity="warning" [text]="warningMessage" />
+    <div class="matrix-type-container">
+      <!-- Notification p-toast -->
+      <p-toast position="top-center"/>
+      <label class="matrix-type-label">Matrix type:</label>
+      <p-dropdown
+        [options]="matrixTypes"
+        [formControl]="matrixType"
+        optionValue="value"
+        optionLabel="label"/>
+    </div>
+
+    <!-- Matrix table container -->
+    <div class="matrix-content-container">
+      <div class="matrix-table-container">
+        <div class="matrix-table-wrapper">
+          <app-matrix-table [matrix]="matrix" [columns]="columns" [valuesOfFirstColumn]="valuesOfFirstColumn"
+                            [scrollHeight]="'300px'"></app-matrix-table>
+        </div>
+
+        <div class="vertical-bar-container">
+          <!-- Open table in separate window button -->
+          <i pRipple pTooltip="Show in separate window" tooltipPosition="bottom" showDelay="200"
+             class="pi pi-window-maximize graph-web-button" style="font-size: 1.75rem; padding-bottom: 4px"
+             (click)="onExpandTable()">
+          </i>
+          <!-- Copy to clipboard button -->
+          <i pRipple pTooltip="Copy to clipboard" tooltipPosition="bottom" showDelay="200"
+             class="pi pi-clipboard graph-web-button" style="font-size: 1.75rem"
+             (click)="onCopyToClipboard()">
+          </i>
+          <!-- Refresh matrix -->
+          <i *ngIf="!isMobileDevice" pRipple pTooltip="Refresh " tooltipPosition="bottom" showDelay="200"
+             class="pi pi-refresh graph-web-button" style="font-size: 1.75rem; padding-bottom: 4px"
+             (click)="onRefreshMatrix()">
+          </i>
+          <!-- TODO Open matrix as text button -->
+        </div>
+      </div>
+
+      <!-- Fullscreen matrix window -->
+      <p-dialog header="Full screen matrix"
+                [modal]="true"
+                [(visible)]="fullScreen"
+                [style]="{ width: '95vw', height: '95vh'}"
+                [appendTo]="'body'"
+                [closeOnEscape]="true"
+                dismissableMask="true"
+                resizable="false">
+        <div class="full-size-matrix-table-wrapper">
+          <app-matrix-table [matrix]="matrix" [columns]="columns"
+                            [valuesOfFirstColumn]="valuesOfFirstColumn"></app-matrix-table>
+        </div>
+      </p-dialog>
+    </div>
+  </div>
+
+  <!-- Separator -->
+  <div class="separator"></div>
+
+  <!-- Graph sets container -->
+  <div class="graph-sets-container">
+    <h3>Graph sets
+      <div *ngIf="!isMobileDevice" class="vertical-bar-container" style="margin-left: auto;">
+        <!-- Open table in separate window button -->
+        <i pRipple pTooltip="Refresh" tooltipPosition="bottom" showDelay="200"
+           class="pi pi-refresh graph-web-button" style="font-size: 1.75rem; padding-bottom: 4px"
+           (click)="onSetsRefresh()">
+        </i>
+      </div></h3>
+
+    <!-- Vertices set -->
+    <div class="set-container">
+      <label class="graph-set-label">Vertices set</label>
+      <textarea class="graph-set-textarea"
+                rows="5"
+                placeholder="Add a vertex/edge to see actual set"
+                [(ngModel)]="verticesSet"
+                [readOnly]="true"
+                pInputTextarea>
+      </textarea>
+    </div>
+    <!-- Edges set -->
+    <div class="set-container">
+      <label class="graph-set-label">Edges set</label>
+      <textarea class="graph-set-textarea"
+                rows="5"
+                placeholder="Add a vertex/edge to see actual set"
+                [(ngModel)]="edgesSet"
+                [readOnly]="true"
+                pInputTextarea>
+      </textarea>
+    </div>
+  </div>
+</div>

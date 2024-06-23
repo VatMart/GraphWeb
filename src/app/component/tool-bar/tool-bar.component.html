@@ -17,7 +17,7 @@
   </span>
 
   <!-- Toggle Button for Vertex Addition -->
-  <button pRipple pTooltip="Add/Remove vertices" tooltipPosition="bottom" showDelay="200"
+  <button pRipple pTooltip="Toggle Add/Remove vertices mode" tooltipPosition="bottom" showDelay="200"
           id="buttonAddVertex" class="graph-web-toggle-button" [class.active]="isAddVertexButtonActive"
           (click)="onToggleAddVertexButton()"
           (mouseleave)="buttonAddVertexMouseLeave()"
@@ -41,7 +41,7 @@
   </button>
 
   <!-- Toggle Button for Edge Addition -->
-  <button pRipple pTooltip="Add/Remove edges" tooltipPosition="bottom" showDelay="200"
+  <button pRipple pTooltip="Toggle Add/Remove edges mode" tooltipPosition="bottom" showDelay="200"
           id="buttonAddEdge" class="graph-web-toggle-button" [class.active]="isAddEdgesButtonActive"
           (click)="onToggleAddEdgesButton()"
           (mouseleave)="buttonAddEdgesMouseLeave()"
@@ -148,13 +148,15 @@
                       (click)="onCheckboxClick($event, 'hideHelper')"
                       *ngIf="item.id === 'hideHelper'">
           </p-checkbox>
-          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
+          <p-checkbox pRipple pTooltip="Center force attracts vertices to center mass" tooltipPosition="left"
+                      class="p-menuitem-link" [label]="item.label"
                       [formControl]="enableCenterForce"
                       [binary]="true" inputId="binary"
                       (click)="onCheckboxClick($event, 'enableCenterForce')"
                       *ngIf="item.id === 'enableCenterForce'">
           </p-checkbox>
-          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
+          <p-checkbox pRipple pTooltip="Link force attracts connected vertices closer to each other" tooltipPosition="left"
+                      class="p-menuitem-link" [label]="item.label"
                       [formControl]="enableLinkForce"
                       [binary]="true" inputId="binary"
                       (click)="onCheckboxClick($event, 'enableLinkForce')"

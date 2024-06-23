@@ -2,7 +2,9 @@
   <p-table [value]="matrix" styleClass="p-datatable-sm p-datatable-gridlines"
            [scrollable]="true"
            [scrollHeight]="scrollHeight"
-           [tableStyle]="{'min-width': '215px', 'min-height': '200px', 'background-color': '#F5F5F5'}">
+           [virtualScroll]="true"
+           [virtualScrollItemSize]="46"
+           [tableStyle]="{'min-width': '215px', 'min-height': '300px', 'background-color': '#F5F5F5'}">
     <ng-template pTemplate="header">
       <tr>
         <th class="th-first">#</th>
@@ -20,8 +22,8 @@
 <ng-template #emptyState>
   <p-table [value]="['string']" styleClass="p-datatable-sm p-datatable-gridlines"
            [scrollable]="true"
-           scrollHeight="200px"
-           [tableStyle]="{'min-width': '215px', 'min-height': '200px', 'background-color': '#F5F5F5'}">
+           scrollHeight="300px"
+           [tableStyle]="{'min-width': '215px', 'min-height': '300px', 'background-color': '#F5F5F5'}">
     <ng-template pTemplate="header">
       <tr>
         <th class="th-first">Graph is empty</th>

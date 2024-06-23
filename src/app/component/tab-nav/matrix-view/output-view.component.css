@@ -1,3 +1,8 @@
+.output-view-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .matrix-type-container {
   display: flex;
   flex-direction: row;
@@ -19,8 +24,9 @@
 
 .matrix-table-wrapper {
   display: flow;
-  max-width: calc(100% - 36px - 4px);
-  min-width: calc(100% - 36px - 4px);
+  max-width: calc(100% - 40px - 4px);
+  min-width: calc(100% - 40px - 4px);
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
 }
 
 .graph-web-button {
@@ -42,12 +48,14 @@
   color: transparent;
 }
 
-.matrix-vertical-bar-container {
+.vertical-bar-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-inline: 4px;
+  padding: 2px;
   height: fit-content;
+  width: fit-content;
   background-color: black;
   opacity: 70%;
   border-radius: 5px;
@@ -57,4 +65,40 @@
   display: flow;
   max-width: 100%;
   min-width: 100%;
+}
+
+.separator {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--main-border-color);
+  margin-block: 16px;
+}
+
+h3 {
+  display: flex;
+  align-content: center;
+  margin: 0;
+}
+
+.graph-sets-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.set-container {
+  display: flex;
+  flex-direction: column;
+  padding-block: 8px;
+}
+
+.graph-set-label {
+  display: block;
+  color: black;
+  font-weight: bold;
+  padding-bottom: 4px;
+}
+
+.graph-set-textarea {
+  resize: none;
 }

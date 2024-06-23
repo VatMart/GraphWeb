@@ -12,11 +12,9 @@ import {Edge} from "../model/edge";
   providedIn: 'root'
 })
 export class GraphMatrixService {
-  // TODO implement
   constructor() { }
 
   public buildMatrixFromGraph(graph: Graph, matrixType: TypeMatrix): GraphMatrix {
-    // TODO implement
     const builder = this.getBuilder(matrixType);
     return builder.buildFromGraph(graph);
   }
