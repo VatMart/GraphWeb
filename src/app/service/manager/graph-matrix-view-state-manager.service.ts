@@ -7,6 +7,9 @@ import {TypeMatrix} from "../../model/graph-matrix";
 import {ServiceManager} from "../../logic/service-manager";
 import {Subscription} from "rxjs";
 
+/**
+ * Service for managing the graph matrix view.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -28,7 +31,7 @@ export class GraphMatrixViewStateManagerService implements ServiceManager {
     // Subscribe to state changes
     // Matrix view visibility
     this.subscriptions.add(
-      this.stateService.matrixViewVisibility$.subscribe(value => {
+      this.stateService.outputViewVisibility$.subscribe(value => {
         if (value === this.isMatrixViewVisible) {
           return;
         }
@@ -45,9 +48,9 @@ export class GraphMatrixViewStateManagerService implements ServiceManager {
         }
       })
     );
-    // Change matrix type on changes in the graph
+    // Change matrix type on UI request
     this.subscriptions.add(
-      this.stateService.graphChanged$.subscribe(() => { // TODO find a way to optimize this (removing of node will lead to removing of its edges, so it unnecessary will called more than once)
+      this.stateService.needUpdateMatrix$.subscribe(() => {
         this.buildAndShowMatrixView();
       })
     );

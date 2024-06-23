@@ -124,6 +124,13 @@ body {
   padding-inline: 4px;
 }
 
+/* PrimeNG button */
+.p-button {
+  background: var(--main-button-color);
+  border: none;
+  padding: 0.5rem 0.5rem;
+}
+
 /* Style for the overall scrollbar */
 ::-webkit-scrollbar {
   width: 8px; /* Width of the vertical scrollbar */
@@ -159,12 +166,12 @@ body {
 }
 
 .p-tabmenuitem .p-menuitem-link {
-  border: 1px solid #e5e7eb;
-  border-width: 2px 0 0 0;
+  border: solid #e5e7eb;
+  border-width: 1px 0 0 0;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
   margin: -2px 0 0 0;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.5rem;
 }
 
 .p-tabmenu-nav-content {
@@ -177,6 +184,7 @@ body {
 
 .p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {
   background: var(--main-bg-color);
+  text-align: center;
 }
 
 .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link {
@@ -189,4 +197,8 @@ body {
   background-color: var(--main-bg-color);
   border-right: 1px solid var(--main-border-color);
   z-index: 1;
+}
+
+.p-sidebar-left {
+  height: calc(100% - 40px);
 }

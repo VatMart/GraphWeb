@@ -7,6 +7,12 @@ export class Node {
 
   private _index: number;
 
+  /**
+   * Label of node. Replace index in representations if set
+   * TODO implement label
+   */
+  private _label: string = "";
+
   private _edges: string[] = []; // adjacent edge indexes
 
   constructor(index: number) {
@@ -30,6 +36,14 @@ export class Node {
 
   set index(value: number) {
     this._index = value;
+  }
+
+  get label(): string {
+    return this._label;
+  }
+
+  set label(value: string) {
+    this._label = value;
   }
 
   public getAdjacentEdges(): string[] {

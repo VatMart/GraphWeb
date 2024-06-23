@@ -8,6 +8,7 @@ import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
 import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../component/canvas/float-helper/float-helper.component";
 import {Weight} from "../model/graphical-model/edge/weight";
 import {ForceMode} from "../logic/mode/force-mode";
+import {GraphSet} from "../model/graph-set";
 
 /**
  * Service for managing the state of the application.
@@ -46,16 +47,28 @@ export class StateService {
   public currentAddEdgesState = this.stateAddEdgesSource.asObservable();
 
   // --------------------------------------------------
-  // UI component states. Nav bar components
+  // UI component states. Nav bar components. Output view
   // --------------------------------------------------
-  private matrixViewVisibilitySource = new BehaviorSubject<boolean>(false);
-  public matrixViewVisibility$ = this.matrixViewVisibilitySource.asObservable();
+  private outputViewVisibilitySource = new BehaviorSubject<boolean>(false);
+  public outputViewVisibility$ = this.outputViewVisibilitySource.asObservable();
 
   private matrixTypeSource = new BehaviorSubject<TypeMatrix>(TypeMatrix.ADJACENCY);
   public currentMatrixType$ = this.matrixTypeSource.asObservable();
 
   private matrixSource = new BehaviorSubject<GraphMatrix | null>(null);
   public currentMatrix$ = this.matrixSource.asObservable();
+
+  private needUpdateMatrixSource = new BehaviorSubject<boolean>(false);
+  public needUpdateMatrix$ = this.needUpdateMatrixSource.asObservable();
+
+  private verticesGraphSetSource = new BehaviorSubject<GraphSet | null>(null);
+  public currentVerticesGraphSet$ = this.verticesGraphSetSource.asObservable();
+
+  private edgesGraphSetSource = new BehaviorSubject<GraphSet | null>(null);
+  public currentEdgesGraphSet$ = this.edgesGraphSetSource.asObservable();
+
+  private needUpdateGraphSetSource = new BehaviorSubject<boolean>(false);
+  public needUpdateGraphSet$ = this.needUpdateGraphSetSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas
@@ -235,9 +248,9 @@ export class StateService {
   /**
    * Change the visibility of the matrix view.
    */
-  changedMatrixViewVisibility(value: boolean) {
-    console.log("Matrix view visibility changed: " + value);
-    this.matrixViewVisibilitySource.next(value);
+  changedOutputViewVisibility(value: boolean) {
+    console.log("Output view visibility changed: " + value);
+    this.outputViewVisibilitySource.next(value);
   }
 
   /**
@@ -246,6 +259,34 @@ export class StateService {
   changeMatrixType(type: TypeMatrix) {
     console.log("Matrix type changed: " + type);
     this.matrixTypeSource.next(type);
+  }
+
+  /**
+   * Notify that the matrix needs to be updated.
+   */
+  needUpdateMatrix() {
+    this.needUpdateMatrixSource.next(true);
+  }
+
+  /**
+   * Change the current vertices graph set.
+   */
+  changeVerticesGraphSet(graphSet: GraphSet) {
+    this.verticesGraphSetSource.next(graphSet);
+  }
+
+  /**
+   * Change the current edges graph set.
+   */
+  changeEdgesGraphSet(graphSet: GraphSet) {
+    this.edgesGraphSetSource.next(graphSet);
+  }
+
+  /**
+   * Notify that the graph set needs to be updated.
+   */
+  needUpdateGraphSet() {
+    this.needUpdateGraphSetSource.next(true);
   }
 
   /**

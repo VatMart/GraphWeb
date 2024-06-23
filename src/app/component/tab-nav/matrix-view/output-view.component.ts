@@ -9,13 +9,20 @@ import {MenuModule} from "primeng/menu";
 import {DropdownModule} from "primeng/dropdown";
 import {RippleModule} from "primeng/ripple";
 import {Subscription} from "rxjs";
-import {MessageService} from "primeng/api";
+import {Message, MessageService} from "primeng/api";
 import {ToastModule} from "primeng/toast";
 import {DialogModule} from "primeng/dialog";
 import {MatrixTableComponent} from "./matrix-table/matrix-table.component";
+import {EnvironmentService} from "../../../service/environment.service";
+import {FloatLabelModule} from "primeng/floatlabel";
+import {InputTextareaModule} from "primeng/inputtextarea";
+import {ButtonModule} from "primeng/button";
+import {GraphSet} from "../../../model/graph-set";
+import {MessagesModule} from "primeng/messages";
+import {MessageModule} from "primeng/message";
 
 @Component({
-  selector: 'app-matrix-view',
+  selector: 'app-output-view',
   standalone: true,
   imports: [
     SelectButtonModule,
@@ -29,28 +36,42 @@ import {MatrixTableComponent} from "./matrix-table/matrix-table.component";
     RippleModule,
     ToastModule,
     DialogModule,
-    MatrixTableComponent
+    MatrixTableComponent,
+    FloatLabelModule,
+    InputTextareaModule,
+    ButtonModule,
+    MessagesModule,
+    MessageModule
   ],
   providers: [MessageService],
-  templateUrl: './matrix-view.component.html',
-  styleUrls: ['./matrix-view.component.css']
+  templateUrl: './output-view.component.html',
+  styleUrls: ['./output-view.component.css']
 })
-export class MatrixViewComponent implements OnInit, OnDestroy {
+export class OutputViewComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
+
+  isMobileDevice: boolean;
+
+  warningMessage: string = 'Huge matrix table may slow down the application. Close output view when interact with the graph.';
 
   matrixTypes: SelectMatrixTypeItem[] | undefined;
   matrixType = new FormControl(TypeMatrix.ADJACENCY);
   fullScreen = false;
 
-  // Table data
+  // Matrix table data
   columns: string[] = [];
   valuesOfFirstColumn: string[] = [];
   matrix: number[][] = [];
-
   graphMatrix: GraphMatrix | undefined;
 
+  // Graph sets
+  verticesSet: string = '';
+  edgesSet: string = '';
+
   constructor(private stateService: StateService,
-              private messageService: MessageService) {
+              private messageService: MessageService,
+              private environmentService: EnvironmentService) {
+    this.isMobileDevice = this.environmentService.isMobile();
   }
 
   ngOnInit(): void {
@@ -66,7 +87,6 @@ export class MatrixViewComponent implements OnInit, OnDestroy {
         }
       })
     );
-
     // On matrix change
     this.subscriptions.add(
       this.stateService.currentMatrix$.subscribe(matrix => {
@@ -75,11 +95,26 @@ export class MatrixViewComponent implements OnInit, OnDestroy {
         }
       })
     );
-    this.stateService.changedMatrixViewVisibility(true);
+    // On graph sets change
+    this.subscriptions.add(
+      this.stateService.currentVerticesGraphSet$.subscribe(set => {
+        if (set !== null) {
+          this.onVerticesSetChange(set);
+        }
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.currentEdgesGraphSet$.subscribe(set => {
+        if (set !== null) {
+          this.onEdgesSetChange(set);
+        }
+      })
+    );
+    this.stateService.changedOutputViewVisibility(true);
   }
 
   ngOnDestroy(): void {
-    this.stateService.changedMatrixViewVisibility(false);
+    this.stateService.changedOutputViewVisibility(false);
     this.subscriptions.unsubscribe(); // Unsubscribe from all subscriptions
   }
 
@@ -95,7 +130,12 @@ export class MatrixViewComponent implements OnInit, OnDestroy {
     this.valuesOfFirstColumn = vertexIndexesToString;
   }
 
+  onRefreshMatrix() {
+    this.stateService.needUpdateMatrix();
+  }
+
   onExpandTable() {
+    this.onRefreshMatrix(); // Refresh matrix before expanding
     this.fullScreen = true;
   }
 
@@ -156,6 +196,18 @@ export class MatrixViewComponent implements OnInit, OnDestroy {
 
   showErrorCopy(message: string) {
     this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
+  }
+
+  onSetsRefresh() {
+    this.stateService.needUpdateGraphSet();
+  }
+
+  private onVerticesSetChange(set: GraphSet) {
+    this.verticesSet = set.toString();
+  }
+
+  private onEdgesSetChange(set: GraphSet) {
+    this.edgesSet = set.toString();
   }
 }
 

@@ -4,7 +4,7 @@ import {EdgeOrientation} from "../../model/orientation";
 import {Edge} from "../../model/edge";
 
 /**
- * Interface for building graph matrix.
+ * Abstraction for building graph matrix.
  */
 export abstract class GraphMatrixBuilder {
   /**
@@ -38,6 +38,9 @@ export abstract class GraphMatrixBuilder {
     return vertexIndexes;
   }
 
+  /**
+   * Get sorted edges. Edges are sorted by indexes of nodes.
+   */
   protected getSortedEdges(graph: Graph): Map<string, Edge> {
     const edges = graph.getEdges();
     return new Map([...edges.entries()].sort((a, b) => {

@@ -14,6 +14,7 @@ import {
   FloatEdgeWeightInputComponent
 } from "./component/canvas/float-edge-weight-input/float-edge-weight-input.component";
 import {Subscription} from "rxjs";
+import {GraphSetViewManagerService} from "./service/manager/graph-set-view-manager.service";
 
 @Component({
   selector: 'app-root',
@@ -35,6 +36,7 @@ export class AppComponent implements OnInit {
   constructor(private modeManagerService: ModeManagerService,
               private graphStateManager: GraphStateManagerService,
               private matrixManager: GraphMatrixViewStateManagerService,
+              private graphSetManager: GraphSetViewManagerService,
               private environmentService: EnvironmentService,
               private stateService: StateService,
               private cdr: ChangeDetectorRef) {
