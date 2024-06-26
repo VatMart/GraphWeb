@@ -14,13 +14,23 @@ import {Edge} from "../model/edge";
 export class GraphMatrixService {
   constructor() { }
 
+  /**
+   * Build matrix from graph.
+   * @param graph graph to be converted
+   * @param matrixType type of matrix
+   */
   public buildMatrixFromGraph(graph: Graph, matrixType: TypeMatrix): GraphMatrix {
     const builder = this.getBuilder(matrixType);
     return builder.buildFromGraph(graph);
   }
 
+  /**
+   * Build matrix from string.
+   * @param input unchecked string representation of matrix
+   * @param matrixType type of matrix
+   * @throws {ValidationError} If input string is not valid matrix
+   */
   public buildMatrixFromString(input: string, matrixType: TypeMatrix): GraphMatrix {
-    // TODO implement
     const builder = this.getBuilder(matrixType);
     return builder.buildFromString(input);
   }

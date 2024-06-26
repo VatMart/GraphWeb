@@ -5,7 +5,6 @@ import {Edge} from "../model/edge";
 
 /**
  * Service for handling the model of the graph.
- * This service shouldn't have public methods.
  */
 @Injectable({
   providedIn: 'root'
@@ -19,7 +18,10 @@ export class GraphModelService {
    * Adds a node to the graph.
    * All other methods for adding nodes should call this method.
    */
-  protected addNodeToGraph(graph: Graph, nodeOrIndex: Node | number) {
+  public addNodeToGraph(graph: Graph, nodeOrIndex?: Node | number) {
+    if (nodeOrIndex === undefined) {
+      nodeOrIndex = this.calculateNewNodeIndex(graph);
+    }
     let node: Node;
     if (typeof nodeOrIndex === "number") {
       node = new Node(nodeOrIndex);
@@ -34,7 +36,7 @@ export class GraphModelService {
    * Removes a node from the graph.
    * All other methods for removing nodes should call this method.
    */
-  protected removeNodeFromGraph(graph: Graph, node: Node | number): boolean {
+  public removeNodeFromGraph(graph: Graph, node: Node | number): boolean {
     let toNode;
     if (typeof node === "number") {
       toNode = graph.getNodes().get(node);
@@ -55,7 +57,7 @@ export class GraphModelService {
    * Adds an edge to the graph.
    * All other methods for adding edges should call this method.
    */
-  protected addEdgeToGraph(graph: Graph, edge: Edge) {
+  public addEdgeToGraph(graph: Graph, edge: Edge) {
     if (!graph.getEdges().has(edge.edgeIndex.value)) {
       edge.firstNode.addEdge(edge.edgeIndex);
       edge.secondNode.addEdge(edge.edgeIndex);
@@ -69,12 +71,12 @@ export class GraphModelService {
    * Removes an edge from the graph.
    * All other methods for removing edges should call this method.
    */
-  protected removeEdgeFromGraph(graph: Graph, edge: Edge): boolean {
+  public removeEdgeFromGraph(graph: Graph, edge: Edge): boolean {
     this.removeAdjacentEdgeOfNodes(edge);
     return graph.getEdges().delete(edge.edgeIndex.value);
   }
 
-  protected clearAllElements(graph: Graph) {
+  public clearAllElements(graph: Graph) {
     graph.getEdges().clear();
     graph.getNodes().clear();
   }

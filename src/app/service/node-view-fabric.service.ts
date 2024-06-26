@@ -46,10 +46,25 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
     return <Texture>this.textureCache.get(key);
   }
 
+  /**
+   * Create default node view with coordinates.
+   * @param graph - graph to which node belongs
+   * @param point - coordinates of node center on main container
+   */
   public createDefaultNodeViewWithCoordinates(graph: Graph, point: Point): NodeView {
     let index = this.graphModelService.calculateNewNodeIndex(graph);
     const texture: Texture = <Texture>this.getOrCreateTexture(point, NodeView.DEFAULT_RADIUS, DEFAULT_NODE_STYLE);
     return NodeView.createFromTexture(new Node(index), point, NodeView.DEFAULT_RADIUS, texture);
+  }
+
+  /**
+   * Create default node view from node and coordinates.
+   * @param node - node to create view
+   * @param point - coordinates of node center on main container
+   */
+  public createDefaultNodeViewFromNode(node: Node, point: Point): NodeView {
+    const texture: Texture = <Texture>this.getOrCreateTexture(point, NodeView.DEFAULT_RADIUS, DEFAULT_NODE_STYLE);
+    return NodeView.createFromTexture(node, point, NodeView.DEFAULT_RADIUS, texture);
   }
 
   public changeToStyle(nodeView: NodeView, nodeStyle: NodeStyle) {

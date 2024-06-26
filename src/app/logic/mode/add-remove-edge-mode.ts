@@ -40,6 +40,10 @@ export class AddRemoveEdgeMode implements ModeBehavior {
     EdgeEventHandler.getInstance().clearSelectedNodes();
   }
 
+  onGraphViewGenerated(): void {
+    EdgeEventHandler.getInstance().clearSelectedNodes();
+  }
+
   onUndoInvoked(): void {
     EdgeEventHandler.getInstance().clearSelectedNodes();
   }

@@ -76,6 +76,13 @@ export class ForceMode {
   }
 
   onGraphCleared(): void {
+    this.destroyForceNodes();
+  }
+
+  onGraphViewGenerated(): void {
+    // Reinitialize force nodes
+    this.destroyForceNodes();
+    this.initializeForceNodes();
   }
 
   onUndoInvoked(): void {

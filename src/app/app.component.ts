@@ -4,7 +4,6 @@ import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/manager/mode-manager.service";
 import {GraphStateManagerService} from "./service/manager/graph-state-manager.service";
 import {TabNavComponent} from "./component/tab-nav/tab-nav.component";
-import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix-view-state-manager.service";
 import {EnvironmentService} from "./service/environment.service";
 import {NgClass, NgIf} from "@angular/common";
 import {FloatToolBarComponent} from "./component/canvas/float-tool-bar/float-tool-bar.component";
@@ -15,6 +14,7 @@ import {
 } from "./component/canvas/float-edge-weight-input/float-edge-weight-input.component";
 import {Subscription} from "rxjs";
 import {GraphSetViewManagerService} from "./service/manager/graph-set-view-manager.service";
+import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix-view-state-manager.service";
 
 @Component({
   selector: 'app-root',

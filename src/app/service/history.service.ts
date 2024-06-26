@@ -52,7 +52,7 @@ export class HistoryService {
       return;
     }
     const command = this.redoStack.pop()!;
-    command.execute();
+    command.redo();
     this.commands.push(command);
     if (this.commands.length > this.maxCommands) {
       this.commands.shift(); // Remove the oldest command if limit is exceeded

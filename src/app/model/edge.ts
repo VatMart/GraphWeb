@@ -43,6 +43,12 @@ export class Edge {
     return this._firstNode.index === this._secondNode.index;
   }
 
+  clone() {
+    const edge = new Edge(this._firstNode, this._secondNode, this._orientation, this._weight);
+    edge.label = this._label;
+    return edge;
+  }
+
   get firstNode(): Node {
     return this._firstNode;
   }

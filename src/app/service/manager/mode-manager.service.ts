@@ -150,8 +150,17 @@ export class ModeManagerService implements ServiceManager {
       })
     );
     this.subscriptions.add(
-      this.stateService.graphCleared$.subscribe(() => {
-        this.onGraphCleared();
+      this.stateService.graphCleared$.subscribe((value) => {
+        if (value !== null) {
+          this.onGraphCleared();
+        }
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.graphViewGenerated$.subscribe((value) => {
+        if (value !== null) {
+          this.onGraphViewGenerated();
+        }
       })
     );
     this.subscriptions.add(
@@ -232,6 +241,13 @@ export class ModeManagerService implements ServiceManager {
   }
 
   /**
+   * On graph view generated handling, while mode is active
+   */
+  public onGraphViewGenerated() {
+    this.modeStateActions[this.currentModeState].onGraphViewGenerated();
+  }
+
+  /**
    * On undo invoked handling, while mode is active
    */
   public onUndoInvoked() {
@@ -260,6 +276,8 @@ export interface ModeBehavior {
   onRemovedEdge(edgeView: EdgeView): void;
 
   onGraphCleared(): void;
+
+  onGraphViewGenerated(): void;
 
   onUndoInvoked(): void;
 

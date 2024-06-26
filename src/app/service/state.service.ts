@@ -9,6 +9,7 @@ import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../component/canvas/float-he
 import {Weight} from "../model/graphical-model/edge/weight";
 import {ForceMode} from "../logic/mode/force-mode";
 import {GraphSet} from "../model/graph-set";
+import {MatrixStringInput, MatrixParseResult} from "../component/tab-nav/input-view/input-view.component";
 
 /**
  * Service for managing the state of the application.
@@ -52,14 +53,14 @@ export class StateService {
   private outputViewVisibilitySource = new BehaviorSubject<boolean>(false);
   public outputViewVisibility$ = this.outputViewVisibilitySource.asObservable();
 
-  private matrixTypeSource = new BehaviorSubject<TypeMatrix>(TypeMatrix.ADJACENCY);
-  public currentMatrixType$ = this.matrixTypeSource.asObservable();
+  private outputMatrixTypeSource = new BehaviorSubject<TypeMatrix>(TypeMatrix.ADJACENCY);
+  public currentOutputMatrixType$ = this.outputMatrixTypeSource.asObservable();
 
-  private matrixSource = new BehaviorSubject<GraphMatrix | null>(null);
-  public currentMatrix$ = this.matrixSource.asObservable();
+  private outputMatrixSource = new BehaviorSubject<GraphMatrix | null>(null);
+  public currentOutputMatrix$ = this.outputMatrixSource.asObservable();
 
-  private needUpdateMatrixSource = new BehaviorSubject<boolean>(false);
-  public needUpdateMatrix$ = this.needUpdateMatrixSource.asObservable();
+  private needUpdateOutputMatrixSource = new BehaviorSubject<boolean>(false);
+  public needUpdateOutputMatrix$ = this.needUpdateOutputMatrixSource.asObservable();
 
   private verticesGraphSetSource = new BehaviorSubject<GraphSet | null>(null);
   public currentVerticesGraphSet$ = this.verticesGraphSetSource.asObservable();
@@ -69,6 +70,18 @@ export class StateService {
 
   private needUpdateGraphSetSource = new BehaviorSubject<boolean>(false);
   public needUpdateGraphSet$ = this.needUpdateGraphSetSource.asObservable();
+
+  // --------------------------------------------------
+  // UI component states. Nav bar components. Input view
+  // --------------------------------------------------
+  private inputMatrixSource = new BehaviorSubject<MatrixStringInput | null>(null);
+  public currentMatrixInput$ = this.inputMatrixSource.asObservable();
+
+  private inputMatrixParseResultSource = new BehaviorSubject<MatrixParseResult | null>(null);
+  public currentMatrixParseResult$ = this.inputMatrixParseResultSource.asObservable();
+
+  private generateGraphByMatrixSource = new BehaviorSubject<GraphMatrix | null>(null);
+  public generateGraphByMatrix$ = this.generateGraphByMatrixSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas
@@ -159,7 +172,7 @@ export class StateService {
   private graphChangedSource = new BehaviorSubject<boolean>(false);
   public graphChanged$ = this.graphChangedSource.asObservable();
 
-  private graphClearedSource = new BehaviorSubject<boolean>(false);
+  private graphClearedSource = new BehaviorSubject<boolean | null>(null);
   public graphCleared$ = this.graphClearedSource.asObservable();
 
   private showWeightsSource = new BehaviorSubject<boolean>(true);
@@ -170,6 +183,9 @@ export class StateService {
 
   private graphOrientationChangedSource = new BehaviorSubject<GraphOrientation>(GraphOrientation.ORIENTED);
   public graphOrientationChanged$ = this.graphOrientationChangedSource.asObservable();
+
+  private graphViewGeneratedSource = new BehaviorSubject<boolean | null>(null);
+  public graphViewGenerated$ = this.graphViewGeneratedSource.asObservable();
 
   constructor() { }
 
@@ -246,6 +262,14 @@ export class StateService {
   }
 
   /**
+   * Notify that the graph view has been generated.
+   */
+  graphViewGenerated() {
+    this.graphViewGeneratedSource.next(true);
+    this.graphChangedSource.next(true);
+  }
+
+  /**
    * Change the visibility of the matrix view.
    */
   changedOutputViewVisibility(value: boolean) {
@@ -254,18 +278,17 @@ export class StateService {
   }
 
   /**
-   * Change the matrix type.
+   * Change the output matrix type.
    */
-  changeMatrixType(type: TypeMatrix) {
-    console.log("Matrix type changed: " + type);
-    this.matrixTypeSource.next(type);
+  changeOutputMatrixType(type: TypeMatrix) {
+    this.outputMatrixTypeSource.next(type);
   }
 
   /**
    * Notify that the matrix needs to be updated.
    */
-  needUpdateMatrix() {
-    this.needUpdateMatrixSource.next(true);
+  needUpdateOutputMatrix() {
+    this.needUpdateOutputMatrixSource.next(true);
   }
 
   /**
@@ -290,10 +313,31 @@ export class StateService {
   }
 
   /**
-   * Change the matrix.
+   * Change the input matrix string.
    */
-  changeMatrix(matrix: GraphMatrix) {
-    this.matrixSource.next(matrix);
+  changeMatrixInput(matrixInput: MatrixStringInput) {
+    this.inputMatrixSource.next(matrixInput);
+  }
+
+  /**
+   * Change the input matrix parse result.
+   */
+  changeMatrixParseResult(result: MatrixParseResult | null) {
+    this.inputMatrixParseResultSource.next(result);
+  }
+
+  /**
+   * Generate graph by matrix.
+   */
+  generateGraphByMatrix(matrix: GraphMatrix) {
+    this.generateGraphByMatrixSource.next(matrix);
+  }
+
+  /**
+   * Change the output matrix.
+   */
+  changeOutputMatrix(matrix: GraphMatrix) {
+    this.outputMatrixSource.next(matrix);
   }
 
   /**

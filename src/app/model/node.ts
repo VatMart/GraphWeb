@@ -19,15 +19,35 @@ export class Node {
     this._index = index;
   }
 
+  /**
+   * Add edge to adjacent edges
+   */
   addEdge(edgeIndex: EdgeIndex) {
     this._edges.push(edgeIndex.value);
   }
 
+  /**
+   * Remove edge from adjacent edges
+   */
   removeEdge(edgeIndex: EdgeIndex) {
     const arrIndex = this._edges.indexOf(edgeIndex.value);
     if (arrIndex !== -1) {
       this._edges.splice(arrIndex, 1);
     }
+  }
+
+  /**
+   * Get adjacent edges
+   */
+  public getAdjacentEdges(): string[] {
+    return this._edges;
+  }
+
+  clone() {
+    const node = new Node(this._index);
+    node.label = this._label;
+    node._edges = this._edges.slice();
+    return node;
   }
 
   get index(): number {
@@ -44,9 +64,5 @@ export class Node {
 
   set label(value: string) {
     this._label = value;
-  }
-
-  public getAdjacentEdges(): string[] {
-    return this._edges;
   }
 }

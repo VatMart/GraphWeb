@@ -2,6 +2,7 @@ import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
 import {Graph} from "../../model/graph";
 import {EdgeOrientation} from "../../model/orientation";
 import {Edge} from "../../model/edge";
+import {ValidationError} from "../../error/validation-error";
 
 /**
  * Abstraction for building graph matrix.
@@ -10,6 +11,7 @@ export abstract class GraphMatrixBuilder {
   /**
    * Build matrix from string.
    * @param input unchecked string representation of matrix
+   * @throws {ValidationError} If input string is not valid matrix
    */
   abstract buildFromString(input: string): GraphMatrix;
 
@@ -63,6 +65,10 @@ export abstract class GraphMatrixBuilder {
  */
 export class AdjacencyMatrixBuilder extends GraphMatrixBuilder {
 
+  /**
+   * Build matrix from graph.
+   * @param graph graph to be converted
+   */
   buildFromGraph(graph: Graph): GraphMatrix {
     if (!graph) {
       return new GraphMatrix(TypeMatrix.ADJACENCY); // Empty matrix
@@ -96,9 +102,46 @@ export class AdjacencyMatrixBuilder extends GraphMatrixBuilder {
     return graphMatrix;
   }
 
+  /**
+   * Build matrix from string.
+   * @param input unchecked string representation of the matrix.
+   * @returns A GraphMatrix instance representing the adjacency matrix.
+   * @throws {ValidationError} If the input string is invalid.
+   */
   buildFromString(input: string): GraphMatrix {
-    // TODO implement
-    return new GraphMatrix(TypeMatrix.ADJACENCY);
+    if (!input || input.trim().length === 0) {
+      throw new ValidationError("Input string cannot be empty.");
+    }
+    const separators = [' ', ',', ';', '\n']
+    // Normalize the input: replace all possible separators with a single one
+    const normalizedInput = input
+      .replace(/[,;\n]/g, ' ')    // Replace commas, semicolons, and newlines with spaces
+      .replace(/\s+/g, ' ');      // Replace multiple spaces with a single space
+    // Split the normalized string into an array of values
+    const values = normalizedInput.trim().split(' ');
+
+    // Determine the size of the matrix
+    const size = Math.sqrt(values.length);
+    if (!Number.isInteger(size)) {
+      throw new ValidationError("Invalid input string: The number of elements must form a perfect square." +
+        " Please, check the number of rows and columns.");
+    }
+    // Convert the array of values into a 2D matrix
+    const matrix: number[][] = [];
+    for (let i = 0; i < size; i++) {
+      const row: number[] = [];
+      for (let j = 0; j < size; j++) {
+        const value = Number(values[i * size + j]); // Taking values row by row
+        if (isNaN(value)) {
+          throw new ValidationError(`Invalid number in the input string: '${values[i * size + j]}' is not valid number.`);
+        }
+        row.push(value);
+      }
+      matrix.push(row);
+    }
+
+    //console.log("Built adjacency matrix from string: ", matrix); // TODO remove
+    return new GraphMatrix(TypeMatrix.ADJACENCY, matrix);
   }
 
 }

@@ -1,0 +1,51 @@
+.output-view-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.matrix-type-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-block: 8px;
+}
+
+.matrix-type-label {
+  display: block;
+  color: black;
+  font-weight: bold;
+  padding-right: 4px;
+}
+
+.input-matrix-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.graph-matrix-textarea {
+  resize: none;
+  font-family: 'Calibri', sans-serif;
+  white-space: pre;
+  overflow-x: auto;
+  margin-bottom: 4px;
+}
+
+.matrix-input-items {
+  display: flex;
+  flex-direction: row;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+h3 {
+  display: flex;
+  align-content: center;
+  margin: 0;
+}

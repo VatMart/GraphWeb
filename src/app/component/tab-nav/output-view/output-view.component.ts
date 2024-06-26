@@ -9,7 +9,7 @@ import {MenuModule} from "primeng/menu";
 import {DropdownModule} from "primeng/dropdown";
 import {RippleModule} from "primeng/ripple";
 import {Subscription} from "rxjs";
-import {Message, MessageService} from "primeng/api";
+import {MessageService} from "primeng/api";
 import {ToastModule} from "primeng/toast";
 import {DialogModule} from "primeng/dialog";
 import {MatrixTableComponent} from "./matrix-table/matrix-table.component";
@@ -54,15 +54,16 @@ export class OutputViewComponent implements OnInit, OnDestroy {
 
   warningMessage: string = 'Huge matrix table may slow down the application. Close output view when interact with the graph.';
 
+  // Matrix type
   matrixTypes: SelectMatrixTypeItem[] | undefined;
   matrixType = new FormControl(TypeMatrix.ADJACENCY);
-  fullScreen = false;
 
   // Matrix table data
   columns: string[] = [];
   valuesOfFirstColumn: string[] = [];
   matrix: number[][] = [];
   graphMatrix: GraphMatrix | undefined;
+  fullScreen = false;
 
   // Graph sets
   verticesSet: string = '';
@@ -89,7 +90,7 @@ export class OutputViewComponent implements OnInit, OnDestroy {
     );
     // On matrix change
     this.subscriptions.add(
-      this.stateService.currentMatrix$.subscribe(matrix => {
+      this.stateService.currentOutputMatrix$.subscribe(matrix => {
         if (matrix !== null) {
           this.onMatrixChange(matrix);
         }
@@ -119,7 +120,7 @@ export class OutputViewComponent implements OnInit, OnDestroy {
   }
 
   private onChoseMatrixType(value: TypeMatrix) {
-    this.stateService.changeMatrixType(value);
+    this.stateService.changeOutputMatrixType(value);
   }
 
   private onMatrixChange(matrix: GraphMatrix) {
@@ -131,7 +132,7 @@ export class OutputViewComponent implements OnInit, OnDestroy {
   }
 
   onRefreshMatrix() {
-    this.stateService.needUpdateMatrix();
+    this.stateService.needUpdateOutputMatrix();
   }
 
   onExpandTable() {
@@ -211,7 +212,7 @@ export class OutputViewComponent implements OnInit, OnDestroy {
   }
 }
 
-interface SelectMatrixTypeItem {
+export interface SelectMatrixTypeItem {
   label: string;
   value: TypeMatrix;
 }

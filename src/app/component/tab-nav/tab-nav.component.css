@@ -62,6 +62,10 @@
   color: white;
 }
 
+.nav-item a {
+  font-family: 'Nunito Sans', sans-serif;
+}
+
 .collapse-icon {
   cursor: pointer;
   padding: 2px 4px;
@@ -117,12 +121,19 @@
   height: 100%;
   padding: 8px;
   width: 20vw;
-  min-width: 280px;
+  min-width: 300px;
   background-color: var(--main-bg-color);
   box-sizing: border-box;
   border-left-width: 1px;
   border-left-style: solid;
   border-left-color: var(--main-border-color);
+}
+
+.left-side-content {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-inline: 8px;
 }
 
 /* Mobile styles */
@@ -140,9 +151,23 @@
   margin-right: 4px;
 }
 
+.generate-icon {
+  margin-top: 2px;
+}
+
+.algorithm-icon {
+  position: relative;
+  top: 2px;
+}
+
+.algorithm-icon-custom-text {
+  color: #fe6b00;
+}
+
 .mobile-sidebar {
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
 .mobile-sidebar-header {
@@ -163,4 +188,9 @@
   flex-direction: column;
   padding-inline: 8px;
   overflow-y: auto;
+}
+
+.p-menuitem-link a {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: bold;
 }
