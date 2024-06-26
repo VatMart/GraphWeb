@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import * as PIXI from "pixi.js";
 import {StateService} from "../../service/state.service";
 import {PixiService} from "../../service/pixi.service";
@@ -21,6 +21,9 @@ import {PixiManagerService} from "../../service/manager/pixi-manager.service";
 })
 export class CanvasComponent implements AfterViewInit {
 
+  @ViewChild('canvasContainer', { static: true }) canvasContainer!: ElementRef;
+  private resizeObserver!: ResizeObserver;
+
   constructor(private pixiService: PixiService,
               private stateService: StateService,
               private eventBus: EventBusService,
@@ -33,6 +36,9 @@ export class CanvasComponent implements AfterViewInit {
   async ngAfterViewInit(): Promise<void> {
     // Start PIXI after the view canvas container is initialized
     await this.pixiManager.startPixi();
+    // Resize canvas on container resize
+    this.resizeObserver = new ResizeObserver(() => this.onResize());
+    this.resizeObserver.observe(this.canvasContainer.nativeElement);
 
 
     // ----------------- TODO Remove below -----------------
@@ -68,5 +74,9 @@ export class CanvasComponent implements AfterViewInit {
       renderer: this.pixiService.renderer,
       stage: this.pixiService.stage
     };
+  }
+
+  private onResize(): void {
+    this.stateService.needResizeCanvas();
   }
 }

@@ -14,6 +14,7 @@ import {
   DEFAULT_HELPER_ITEM,
   EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM
 } from "../component/canvas/float-helper/float-helper.component";
+import {DefaultGraphViewGenerator} from "../logic/graph-view-generator/default-graph-view-generator";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -44,8 +45,10 @@ export class GraphViewService extends GraphModelService {
    * Adds a node to the graph and the graph view.
    * All other methods for adding nodes should call this method.
    */
-  public addNodeToGraphView(graph: Graph, nodeView: NodeView) {
-    super.addNodeToGraph(graph, nodeView.node);
+  public addNodeToGraphView(graph: Graph, nodeView: NodeView, callModel: boolean = true) {
+    if (callModel) {
+      super.addNodeToGraph(graph, nodeView.node);
+    }
     this._nodeViews.set(nodeView.node.index, nodeView);
     this.pixiService.mainContainer.addChild(nodeView); // TODO Add container, not the node itself
     this.stateService.addedNode(nodeView); // Notify state service
@@ -73,8 +76,14 @@ export class GraphViewService extends GraphModelService {
    * Adds an edge to the graph and the graph view.
    * All other methods for adding edges should call this method.
    */
-  public addEdgeToGraphView(graph: Graph, edgeView: EdgeView) {
-    super.addEdgeToGraph(graph, edgeView.edge);
+  public addEdgeToGraphView(graph: Graph, edgeView: EdgeView, callModel: boolean = true) {
+    if (edgeView.edge.isLoop()) {
+      console.error("Loop edge is not supported for now"); // TODO implement loop edge
+      return;
+    }
+    if (callModel) {
+      super.addEdgeToGraph(graph, edgeView.edge);
+    }
     this._edgeViews.set(edgeView.edge.edgeIndex.value, edgeView);
     this.pixiService.mainContainer.addChild(edgeView); // TODO Add container, not the edge itself
     this.stateService.addedEdge(edgeView); // Notify state service
@@ -117,15 +126,14 @@ export class GraphViewService extends GraphModelService {
   /**
    * Populates the graph view of the given graph with node views and edge views.
    */
-  public populateGraphView(graph: Graph, nodeViews: NodeView[], edgeViews: EdgeView[]) {
+  public populateGraphView(graph: Graph, nodeViews: NodeView[], edgeViews: EdgeView[], callModel: boolean = true) {
     nodeViews.forEach((nodeView: NodeView) => {
-      this.addNodeToGraphView(graph, nodeView);
+      this.addNodeToGraphView(graph, nodeView, callModel);
     });
     edgeViews.forEach((edgeView: EdgeView) => {
-      this.addEdgeToGraphView(graph, edgeView);
+      this.addEdgeToGraphView(graph, edgeView, callModel);
     });
   }
-
 
   /**
    * Moves the given node view to the given point.
@@ -145,7 +153,7 @@ export class GraphViewService extends GraphModelService {
   public changeEdgeViewWeight(edgeView: EdgeView, weight: number) {
     edgeView.changeEdgeWeight(weight);
     this.edgeFabric.updateEdgeViewWeightTexture(edgeView); // Update texture, to resize text box
-    console.log('Edge weight changed: edge: '+ edgeView.getIndex() + '; weight: ' + weight); // TODO remove
+    console.log('Edge weight changed: edge: ' + edgeView.getIndex() + '; weight: ' + weight); // TODO remove
     this.stateService.edgeWeightChanged(edgeView);
   }
 
@@ -153,9 +161,6 @@ export class GraphViewService extends GraphModelService {
    * Changes the graph orientation.
    */
   public changeGraphOrientation(graph: Graph, orientation: GraphOrientation) {
-    if (orientation === graph.orientation) {
-      return;
-    }
     graph.orientation = orientation;
     console.log("Graph orientation changed: " + orientation); // TODO remove
     if (orientation === GraphOrientation.MIXED) { // If mixed, do not change edge orientations
@@ -201,6 +206,30 @@ export class GraphViewService extends GraphModelService {
     return edges;
   }
 
+  // ------------------ Graph view creation ------------------
+  /**
+   * Generate graph view from graph model.
+   * Deletes old graph view and creates new one.
+   */
+  public generateGraphView(newGraph: Graph): void {
+    // Clear old graph view elements from canvas and memory
+    this.clearAllElementsView(this.currentGraph);
+    // Replace current graph with new one
+    this.currentGraph = newGraph;
+    // Create new graph view elements by default generator
+    const generator = new DefaultGraphViewGenerator(this.pixiService, this.nodeFabric,
+      this.edgeFabric);
+    const result = generator.generateGraphViewElements(newGraph);
+    const nodeViews = result.nodes;
+    const edgeViews = result.edges;
+    // Populate graph view with new elements
+    this.populateGraphView(newGraph, nodeViews, edgeViews, false); // Do not call model service methods, because it is already called
+    console.log("Graph orientation: " + newGraph.orientation);
+    this.changeGraphOrientation(newGraph, newGraph.orientation); // Change orientation (to update state on UI)
+    this.stateService.graphViewGenerated(); // Notify state service about graph view generation
+  }
+
+  // ------------------ Selection methods ------------------
   /**
    * Return whether the given element is selected.
    */

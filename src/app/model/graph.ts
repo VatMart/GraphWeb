@@ -25,6 +25,21 @@ export class Graph {
     }
   }
 
+  toString(): string {
+    return `Graph: nodes: ${this.nodes.size}, edges: ${this.edges.size}`;
+  }
+
+  clone() {
+    const graph = new Graph(this.orientation);
+    for (const node of this.nodes.values()) {
+      graph.nodes.set(node.index, node.clone());
+    }
+    for (const edge of this.edges.values()) {
+      graph.edges.set(edge.edgeIndex.value, edge.clone());
+    }
+    return graph;
+  }
+
   public isEmpty(): boolean {
     return this.nodes.size === 0;
   }

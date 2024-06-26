@@ -76,6 +76,12 @@ export class DefaultMode implements ModeBehavior {
     }
   }
 
+  onGraphViewGenerated(): void {
+    if (this.stateService.isForceModeEnabled()) {
+      this.forceMode.onGraphViewGenerated();
+    }
+  }
+
   onUndoInvoked(): void {
     if (this.stateService.isForceModeEnabled()) {
       this.forceMode.onUndoInvoked();

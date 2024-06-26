@@ -68,9 +68,13 @@ export class EdgeView extends Graphics implements GraphElement {
     if (this._edge.orientation === EdgeOrientation.ORIENTED) {
       this.drawArrow();
     }
-    this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
-      .lineTo(this._endCoordinates.x, this._endCoordinates.y)
-      .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round'});
+    if (!this.edge.isLoop()) {
+      this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
+        .lineTo(this._endCoordinates.x, this._endCoordinates.y)
+        .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round'});
+    } else {
+      // TODO Implement loop edge
+    }
     // Draw the hit area
     this.hitArea = this.calculateHitArea(this._startCoordinates, this._endCoordinates);
     this.zIndex = 0;
@@ -168,6 +172,9 @@ export class EdgeView extends Graphics implements GraphElement {
    * @return [startConnector, endConnector] - coordinates of start and end nodes connectors
    */
   private resolveConnectors(): [Point, Point] {
+    if (this.edge.isLoop()) {
+      return this.resolveLoopConnectors();
+    }
     const centerNode1 = this._startNode.centerCoordinates();
     const centerNode2 = this._endNode.centerCoordinates();
     const distance = GraphicalUtils.distanceBetween(centerNode1, centerNode2);
@@ -178,6 +185,11 @@ export class EdgeView extends Graphics implements GraphElement {
     const xNode2 = centerNode2.x + (centerNode1.x - centerNode2.x) * ko2;
     const yNode2 = centerNode2.y + (centerNode1.y - centerNode2.y) * ko2;
     return [{x: xNode1, y: yNode1}, {x: xNode2, y: yNode2}];
+  }
+
+  private resolveLoopConnectors(): [Point, Point] {
+    // TODO Implement loop edge
+    return [{x: 0, y: 0}, {x: 0, y: 0}];
   }
 
   get edge(): Edge {

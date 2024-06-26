@@ -173,6 +173,29 @@ export class PixiService {
     this.canvasBoundaries.position.set(this.mainContainer.x, this.mainContainer.y);
   }
 
+  /**
+   * Return the center point of the canvas.
+   */
+  getCenterCanvasPoint(): Point {
+    const x = (Math.abs(this.boundaryXMax) - Math.abs(this.boundaryXMin))/2;
+    const y = (Math.abs(this.boundaryYMax) - Math.abs(this.boundaryYMin))/2;
+    return {x: x, y: y};
+  }
+
+  /**
+   * Get width of the canvas borders.
+   */
+  getCanvasBorderWidth(): number {
+    return this.boundaryXMax - this.boundaryXMin;
+  }
+
+  /**
+   * Get height of the canvas borders.
+   */
+  getCanvasBorderHeight(): number {
+    return this.boundaryYMax - this.boundaryYMin;
+  }
+
   // ------------------
   // Getters and Setters
   // ------------------

@@ -45,11 +45,31 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     return <Texture>this.textureWeightCache.get(key);
   }
 
+  /**
+   * Create default edge view from start and end node views.
+   * @param graph - graph to which edge belongs
+   * @param startNodeView - start node view
+   * @param endNodeView - end node view
+   */
   public createDefaultEdgeView(graph: Graph, startNodeView: NodeView, endNodeView: NodeView): EdgeView {
     const edgeOrientation = graph.orientation === GraphOrientation.NON_ORIENTED ?
       EdgeOrientation.NON_ORIENTED : EdgeOrientation.ORIENTED
     let newEdge: Edge = new Edge(startNodeView.node, endNodeView.node, edgeOrientation);
     const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView);
+    const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
+    result.weightView.texture = weightTexture;
+    result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
+    return result;
+  }
+
+  /**
+   * Create default edge view from edge and start and end node views.
+   * @param edge - edge to create view
+   * @param startNodeView - start node view
+   * @param endNodeView - end node view
+   */
+  public createDefaultEdgeViewFromEdge(edge: Edge, startNodeView: NodeView, endNodeView: NodeView): EdgeView {
+    const result: EdgeView = EdgeView.createFrom(edge, startNodeView, endNodeView);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
     result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);

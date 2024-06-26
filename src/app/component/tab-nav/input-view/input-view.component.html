@@ -1,0 +1,43 @@
+<div class="input-view-container">
+  <div class="matrix-container">
+    <h3>Graph matrix</h3>
+    <div class="matrix-type-container">
+      <!-- Notification p-toast -->
+      <p-toast position="top-center"/>
+      <label class="matrix-type-label">Matrix type:</label>
+      <p-dropdown
+        [options]="matrixTypes"
+        [formControl]="matrixType"
+        optionValue="value"
+        optionLabel="label"/>
+    </div>
+    <div class="input-matrix-container">
+      <textarea class="graph-matrix-textarea"
+                rows="10"
+                [placeholder]="matrixPlaceholder"
+                [ngModel]="matrixInput"
+                pInputTextarea
+                (input)="onMatrixInput($event)">
+      </textarea>
+      <div class="matrix-input-items">
+        <p-tag rounded="true" [icon]="currentValidationType.icon"
+               [severity]="currentValidationType.severity"
+               [value]="currentValidationType.message"/>
+        <p-confirmDialog />
+        <p-button class="move-right" severity="contrast"
+                  [label]="currentMatrixSubmitButton.label"
+                  [outlined]="true"
+                  [icon]="currentMatrixSubmitButton.icon"
+                  [disabled]="currentMatrixSubmitButton.disabled"
+                  (onClick)="currentMatrixSubmitButton.command()">
+          <!-- Apply spin animation -->
+          <span *ngIf="currentMatrixSubmitButton.spin" class="spin-icon pi pi-spinner" style="margin-right: 6px;"></span>
+          </p-button>
+      </div>
+    </div>
+  </div>
+<!--  <div class="separator"></div>-->
+  <div class="graph-sets-container">
+
+  </div>
+</div>

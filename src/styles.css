@@ -5,6 +5,11 @@
 /* Nunito Sans font */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
+@font-face {
+  font-family: Calibri ;
+  src: url('/assets/fonts/Calibri.ttf');
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -126,9 +131,21 @@ body {
 
 /* PrimeNG button */
 .p-button {
-  background: var(--main-button-color);
-  border: none;
-  padding: 0.5rem 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.p-button:not(:disabled):hover {
+  background-color: var(--main-hover-color);
+  color: var(--main-blue-color);
+}
+
+/* PrimeNG tag */
+.p-tag.p-tag-rounded {
+  border-radius: 0.8rem;
+}
+
+.p-tag {
+  padding: 0.15rem 0.4rem;
 }
 
 /* Style for the overall scrollbar */
@@ -166,6 +183,7 @@ body {
 }
 
 .p-tabmenuitem .p-menuitem-link {
+  width: max-content;
   border: solid #e5e7eb;
   border-width: 1px 0 0 0;
   border-top-right-radius: 0;
@@ -200,5 +218,5 @@ body {
 }
 
 .p-sidebar-left {
-  height: calc(100% - 40px);
+  height: 100%;
 }

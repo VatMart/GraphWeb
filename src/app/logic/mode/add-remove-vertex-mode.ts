@@ -43,6 +43,9 @@ export class AddRemoveVertexMode implements ModeBehavior {
   onGraphCleared(): void {
   }
 
+  onGraphViewGenerated(): void {
+  }
+
   onUndoInvoked(): void {
   }
 
