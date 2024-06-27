@@ -29,3 +29,8 @@ export enum TypeGraphSet {
   VERTICES = 'Vertices',
   EDGES = 'Edges'
 }
+
+export interface GraphSets {
+  verticesSet: GraphSet;
+  edgesSet: GraphSet;
+}

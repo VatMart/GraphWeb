@@ -81,6 +81,20 @@ export class GraphStateManagerService implements ServiceManager {
         }
       })
     );
+    // Generate graph from graph sets on UI request
+    this.subscriptions.add(
+      this.stateService.generateGraphBySets$.subscribe((graphSets) => {
+        if (graphSets === null) {
+          return;
+        }
+        // Generate graph from sets
+        const graph: Graph = this.graphGeneratorService.generateFromSets(graphSets);
+        // Command saves current graph before generating new one
+        const command = new GenerateNewGraphCommand(this.graphService, graph);
+        // Execute command
+        this.historyService.execute(command);
+      })
+    );
   }
 
   destroySubscriptions(): void {

@@ -8,8 +8,13 @@ import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
 import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../component/canvas/float-helper/float-helper.component";
 import {Weight} from "../model/graphical-model/edge/weight";
 import {ForceMode} from "../logic/mode/force-mode";
-import {GraphSet} from "../model/graph-set";
-import {MatrixStringInput, MatrixParseResult} from "../component/tab-nav/input-view/input-view.component";
+import {GraphSet, GraphSets} from "../model/graph-set";
+import {
+  MatrixStringInput,
+  MatrixParseResult,
+  GraphSetRequest, GraphSetParseResult
+} from "../component/tab-nav/input-view/input-view.component";
+import {SetValidationResult} from "./graph-set.service";
 
 /**
  * Service for managing the state of the application.
@@ -82,6 +87,27 @@ export class StateService {
 
   private generateGraphByMatrixSource = new BehaviorSubject<GraphMatrix | null>(null);
   public generateGraphByMatrix$ = this.generateGraphByMatrixSource.asObservable();
+
+  private validateVerticesInputSource = new BehaviorSubject<string | null>(null);
+  public validateVerticesInput$ = this.validateVerticesInputSource.asObservable();
+
+  private currentInputVerticesSetValidationResultSource = new BehaviorSubject<SetValidationResult | null>(null);
+  public currentInputVerticesSetValidationResult$ = this.currentInputVerticesSetValidationResultSource.asObservable();
+
+  private validateEdgesInputSource = new BehaviorSubject<GraphSetRequest | null>(null);
+  public validateEdgesInput$ = this.validateEdgesInputSource.asObservable();
+
+  private currentInputEdgesSetValidationResultSource = new BehaviorSubject<SetValidationResult | null>(null);
+  public currentInputEdgesSetValidationResult$ = this.currentInputEdgesSetValidationResultSource.asObservable();
+
+  private inputGraphSetSource = new BehaviorSubject<GraphSetRequest | null>(null);
+  public currentInputGraphSet$ = this.inputGraphSetSource.asObservable();
+
+  private inputGraphSetParseResultSource = new BehaviorSubject<GraphSetParseResult | null>(null);
+  public currentInputGraphSetParseResult$ = this.inputGraphSetParseResultSource.asObservable();
+
+  private generateGraphBySetsSource = new BehaviorSubject<GraphSets | null>(null);
+  public generateGraphBySets$ = this.generateGraphBySetsSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas
@@ -331,6 +357,55 @@ export class StateService {
    */
   generateGraphByMatrix(matrix: GraphMatrix) {
     this.generateGraphByMatrixSource.next(matrix);
+  }
+
+  /**
+   * Validate vertices input.
+   */
+  validateVerticesInput(value: string) {
+    this.validateVerticesInputSource.next(value);
+  }
+
+  /**
+   * Change vertices set validation result.
+   */
+  changeInputVerticesSetValidationResult(result: SetValidationResult) {
+    this.currentInputVerticesSetValidationResultSource.next(result);
+  }
+
+  /**
+   * Validate edges input.
+   */
+  validateEdgesInput(value: GraphSetRequest) {
+    this.validateEdgesInputSource.next(value);
+  }
+
+  /**
+   * Change edges set validation result.
+   */
+  changeInputEdgesSetValidationResult(result: SetValidationResult) {
+    this.currentInputEdgesSetValidationResultSource.next(result);
+  }
+
+  /**
+   * Change the input graph set.
+   */
+  changeInputGraphSet(graphSet: GraphSetRequest) {
+    this.inputGraphSetSource.next(graphSet);
+  }
+
+  /**
+   * Change the input graph set parse result.
+   */
+  changeInputGraphSetParseResult(result: GraphSetParseResult | null) {
+    this.inputGraphSetParseResultSource.next(result);
+  }
+
+  /**
+   * Generate graph by sets.
+   */
+  generateGraphBySets(sets: GraphSets) {
+    this.generateGraphBySetsSource.next(sets);
   }
 
   /**

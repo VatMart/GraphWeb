@@ -18,18 +18,26 @@ export class GraphModelService {
    * Adds a node to the graph.
    * All other methods for adding nodes should call this method.
    */
-  public addNodeToGraph(graph: Graph, nodeOrIndex?: Node | number) {
+  public addNodeToGraph(graph: Graph, nodeOrIndex?: Node | number, label?: string) {
     if (nodeOrIndex === undefined) {
       nodeOrIndex = this.calculateNewNodeIndex(graph);
     }
     let node: Node;
     if (typeof nodeOrIndex === "number") {
-      node = new Node(nodeOrIndex);
+      node = label ? new Node(nodeOrIndex, label) : new Node(nodeOrIndex);
     } else {
       node = nodeOrIndex;
     }
     graph.getNodes().has(node.index) ? console.error("Node already exists in graph") // TODO throw exception
       : graph.getNodes().set(node.index, node);
+  }
+
+  /**
+   * Adds a node to the graph with a label.
+   */
+  public addNodeToGraphWithLabel(graph: Graph, label: string) {
+    const index = this.calculateNewNodeIndex(graph);
+    this.addNodeToGraph(graph, index, label);
   }
 
   /**

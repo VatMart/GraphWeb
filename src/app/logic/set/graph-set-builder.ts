@@ -8,6 +8,7 @@ export abstract class GraphSetBuilder {
 
   /**
    * Build graph set from string.
+   * Input string should be validated before calling this method.
    * @param input unchecked string representation of matrix
    */
   abstract buildFromString(input: string): GraphSet;
@@ -25,8 +26,8 @@ export abstract class GraphSetBuilder {
 export class VerticesGraphSetBuilder extends GraphSetBuilder {
 
   buildFromString(input: string): GraphSet {
-    // TODO: implement
-    return new GraphSet(TypeGraphSet.VERTICES);
+    const vertices = input.split(' ').filter(value => value.trim() !== '');
+    return new GraphSet(TypeGraphSet.VERTICES, vertices);
   }
 
   buildFromGraph(graph: Graph): GraphSet {
@@ -43,7 +44,8 @@ export class VerticesGraphSetBuilder extends GraphSetBuilder {
 export class EdgesGraphSetBuilder extends GraphSetBuilder {
 
     buildFromString(input: string): GraphSet {
-      return new GraphSet(TypeGraphSet.EDGES);
+      const edges = input.split(' ').filter(value => value.trim() !== '');
+      return new GraphSet(TypeGraphSet.EDGES, edges);
     }
 
     buildFromGraph(graph: Graph): GraphSet {

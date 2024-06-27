@@ -81,6 +81,26 @@ body {
   padding: 0.5rem 0.5rem;
 }
 
+/* PrimeNG card */
+.p-card {
+  background: var(--main-bg-color);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+}
+
+.p-card .p-card-body {
+  padding: 0.75rem;
+  margin-block: 4px;
+}
+
+.p-card .p-card-content {
+  padding: 0;
+}
+
+.p-card .p-card-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
 /* PrimeNG checkbox */
 .p-checkbox .p-checkbox-box.p-highlight {
   border-color: var(--main-blue-color);
