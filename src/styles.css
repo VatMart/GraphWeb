@@ -45,6 +45,10 @@ body {
   justify-content: flex-start;
 }
 
+.full-width {
+  width: 100%;
+}
+
 /* PrimeNG customization */
 /* Menu customization*/
 .p-menu {

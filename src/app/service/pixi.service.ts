@@ -177,8 +177,8 @@ export class PixiService {
    * Return the center point of the canvas.
    */
   getCenterCanvasPoint(): Point {
-    const x = (Math.abs(this.boundaryXMax) - Math.abs(this.boundaryXMin))/2;
-    const y = (Math.abs(this.boundaryYMax) - Math.abs(this.boundaryYMin))/2;
+    const x = (this.boundaryXMin + this.boundaryXMax)/2;
+    const y = (this.boundaryYMin + this.boundaryYMax)/2;
     return {x: x, y: y};
   }
 

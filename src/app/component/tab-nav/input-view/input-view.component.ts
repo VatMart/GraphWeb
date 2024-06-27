@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import {ToastModule} from "primeng/toast";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -14,6 +14,7 @@ import {TagModule} from "primeng/tag";
 import {ButtonModule} from "primeng/button";
 import {NgClass, NgIf} from "@angular/common";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {FileUploadModule} from "primeng/fileupload";
 
 /**
  * Component for the input view. It is used for generate graph from matrix or graph set.
@@ -32,7 +33,8 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
     ButtonModule,
     NgIf,
     NgClass,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    FileUploadModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './input-view.component.html',
@@ -41,6 +43,9 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
 export class InputViewComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
   isMobileDevice: boolean;
+
+  @ViewChild('fileInput') fileInput!: ElementRef;
+  selectedFileName: string | null = null; // Property to store the selected file name
 
   // Matrix types for select
   matrixTypes: SelectMatrixTypeItem[] | undefined;
@@ -85,7 +90,10 @@ export class InputViewComponent implements OnInit, OnDestroy {
     // Button items
     this.buttonItems = [
       {label: 'Submit', icon: 'pi pi-check', command: () => this.submitMatrix(), disabled: false},
-      {label: 'In process', command: () => {}, disabled: true, spin: true}
+      {
+        label: 'In process', command: () => {
+        }, disabled: true, spin: true
+      }
     ];
     this.currentMatrixSubmitButton = this.buttonItems[0];
     this.currentValidationType = this.matrixValidationTypes[0];
@@ -117,6 +125,23 @@ export class InputViewComponent implements OnInit, OnDestroy {
     this.matrixPlaceholder = value === TypeMatrix.ADJACENCY ? this.adjacencyMatrixPlaceholder : this.incidenceMatrixPlaceholder;
   }
 
+  /**
+   * On upload matrix file
+   */
+  onMatrixFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.matrixInput = reader.result as string;
+        this.fileInput.nativeElement.value = ''; // Clear the input value to allow re-selection of the same file
+        this.selectedFileName = file.name; // Set the selected file name
+      };
+      reader.readAsText(file);
+    }
+  }
+
   onMatrixInput(event: Event) {
     const inputElement = event.target as HTMLTextAreaElement;
     inputElement.value = inputElement.value.replace(/[^0-9\n ;,.\-]/g, '');
@@ -129,8 +154,10 @@ export class InputViewComponent implements OnInit, OnDestroy {
     this.matrixInProcess = true; // Set in process state
     this.currentMatrixSubmitButton = this.buttonItems[1]; // Change button to in process
     // Send input matrix string to the state service
-    this.stateService.changeMatrixInput({value: this.matrixInput,
-      matrixType: this.matrixType.value as TypeMatrix});
+    this.stateService.changeMatrixInput({
+      value: this.matrixInput,
+      matrixType: this.matrixType.value as TypeMatrix
+    });
   }
 
   private onMatrixParseResult(result: MatrixParseResult) {
@@ -148,7 +175,7 @@ export class InputViewComponent implements OnInit, OnDestroy {
   }
 
   private showValidationMatrixInputError(message: string) {
-    this.messageService.add({ severity: 'error', summary: 'Invalid matrix string', detail: message });
+    this.messageService.add({severity: 'error', summary: 'Invalid matrix string', detail: message});
   }
 
   /**
@@ -159,15 +186,16 @@ export class InputViewComponent implements OnInit, OnDestroy {
       message: 'Your matrix is valid. Are you sure you want to generate new graph by this matrix? Previous graph will be removed.',
       header: 'Confirmation',
       icon: 'pi pi-exclamation-triangle',
-      acceptIcon:"none",
-      rejectIcon:"none",
-      rejectButtonStyleClass:"p-button-text",
+      acceptIcon: "none",
+      rejectIcon: "none",
+      rejectButtonStyleClass: "p-button-text",
       accept: () => {
         // Call state service to generate graph by matrix
         this.stateService.generateGraphByMatrix(graphMatrix);
         this.matrixInput = ''; // Clear input
       },
-      reject: () => {} // Do nothing on reject
+      reject: () => {
+      } // Do nothing on reject
     });
 
   }

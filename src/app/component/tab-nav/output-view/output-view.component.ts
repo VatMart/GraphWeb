@@ -141,6 +141,7 @@ export class OutputViewComponent implements OnInit, OnDestroy {
   }
 
   onCopyToClipboard() {
+    this.stateService.needUpdateOutputMatrix();
     if (!this.graphMatrix || this.graphMatrix.matrix.length === 0) {
       return;
     }

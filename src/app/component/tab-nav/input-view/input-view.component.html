@@ -12,6 +12,12 @@
         optionLabel="label"/>
     </div>
     <div class="input-matrix-container">
+      <input type="file" accept=".txt" (change)="onMatrixFileSelected($event)" style="display: none;" #fileInput />
+      <p-button styleClass="p-button-contrast p-button-outlined full-width"
+                [label]="selectedFileName || 'Upload matrix'"
+                icon="pi pi-upload"
+                (onClick)="fileInput.click()">
+      </p-button>
       <textarea class="graph-matrix-textarea"
                 rows="10"
                 [placeholder]="matrixPlaceholder"

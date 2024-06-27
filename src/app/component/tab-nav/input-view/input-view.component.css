@@ -27,7 +27,7 @@
   font-family: 'Calibri', sans-serif;
   white-space: pre;
   overflow-x: auto;
-  margin-bottom: 4px;
+  margin-block: 4px;
 }
 
 .matrix-input-items {

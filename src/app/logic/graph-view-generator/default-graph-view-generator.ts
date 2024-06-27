@@ -79,13 +79,15 @@ export class DefaultGraphViewGenerator extends GraphViewGenerator {
     }
 
     // Place remaining nodes randomly within canvas boundaries if any
-    const canvasWidth = this.pixiService.getCanvasBorderWidth();
-    const canvasHeight = this.pixiService.getCanvasBorderHeight();
+    const boundaryXMin = this.pixiService.boundaryXMin + this.pixiService.boundaryGap;
+    const boundaryXMax = this.pixiService.boundaryXMax - this.pixiService.boundaryGap;
+    const boundaryYMin = this.pixiService.boundaryYMin + this.pixiService.boundaryGap;
+    const boundaryYMax = this.pixiService.boundaryYMax - this.pixiService.boundaryGap;
 
     while (nodeIndex < totalNodes) {
       const position: Point = {
-        x: Math.random() * canvasWidth,
-        y: Math.random() * canvasHeight,
+        x: boundaryXMin + Math.random() * (boundaryXMax - boundaryXMin),
+        y: boundaryYMin + Math.random() * (boundaryYMax - boundaryYMin),
       };
       positions.push({ node: nodes[nodeIndex], position });
       nodeIndex++;
