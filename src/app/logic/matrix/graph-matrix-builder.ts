@@ -112,7 +112,6 @@ export class AdjacencyMatrixBuilder extends GraphMatrixBuilder {
     if (!input || input.trim().length === 0) {
       throw new ValidationError("Input string cannot be empty.");
     }
-    const separators = [' ', ',', ';', '\n']
     // Normalize the input: replace all possible separators with a single one
     const normalizedInput = input
       .replace(/[,;\n]/g, ' ')    // Replace commas, semicolons, and newlines with spaces
@@ -152,6 +151,10 @@ export class AdjacencyMatrixBuilder extends GraphMatrixBuilder {
  */
 export class IncidenceMatrixBuilder extends GraphMatrixBuilder {
 
+  /**
+   * Build matrix from graph.
+   * @param graph graph to be converted
+   */
   buildFromGraph(graph: Graph): GraphMatrix {
     if (!graph) {
       return new GraphMatrix(TypeMatrix.INCIDENCE); // Empty matrix
@@ -192,9 +195,61 @@ export class IncidenceMatrixBuilder extends GraphMatrixBuilder {
     return graphMatrix;
   }
 
+  /**
+   * Build matrix from string.
+   * @param input unchecked string representation of the matrix.
+   * @returns A GraphMatrix instance representing the incidence matrix.
+   * @throws {ValidationError} If the input string is invalid.
+   */
   buildFromString(input: string): GraphMatrix {
-    // TODO implement
-    return new GraphMatrix(TypeMatrix.INCIDENCE);
+    if (!input || input.trim().length === 0) {
+      throw new ValidationError("Input string cannot be empty.");
+    }
+
+    // Normalize the input: replace all possible separators with a single one
+    const normalizedInput = input
+      .replace(/[,;\n]/g, ' ')    // Replace commas, semicolons, and newlines with spaces
+      .replace(/\s+/g, ' ');      // Replace multiple spaces with a single space
+
+    // Split the normalized string into an array of values
+    const values = normalizedInput.trim().split(' ');
+
+    // Determine the number of rows and columns
+    const totalValues = values.length;
+    let numberOfRows = 0;
+    let numberOfColumns = 0;
+
+    // Try to determine the number of rows and columns
+    for (let i = 1; i <= totalValues; i++) {
+      if (totalValues % i === 0) {
+        const possibleColumns = totalValues / i;
+        if (i >= possibleColumns) {
+          numberOfRows = i;
+          numberOfColumns = possibleColumns;
+          break;
+        }
+      }
+    }
+
+    if (numberOfRows === 0 || numberOfColumns === 0) {
+      throw new ValidationError("Invalid input string: Unable to determine the dimensions of the incidence matrix.");
+    }
+
+    // Convert the array of values into a 2D matrix
+    const matrix: number[][] = [];
+    for (let i = 0; i < numberOfRows; i++) {
+      const row: number[] = [];
+      for (let j = 0; j < numberOfColumns; j++) {
+        const value = Number(values[i * numberOfColumns + j]);
+        if (isNaN(value)) {
+          throw new ValidationError(`Invalid number in the input string: '${values[i * numberOfColumns + j]}' is not a valid number.`);
+        }
+        row.push(value);
+      }
+      matrix.push(row);
+    }
+    //console.log("Built incidence matrix from string: ", new GraphMatrix(TypeMatrix.INCIDENCE, matrix).toString()); // TODO remove
+    return new GraphMatrix(TypeMatrix.INCIDENCE, matrix);
   }
 
 }

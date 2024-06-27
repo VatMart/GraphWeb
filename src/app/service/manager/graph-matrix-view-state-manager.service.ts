@@ -36,8 +36,11 @@ export class GraphMatrixViewStateManagerService implements ServiceManager {
         if (value === this.isMatrixViewVisible) {
           return;
         }
+        // If matrix view is visible then build and show matrix
         this.isMatrixViewVisible = value;
-        this.buildAndShowMatrixView(); // if matrix view is visible then build and show matrix
+        if (this.graphService.currentGraph.getNodes().size <= 50) { // Do not show huge matrix on ui load
+          this.buildAndShowMatrixView();
+        }
       })
     );
     // Change matrix type on changes in the matrix view

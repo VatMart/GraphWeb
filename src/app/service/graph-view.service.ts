@@ -164,6 +164,7 @@ export class GraphViewService extends GraphModelService {
     graph.orientation = orientation;
     console.log("Graph orientation changed: " + orientation); // TODO remove
     if (orientation === GraphOrientation.MIXED) { // If mixed, do not change edge orientations
+      this.stateService.graphOrientationChanged(orientation);
       return;
     }
     const edgeOrientation = orientation === GraphOrientation.ORIENTED ? EdgeOrientation.ORIENTED
