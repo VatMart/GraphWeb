@@ -21,7 +21,7 @@ export class Graph {
     if (orientation) {
       this._orientation = orientation;
     } else {
-      this._orientation = GraphOrientation.ORIENTED;
+      this._orientation = GraphOrientation.ORIENTED; // default orientation TODO MOVE TO Property service
     }
   }
 

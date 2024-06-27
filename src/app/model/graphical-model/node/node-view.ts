@@ -16,10 +16,6 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
   private _radius: number;
   private _text: Text;
 
-  // TEST
-  vx: number = 0;
-  vy: number = 0;
-
   // Properties of circle of vertex
   private _nodeStyle: NodeStyle = DEFAULT_NODE_STYLE;
   // Properties for label
@@ -41,7 +37,7 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this.hitArea = new PIXI.Circle(this.width / 2, this.height / 2, NodeView.DEFAULT_RADIUS);
     this._node = node;
     this._coordinates = coordinates;
-    this._labelText = node.index.toString();
+    this._labelText = node.label ? node.label : node.index.toString();
     this._text = new Text();
     this._radius = radius;
   }
@@ -146,15 +142,4 @@ export interface NodeLabelStyle {
   labelFontSize: number;
   labelFontFamily: string;
   labelFontWeight: string;
-}
-
-// Test
-export class NodeGraphics extends Graphics {
-  acceleration: Point;
-  mass: number;
-  constructor(mass: number = 1, acceleration?: Point) {
-    super();
-    this.mass = mass;
-    this.acceleration = acceleration || new PIXI.Point(0, 0);
-  }
 }

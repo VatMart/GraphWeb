@@ -15,8 +15,9 @@ export class Node {
 
   private _edges: string[] = []; // adjacent edge indexes
 
-  constructor(index: number) {
+  constructor(index: number, label: string = "") {
     this._index = index;
+    this._label = label;
   }
 
   /**

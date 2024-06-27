@@ -70,13 +70,14 @@
            class="pi pi-refresh graph-web-button" style="font-size: 1.75rem; padding-bottom: 4px"
            (click)="onSetsRefresh()">
         </i>
-      </div></h3>
+      </div>
+    </h3>
 
     <!-- Vertices set -->
     <div class="set-container">
       <label class="graph-set-label">Vertices set</label>
       <textarea class="graph-set-textarea"
-                rows="5"
+                rows="3"
                 placeholder="Add a vertex/edge to see actual set"
                 [(ngModel)]="verticesSet"
                 [readOnly]="true"
@@ -87,7 +88,7 @@
     <div class="set-container">
       <label class="graph-set-label">Edges set</label>
       <textarea class="graph-set-textarea"
-                rows="5"
+                rows="3"
                 placeholder="Add a vertex/edge to see actual set"
                 [(ngModel)]="edgesSet"
                 [readOnly]="true"

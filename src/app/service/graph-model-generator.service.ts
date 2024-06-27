@@ -3,6 +3,7 @@ import {GraphMatrix} from "../model/graph-matrix";
 import {GraphModelBuilder} from "../logic/graph-model-builder";
 import {Graph} from "../model/graph";
 import {GraphModelService} from "./graph-model.service";
+import {GraphSets} from "../model/graph-set";
 
 /**
  * Service for generating graph model from different inputs.
@@ -27,5 +28,13 @@ export class GraphModelGeneratorService {
    */
   public generateFromMatrix(graphMatrix: GraphMatrix): Graph {
     return this.graphBuilder.buildGraphFromMatrix(graphMatrix);
+  }
+
+  /**
+   * Generate graph from vertices and edges sets.
+   * @param graphSets vertices and edges sets
+   */
+  public generateFromSets(graphSets: GraphSets) {
+    return this.graphBuilder.buildGraphFromSets(graphSets);
   }
 }
