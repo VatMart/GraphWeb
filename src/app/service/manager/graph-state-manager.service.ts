@@ -1,15 +1,16 @@
 import {Injectable} from '@angular/core';
-import {GraphViewService} from "../graph-view.service";
-import {StateService} from "../state.service";
+import {GraphViewService} from "../graph/graph-view.service";
+import {StateService} from "../event/state.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {ChangeGraphOrientationCommand} from "../../logic/command/change-graph-orientation-command";
 import {HistoryService} from "../history.service";
 import {Subscription} from "rxjs";
 import {ChangeEdgeWeightCommand} from "../../logic/command/change-edge-weight-command";
 import {ServiceManager} from "../../logic/service-manager";
-import {GraphModelGeneratorService} from "../graph-model-generator.service";
+import {GraphModelGeneratorService} from "../graph/graph-model-generator.service";
 import {Graph} from "../../model/graph";
 import {GenerateNewGraphCommand} from "../../logic/command/generate-new-graph-command";
+import {ConfService} from "../config/conf.service";
 
 /**
  * Service for managing the state of the graph.
@@ -39,8 +40,8 @@ export class GraphStateManagerService implements ServiceManager {
     // Change edge weights visibility
     this.subscriptions.add(
       this.stateService.edgeAdded$.subscribe(edge => {
-        if (edge && edge.weightVisible !== EdgeView.SHOW_WEIGHT) {
-          edge.changeWeightVisible(EdgeView.SHOW_WEIGHT);
+        if (edge && edge.weightVisible !== ConfService.SHOW_WEIGHT) {
+          edge.changeWeightVisible(ConfService.SHOW_WEIGHT);
         }
       })
     );

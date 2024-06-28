@@ -3,7 +3,7 @@ import {RippleModule} from "primeng/ripple";
 import {SvgIconService} from "../../../service/svg-icon.service";
 import {SvgIconDirective} from "../../../directive/svg-icon.directive";
 import {NgForOf, NgIf} from "@angular/common";
-import {StateService} from "../../../service/state.service";
+import {StateService} from "../../../service/event/state.service";
 import {TooltipModule} from "primeng/tooltip";
 import {Subscription} from "rxjs";
 

@@ -2,10 +2,11 @@ import {GraphViewGenerator, NodeViewPosition} from "./graph-view-generator";
 import {Graph} from "../../model/graph";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
-import {NodeViewFabricService} from "../../service/node-view-fabric.service";
-import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
+import {NodeViewFabricService} from "../../service/fabric/node-view-fabric.service";
+import {EdgeViewFabricService} from "../../service/fabric/edge-view-fabric.service";
 import {PixiService} from "../../service/pixi.service";
 import {Point} from "../../utils/graphical-utils";
+import {ConfService} from "../../service/config/conf.service";
 
 /**
  * Default graph view generator.
@@ -41,7 +42,7 @@ export class DefaultGraphViewGenerator extends GraphViewGenerator {
     const canvasCenter = this.pixiService.getCenterCanvasPoint();
     // Calculate the maximum radius for the circles
     const canvasRadius = Math.min(this.pixiService.getCanvasBorderWidth(),
-      this.pixiService.getCanvasBorderHeight()) / 2 - NodeView.DEFAULT_RADIUS;
+      this.pixiService.getCanvasBorderHeight()) / 2 - ConfService.DEFAULT_RADIUS;
 
     // Get all nodes from the graph
     const nodes = [...graph.getNodes().values()];
@@ -49,8 +50,8 @@ export class DefaultGraphViewGenerator extends GraphViewGenerator {
 
     const positions: NodeViewPosition[] = [];
     let nodeIndex = 0;
-    let currentRadius = NodeView.DEFAULT_RADIUS + 50; // Initial radius for the first circle
-    const minDistance = 100 + NodeView.DEFAULT_RADIUS*2; // Minimum distance between nodes
+    let currentRadius = ConfService.DEFAULT_RADIUS + 50; // Initial radius for the first circle
+    const minDistance = 100 + ConfService.DEFAULT_RADIUS*2; // Minimum distance between nodes
 
     while (nodeIndex < totalNodes && currentRadius <= canvasRadius) {
       // Calculate the circumference of the current circle

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {Graph} from "../model/graph";
-import {Node} from "../model/node";
-import {Edge} from "../model/edge";
+import {Graph} from "../../model/graph";
+import {Node} from "../../model/node";
+import {Edge} from "../../model/edge";
 
 /**
  * Service for handling the model of the graph.

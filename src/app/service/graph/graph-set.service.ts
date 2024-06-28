@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Graph} from "../model/graph";
-import {GraphSet, TypeGraphSet} from "../model/graph-set";
-import {EdgesGraphSetBuilder, GraphSetBuilder, VerticesGraphSetBuilder} from "../logic/set/graph-set-builder";
-import {ValidationError} from "../error/validation-error";
-import {GraphSetRequest} from "../component/tab-nav/input-view/input-view.component";
+import {Graph} from "../../model/graph";
+import {GraphSet, TypeGraphSet} from "../../model/graph-set";
+import {EdgesGraphSetBuilder, GraphSetBuilder, VerticesGraphSetBuilder} from "../../logic/set/graph-set-builder";
+import {ValidationError} from "../../error/validation-error";
+import {GraphSetRequest} from "../../component/tab-nav/input-view/input-view.component";
 
 /**
  * Service for managing the graph set (vertices and edges set).
@@ -34,10 +34,10 @@ export class GraphSetService {
 
   private getBuilder(typeGraphSet: TypeGraphSet): GraphSetBuilder {
     if (typeGraphSet === TypeGraphSet.VERTICES) {
-      console.log("Building vertices set"); // TODO remove
+      //console.log("Building vertices set"); // TODO remove
       return new VerticesGraphSetBuilder();
     } else if (typeGraphSet === TypeGraphSet.EDGES) {
-      console.log("Building edges set"); // TODO remove
+      //console.log("Building edges set"); // TODO remove
       return new EdgesGraphSetBuilder();
     }
     throw new Error("Set type not supported: " + typeGraphSet); // TODO change
@@ -97,7 +97,6 @@ export class GraphSetService {
       }
       const vertex1 = verticesIds[0];
       const vertex2 = verticesIds[1];
-      console.log("Vertices input: " + verticesInput)
       if (!verticesInput.includes(vertex1) && !verticesInput.includes(vertex2)) {
         return {isValid: false, message: "Edge contains vertex not present in the vertices set. Edge: '" + edge + "'" +
             ", vertex1: '" + vertex1 + "', vertex2: '" + vertex2 + "'"};

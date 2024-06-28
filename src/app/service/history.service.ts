@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Command} from "../logic/command/command";
-import {StateService} from "./state.service";
+import {StateService} from "./event/state.service";
 
 /**
  * Service for storing and managing the history of commands.

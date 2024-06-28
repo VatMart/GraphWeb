@@ -1,8 +1,8 @@
 import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {CommonModule, NgClass, NgForOf, NgIf} from "@angular/common";
 import {OutputViewComponent} from "./output-view/output-view.component";
-import {StateService} from "../../service/state.service";
-import {EnvironmentService} from "../../service/environment.service";
+import {StateService} from "../../service/event/state.service";
+import {EnvironmentService} from "../../service/config/environment.service";
 import {TabMenuModule} from "primeng/tabmenu";
 import {MenuItem} from "primeng/api";
 import {RippleModule} from "primeng/ripple";

@@ -1,6 +1,6 @@
 import {GraphMatrix} from "../model/graph-matrix";
 import {Graph} from "../model/graph";
-import {GraphModelService} from "../service/graph-model.service";
+import {GraphModelService} from "../service/graph/graph-model.service";
 import {Edge} from "../model/edge";
 import {EdgeOrientation, GraphOrientation} from "../model/orientation";
 import {GraphSet, GraphSets} from "../model/graph-set";

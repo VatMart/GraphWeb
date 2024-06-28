@@ -1,19 +1,20 @@
 import {InitializationError} from "../../error/initialization-error";
 import {PixiService} from "../../service/pixi.service";
-import {EventBusService, HandlerNames} from "../../service/event-bus.service";
-import {StateService} from "../../service/state.service";
-import {GraphViewService} from "../../service/graph-view.service";
+import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {StateService} from "../../service/event/state.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {HistoryService} from "../../service/history.service";
 import {FederatedPointerEvent} from "pixi.js";
 import {EventUtils} from "../../utils/event-utils";
 import {Weight} from "../../model/graphical-model/edge/weight";
-import {DEFAULT_NODE_STYLE, NodeStyle, NodeView} from "../../model/graphical-model/node/node-view";
+import {NodeStyle, NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeIndex} from "../../model/edge";
 import {AddEdgeViewCommand} from "../command/add-edge-view-command";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {RemoveEdgeViewCommand} from "../command/remove-edge-view-command";
-import {NodeViewFabricService} from "../../service/node-view-fabric.service";
-import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
+import {NodeViewFabricService} from "../../service/fabric/node-view-fabric.service";
+import {EdgeViewFabricService} from "../../service/fabric/edge-view-fabric.service";
+import {ConfService} from "../../service/config/conf.service";
 
 /**
  * Handles all events related to the edge views.
@@ -42,9 +43,9 @@ export class EdgeEventHandler {
 
   // Edge adding
   public static startNodeStyle: NodeStyle = {
-    fillNode: DEFAULT_NODE_STYLE.fillNode,
+    fillNode: ConfService.DEFAULT_NODE_STYLE.fillNode,
     strokeColor: '#FFC618',
-    strokeWidth: DEFAULT_NODE_STYLE.strokeWidth + 1
+    strokeWidth: ConfService.DEFAULT_NODE_STYLE.strokeWidth + 1
   };
   private static startNode: NodeView | undefined;
   private static endNode: NodeView | undefined;

@@ -1,15 +1,15 @@
 import {Injectable} from '@angular/core';
 import {NodeView} from "../../model/graphical-model/node/node-view";
-import {StateService} from "../state.service";
+import {StateService} from "../event/state.service";
 import {DefaultMode} from "../../logic/mode/default-mode";
 import {AddRemoveVertexMode} from "../../logic/mode/add-remove-vertex-mode";
 import {AddRemoveEdgeMode} from "../../logic/mode/add-remove-edge-mode";
 import {PixiService} from "../pixi.service";
-import {GraphViewService} from "../graph-view.service";
-import {EventBusService} from "../event-bus.service";
-import {NodeViewFabricService} from "../node-view-fabric.service";
+import {GraphViewService} from "../graph/graph-view.service";
+import {EventBusService} from "../event/event-bus.service";
+import {NodeViewFabricService} from "../fabric/node-view-fabric.service";
 import {HistoryService} from "../history.service";
-import {EdgeViewFabricService} from "../edge-view-fabric.service";
+import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {
   ADD_REMOVE_EDGE_MODE_HELPER_ITEM,

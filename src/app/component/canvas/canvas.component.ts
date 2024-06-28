@@ -1,12 +1,12 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import * as PIXI from "pixi.js";
-import {StateService} from "../../service/state.service";
+import {StateService} from "../../service/event/state.service";
 import {PixiService} from "../../service/pixi.service";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {Graph} from "../../model/graph";
-import {EventBusService} from "../../service/event-bus.service";
-import {NodeViewFabricService} from "../../service/node-view-fabric.service";
-import {EdgeViewFabricService} from "../../service/edge-view-fabric.service";
+import {EventBusService} from "../../service/event/event-bus.service";
+import {NodeViewFabricService} from "../../service/fabric/node-view-fabric.service";
+import {EdgeViewFabricService} from "../../service/fabric/edge-view-fabric.service";
 import {PixiManagerService} from "../../service/manager/pixi-manager.service";
 
 /**

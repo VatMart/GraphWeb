@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from "rxjs";
-import {ModeState} from "./manager/mode-manager.service";
-import {NodeView} from "../model/graphical-model/node/node-view";
-import {EdgeView} from "../model/graphical-model/edge/edge-view";
-import {GraphOrientation} from "../model/orientation";
-import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
-import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../component/canvas/float-helper/float-helper.component";
-import {Weight} from "../model/graphical-model/edge/weight";
-import {ForceMode} from "../logic/mode/force-mode";
-import {GraphSet, GraphSets} from "../model/graph-set";
+import {ModeState} from "../manager/mode-manager.service";
+import {NodeView} from "../../model/graphical-model/node/node-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {GraphOrientation} from "../../model/orientation";
+import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
+import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../../component/canvas/float-helper/float-helper.component";
+import {Weight} from "../../model/graphical-model/edge/weight";
+import {ForceMode} from "../../logic/mode/force-mode";
+import {GraphSet, GraphSets} from "../../model/graph-set";
 import {
   MatrixStringInput,
   MatrixParseResult,
   GraphSetRequest, GraphSetParseResult
-} from "../component/tab-nav/input-view/input-view.component";
-import {SetValidationResult} from "./graph-set.service";
+} from "../../component/tab-nav/input-view/input-view.component";
+import {SetValidationResult} from "../graph/graph-set.service";
 
 /**
  * Service for managing the state of the application.
@@ -299,7 +299,7 @@ export class StateService {
    * Change the visibility of the matrix view.
    */
   changedOutputViewVisibility(value: boolean) {
-    console.log("Output view visibility changed: " + value);
+    //console.log("Output view visibility changed: " + value); // TODO Remove
     this.outputViewVisibilitySource.next(value);
   }
 

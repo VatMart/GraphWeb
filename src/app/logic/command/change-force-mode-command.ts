@@ -1,9 +1,9 @@
 import {Command} from "./command";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {Point} from "../../utils/graphical-utils";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {DefaultMode} from "../mode/default-mode";
-import {StateService} from "../../service/state.service";
+import {StateService} from "../../service/event/state.service";
 import {ForceMode} from "../mode/force-mode";
 
 /**

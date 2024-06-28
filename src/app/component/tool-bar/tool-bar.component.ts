@@ -1,10 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {DecimalPipe, NgIf} from "@angular/common";
-import {StateService} from "../../service/state.service";
-import {EnvironmentService} from "../../service/environment.service";
+import {StateService} from "../../service/event/state.service";
+import {EnvironmentService} from "../../service/config/environment.service";
 import {HistoryService} from "../../service/history.service";
 import {Subscription} from "rxjs";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {ClearGraphViewCommand} from "../../logic/command/clear-graph-view-command";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GraphOrientation} from "../../model/orientation";
@@ -14,6 +14,7 @@ import {MenuItem, PrimeNGConfig} from "primeng/api";
 import {RippleModule} from "primeng/ripple";
 import {CheckboxModule} from "primeng/checkbox";
 import {DropdownModule} from "primeng/dropdown";
+import {ConfService} from "../../service/config/conf.service";
 
 @Component({
   selector: 'app-tool-bar',
@@ -55,14 +56,14 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   // Settings button
   settingsItems: MenuItem[] | undefined;
   // Dropdown components states
-  showWeights =  new FormControl(true); // TODO change to false by default
-  showGrid = new FormControl(false);
-  hideHelper = new FormControl(false);
+  showWeights =  new FormControl(ConfService.SHOW_WEIGHT);
+  showGrid = new FormControl(ConfService.SHOW_GRID);
+  hideHelper = new FormControl(ConfService.ALWAYS_HIDE_HELPER_TEXT);
   // Force options
-  enableCenterForce = new FormControl(true);
-  enableLinkForce = new FormControl(true);
+  enableCenterForce = new FormControl(ConfService.DEFAULT_CENTER_FORCE_ON);
+  enableLinkForce = new FormControl(ConfService.DEFAULT_LINK_FORCE_ON);
   orientations: SelectOrientationItem[] | undefined;
-  selectedOrientation = new FormControl<GraphOrientation | null>(GraphOrientation.ORIENTED);
+  selectedOrientation = new FormControl<GraphOrientation | null>(ConfService.DEFAULT_GRAPH_ORIENTATION);
 
   // Gradient colors
   gradientColorStart: string = '#FFC618';
@@ -137,11 +138,6 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         this.switchAddEdgesButton(); // Turn off add edges mode
       }
     }));
-    // Default values
-    const showWeights = this.showWeights.value;
-    if (showWeights) {
-      this.onToggleShowWeights(showWeights); // Set initial state
-    }
     // Init zooming button dropdown items
     this.zoomItems = [
       {
@@ -209,6 +205,23 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         ],
       },
     ];
+    // Default values
+    const showWeights = this.showWeights.value;
+    if (showWeights) {
+      this.onToggleShowWeights(showWeights); // Set initial state
+    }
+    const showGrid = this.showGrid.value;
+    if (showGrid) {
+      this.onToggleShowGrid(showGrid); // Set initial state
+    }
+    const hideHelper = this.hideHelper.value;
+    if (hideHelper) {
+      this.onToggleAlwaysHideHelper(hideHelper); // Set initial state
+    }
+    const orientation = this.selectedOrientation.value;
+    if (orientation) {
+      this.onChoseGraphOrientation(orientation); // Set initial state
+    }
   }
 
   ngOnDestroy(): void {

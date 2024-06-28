@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {RippleModule} from "primeng/ripple";
 import {NgIf} from "@angular/common";
-import {StateService} from "../../../service/state.service";
+import {StateService} from "../../../service/event/state.service";
 import {animate, state, style, transition, trigger} from "@angular/animations";
 import {Subscription} from "rxjs";
 
@@ -33,7 +33,6 @@ export class FloatHelperComponent implements OnInit, OnDestroy {
   currentHelperItem!: FloatHelperItem;
 
   constructor(private stateService: StateService) {
-    console.log('FloatHelperComponent constructor')
   }
 
   ngOnInit(): void {
