@@ -78,10 +78,6 @@ export class GraphViewService extends GraphModelService {
    * All other methods for adding edges should call this method.
    */
   public addEdgeToGraphView(graph: Graph, edgeView: EdgeView, callModel: boolean = true) {
-    if (edgeView.edge.isLoop()) {
-      console.error("Loop edge is not supported for now"); // TODO implement loop edge
-      return;
-    }
     if (callModel) {
       super.addEdgeToGraph(graph, edgeView.edge);
     }

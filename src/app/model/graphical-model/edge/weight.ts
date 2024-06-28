@@ -11,6 +11,11 @@ export class Weight extends Sprite {
 
   private _weightStyle: WeightStyle;
 
+  /**
+   * If edge is curved, this is the center of the curve.
+   */
+  private _curveCenter: Point = {x: 0, y: 0};
+
   constructor(value: number, weightStyle?: WeightStyle) {
     super();
     this.anchor.set(0.5);
@@ -22,8 +27,8 @@ export class Weight extends Sprite {
     this.addChild(this.text);
   }
 
-  move(startPoint: Point, endPoint: Point): void {
-    const midpoint = GraphicalUtils.midpoint(startPoint, endPoint);
+  move(startPoint: Point, endPoint: Point, isEdgeLoop: boolean = false): void {
+    const midpoint = isEdgeLoop ? this.curveCenter : GraphicalUtils.midpoint(startPoint, endPoint);
     this.x = midpoint.x;
     this.y = midpoint.y;
   }
@@ -51,6 +56,14 @@ export class Weight extends Sprite {
   set weightStyle(value: WeightStyle) {
     this._weightStyle = value;
     this.applyTextStyle(value.text);
+  }
+
+  get curveCenter(): Point {
+    return this._curveCenter;
+  }
+
+  set curveCenter(value: Point) {
+    this._curveCenter = value;
   }
 
   applyTextStyle(textStyle: WeightTextStyle): void {
