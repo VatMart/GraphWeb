@@ -42,7 +42,7 @@ export class EdgeView extends Graphics implements GraphElement {
     this._edge = edge;
     this._startNode = startNode;
     this._endNode = endNode;
-    if (edge.orientation === EdgeOrientation.ORIENTED) {
+    if (edge.orientation === EdgeOrientation.ORIENTED && !this.edge.isLoop()) {
       this.arrow = new Arrow();
       this.addChild(this.arrow);
     }
@@ -61,18 +61,28 @@ export class EdgeView extends Graphics implements GraphElement {
   private draw() {
     this.clear();
     // Draw Arrow of edge first, because it reset end point coordinates
-    if (this._edge.orientation === EdgeOrientation.ORIENTED) {
+    if (this._edge.orientation === EdgeOrientation.ORIENTED && !this.edge.isLoop()) {
       this.drawArrow();
     }
-    if (!this.edge.isLoop()) {
+    if (!this.edge.isLoop()) { // Draw straight edge
       this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
         .lineTo(this._endCoordinates.x, this._endCoordinates.y)
         .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round'});
-    } else {
-      // TODO Implement loop edge
+    } else { // Draw loop edge
+      const control1 = {x: this._startCoordinates.x - 2.5 * this.startNode.radius,
+        y: this._startCoordinates.y - 3 * this.startNode.radius};
+      const control2 = {x: this._endCoordinates.x + 2.5 * this.startNode.radius,
+        y: this._endCoordinates.y - 3 * this.startNode.radius};
+      this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
+        .bezierCurveTo(control1.x, control1.y, control2.x, control2.y, this._endCoordinates.x, this._endCoordinates.y)
+        .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round', alignment: 1});
+      const nodeCenter = this._startNode.centerCoordinates();
+      this._weightView.curveCenter = GraphicalUtils.calculateBezierCenter(nodeCenter, control1, control2, nodeCenter);
     }
     // Draw the hit area
-    this.hitArea = this.calculateHitArea(this._startCoordinates, this._endCoordinates);
+    if (!this.edge.isLoop()) { // Hit area for straight edge
+      this.hitArea = this.calculateHitArea(this._startCoordinates, this._endCoordinates);
+    }
     this.zIndex = 0;
   }
 
@@ -112,7 +122,7 @@ export class EdgeView extends Graphics implements GraphElement {
 
   private moveWeight() {
     if (this._weightView) {
-      this._weightView.move(this._startCoordinates, this._endCoordinates);
+      this._weightView.move(this._startCoordinates, this._endCoordinates, this.edge.isLoop());
     }
   }
 
@@ -183,9 +193,14 @@ export class EdgeView extends Graphics implements GraphElement {
     return [{x: xNode1, y: yNode1}, {x: xNode2, y: yNode2}];
   }
 
+  // If edge is loop
   private resolveLoopConnectors(): [Point, Point] {
-    // TODO Implement loop edge
-    return [{x: 0, y: 0}, {x: 0, y: 0}];
+    const nodeCenter = this._startNode.centerCoordinates();
+    const v1X = nodeCenter.x - this._startNode.radius + 2;
+    const v1Y = nodeCenter.y - this._startNode.radius + 10;
+    const v2X = nodeCenter.x + this._startNode.radius - 2;
+    const v2Y = nodeCenter.y - this._startNode.radius + 10;
+    return [{x: v1X, y: v1Y}, {x: v2X, y: v2Y}];
   }
 
   get edge(): Edge {

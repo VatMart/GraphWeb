@@ -226,6 +226,9 @@ export class ForceMode {
    */
   private applySpringForceBetweenConnectedNodes(draggedNodes?: NodeView[]): void {
     this.graphViewService.edgeViews.forEach(edgeView => {
+      if (edgeView.edge.isLoop()) {
+        return; // Skip loop edges
+      }
       const forceNodeA = this.forceNodes.get(edgeView.startNode)!;
       const forceNodeB = this.forceNodes.get(edgeView.endNode)!;
 

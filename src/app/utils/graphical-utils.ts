@@ -57,6 +57,21 @@ export class GraphicalUtils {
   }
 
   /**
+   * Calculate the center point of a cubic bezier curve.
+   * @param p0 Start point
+   * @param p1 Control point 1
+   * @param p2 Control point 2
+   * @param p3 End point
+   * @return Center point of the bezier curve
+   */
+  public static calculateBezierCenter(p0: Point, p1: Point, p2: Point, p3: Point): Point {
+    const t = 0.5;
+    const x = Math.pow((1 - t), 3) * p0.x + 3 * Math.pow((1 - t), 2) * t * p1.x + 3 * (1 - t) * Math.pow(t, 2) * p2.x + Math.pow(t, 3) * p3.x;
+    const y = Math.pow((1 - t), 3) * p0.y + 3 * Math.pow((1 - t), 2) * t * p1.y + 3 * (1 - t) * Math.pow(t, 2) * p2.y + Math.pow(t, 3) * p3.y;
+    return {x, y};
+  }
+
+  /**
    * Calculate the bounding box for multiple pixi.Container objects
    */
   public static calculateCompositeBounds(bounds: Rectangle[]): Rectangle {
