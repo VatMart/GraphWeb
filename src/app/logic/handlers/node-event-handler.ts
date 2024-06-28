@@ -1,17 +1,18 @@
 import {InitializationError} from "../../error/initialization-error";
 import {PixiService} from "../../service/pixi.service";
-import {EventBusService, HandlerNames} from "../../service/event-bus.service";
-import {StateService} from "../../service/state.service";
+import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {StateService} from "../../service/event/state.service";
 import {FederatedPointerEvent} from "pixi.js";
 import {MoveNodeViewCommand, NodeMove} from "../command/move-node-view-command";
 import {NodeView} from "../../model/graphical-model/node/node-view";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {HistoryService} from "../../service/history.service";
 import {AddNodeViewCommand} from "../command/add-node-view-command";
 import {EventUtils} from "../../utils/event-utils";
 import {RemoveNodeViewCommand} from "../command/remove-node-view-command";
-import {NodeViewFabricService} from "../../service/node-view-fabric.service";
+import {NodeViewFabricService} from "../../service/fabric/node-view-fabric.service";
 import {InternalGrid} from "../../model/internal-grid";
+import {ConfService} from "../../service/config/conf.service";
 
 /**
  * Handles all events related to the node views.
@@ -227,11 +228,12 @@ export class NodeEventHandler {
     }
     const position = event.getLocalPosition(this.pixiService.mainContainer); // Get position relative to main container
     if (event.target === this.pixiService.stage) {
-      if (!this.pixiService.isPointWithinCanvasBoundaries(position.x, position.y, NodeView.DEFAULT_RADIUS)) {
+      if (!this.pixiService.isPointWithinCanvasBoundaries(position.x, position.y, ConfService.DEFAULT_RADIUS)) {
         // TODO implement notification to user, outside of borders
         return;
       }
-      const positionNode = {x: position.x - NodeView.DEFAULT_RADIUS, y: position.y - NodeView.DEFAULT_RADIUS};
+      const positionNode = {x: position.x - ConfService.DEFAULT_RADIUS,
+        y: position.y - ConfService.DEFAULT_RADIUS};
       let newNodeView: NodeView = this.nodeFabric
         .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph, positionNode);
       let command = new AddNodeViewCommand(newNodeView, this.graphViewService);
@@ -241,7 +243,6 @@ export class NodeEventHandler {
       let nodeView: NodeView = event.target as NodeView;
       let command = new RemoveNodeViewCommand(nodeView, this.graphViewService);
       this.historyService.execute(command);
-      //this.graphViewService.removeNodeFromCurrentGraphView(nodeView);
     }
   }
 }

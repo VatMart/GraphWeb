@@ -1,8 +1,11 @@
 import {Command} from "./command";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {EdgeOrientation, GraphOrientation} from "../../model/orientation";
 
+/**
+ * Command for changing the orientation of the graph.
+ */
 export class ChangeGraphOrientationCommand implements Command {
 
   private _previousOrientation: GraphOrientation;

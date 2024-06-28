@@ -1,9 +1,9 @@
 import {ModeBehavior} from "../../service/manager/mode-manager.service";
 import {PixiService} from "../../service/pixi.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
-import {EventBusService, HandlerNames} from "../../service/event-bus.service";
+import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
-import {StateService} from "../../service/state.service";
+import {StateService} from "../../service/event/state.service";
 
 /**
  * Mode to add or remove vertices from the graph.

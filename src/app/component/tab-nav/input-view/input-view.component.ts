@@ -5,9 +5,9 @@ import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GraphMatrix, TypeMatrix} from "../../../model/graph-matrix";
 import {SelectMatrixTypeItem} from "../output-view/output-view.component";
 import {Subscription} from "rxjs";
-import {StateService} from "../../../service/state.service";
+import {StateService} from "../../../service/event/state.service";
 import {ConfirmationService, MessageService} from "primeng/api";
-import {EnvironmentService} from "../../../service/environment.service";
+import {EnvironmentService} from "../../../service/config/environment.service";
 import {InputTextareaModule} from "primeng/inputtextarea";
 import {KeyFilterModule} from "primeng/keyfilter";
 import {TagModule} from "primeng/tag";
@@ -16,7 +16,7 @@ import {NgClass, NgIf} from "@angular/common";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {FileUploadModule} from "primeng/fileupload";
 import {CardModule} from "primeng/card";
-import {SetValidationResult} from "../../../service/graph-set.service";
+import {SetValidationResult} from "../../../service/graph/graph-set.service";
 import {GraphSet} from "../../../model/graph-set";
 
 /**
@@ -61,10 +61,10 @@ export class InputViewComponent implements OnInit, OnDestroy {
   // Matrix data
   readonly adjacencyMatrixPlaceholder = 'Allowed formats:\n0 1 0      0, 1, 0,      0; 1; 0;      ' +
     '0, 1, 0;\n1 0 1      1, 0, 1,      1; 0; 1;      1, 0, 1;\n0 1 0 or 0, 1, 0  or 0; 1; 0  or  0, 1, 0;\n\n' +
-    'If your graph is weighted, use weights\ninstead of 1s.';
+    'If your graph is weighted, use \nweights instead of 1s.';
   readonly incidenceMatrixPlaceholder = 'Allowed formats:\n 1 0       1, 0,        1; 0;' +
     '       1, 0;\n-1 1      -1, 1,      -1; 1;      -1, 1;\n 0 -1 or 0, -1 or  0; -1 or  0, -1;\n\n' +
-    'If your graph is weighted, use weights\ninstead of 1s.';
+    'If your graph is weighted, use \nweights instead of 1s.';
   matrixInput: string = '';
   matrixPlaceholder!: string;
   matrixInProcess: boolean = false;

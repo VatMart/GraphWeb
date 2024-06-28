@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {ServiceManager} from "../../logic/service-manager";
 import {Subscription} from "rxjs";
-import {StateService} from "../state.service";
-import {GraphViewService} from "../graph-view.service";
-import {GraphSetService, SetValidationResult} from "../graph-set.service";
+import {StateService} from "../event/state.service";
+import {GraphViewService} from "../graph/graph-view.service";
+import {GraphSetService, SetValidationResult} from "../graph/graph-set.service";
 import {TypeGraphSet} from "../../model/graph-set";
 import {GraphSetRequest} from "../../component/tab-nav/input-view/input-view.component";
 import {ValidationError} from "../../error/validation-error";

@@ -1,5 +1,5 @@
 import {Command} from "./command";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 
 /**

@@ -2,8 +2,9 @@ import {ChangeDetectorRef, Component, ElementRef, HostListener, Renderer2, ViewC
 import {Weight} from "../../../model/graphical-model/edge/weight";
 import {MessageService} from "primeng/api";
 import {ToastModule} from "primeng/toast";
-import {StateService} from "../../../service/state.service";
+import {StateService} from "../../../service/event/state.service";
 import {PixiService} from "../../../service/pixi.service";
+import {ConfService} from "../../../service/config/conf.service";
 
 @Component({
   selector: 'app-float-edge-weight-input',
@@ -119,9 +120,9 @@ export class FloatEdgeWeightInputComponent{
       return {valid: false, message: 'Input value is not a number.'};
     }
 
-    if (number < Weight.MIN_WEIGHT || number > Weight.MAX_WEIGHT) {
+    if (number < ConfService.MIN_WEIGHT || number > ConfService.MAX_WEIGHT) {
       return {valid: false,
-        message: `Input value is out of range. Must be between ${Weight.MIN_WEIGHT} and ${Weight.MAX_WEIGHT}.`};
+        message: `Input value is out of range. Must be between ${ConfService.MIN_WEIGHT} and ${ConfService.MAX_WEIGHT}.`};
     }
 
     return {valid: true, message: '', value: number};

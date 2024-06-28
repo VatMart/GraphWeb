@@ -56,12 +56,13 @@ body {
   background: #f9f9f9;
   border-radius: 8px;
   font-size: 14px;
+  width: auto;
 }
 
 .p-menu .p-submenu-header {
   margin: 0;
   color: #414e61;
-  padding: 0.50rem 1rem;
+  padding: 0.25rem 0.5rem;
   background: #f9f9f9;
 }
 
@@ -78,7 +79,7 @@ body {
 }
 
 .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link {
-  padding: 0.5rem 0.5rem;
+  padding: 0.25rem 0.25rem;
 }
 
 /* PrimeNG card */
@@ -107,6 +108,16 @@ body {
   background: var(--main-blue-color);
 }
 
+.p-checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+.p-checkbox .p-checkbox-box {
+  width: 18px;
+  height: 18px;
+}
+
 .p-dropdown {
   background: #f9f9f9;
 }
@@ -125,7 +136,8 @@ body {
 }
 
 .p-inputtext {
-  padding: 0.5rem 0.5rem;
+  font-size: 15px;
+  padding: 0.25rem 0.3rem;
 }
 
 /* PrimeNG tooltip */

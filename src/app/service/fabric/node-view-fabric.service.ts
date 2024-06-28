@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
-import {DEFAULT_NODE_STYLE, NodeStyle, NodeView} from "../model/graphical-model/node/node-view";
-import {Node} from "../model/node";
-import {GraphModelService} from "./graph-model.service";
-import {Graph} from "../model/graph";
+import {NodeStyle, NodeView} from "../../model/graphical-model/node/node-view";
+import {Node} from "../../model/node";
+import {GraphModelService} from "../graph/graph-model.service";
+import {Graph} from "../../model/graph";
 import * as PIXI from "pixi.js";
 import {Graphics, RenderTexture, Texture} from "pixi.js";
-import {PixiService} from "./pixi.service";
-import {Point} from "../utils/graphical-utils";
-import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";
+import {PixiService} from "../pixi.service";
+import {Point} from "../../utils/graphical-utils";
+import {AbstractGraphElementFabric} from "../../model/graphical-model/abstract-graph-element-fabric";
+import {ConfService} from "../config/conf.service";
 
 /**
  * Fabric for creating node views.
@@ -53,8 +54,9 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
    */
   public createDefaultNodeViewWithCoordinates(graph: Graph, point: Point): NodeView {
     let index = this.graphModelService.calculateNewNodeIndex(graph);
-    const texture: Texture = <Texture>this.getOrCreateTexture(point, NodeView.DEFAULT_RADIUS, DEFAULT_NODE_STYLE);
-    return NodeView.createFromTexture(new Node(index), point, NodeView.DEFAULT_RADIUS, texture);
+    const texture: Texture = <Texture>this.getOrCreateTexture(point, ConfService.DEFAULT_RADIUS,
+      ConfService.DEFAULT_NODE_STYLE);
+    return NodeView.createFromTexture(new Node(index), point, ConfService.DEFAULT_RADIUS, texture);
   }
 
   /**
@@ -63,8 +65,9 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
    * @param point - coordinates of node center on main container
    */
   public createDefaultNodeViewFromNode(node: Node, point: Point): NodeView {
-    const texture: Texture = <Texture>this.getOrCreateTexture(point, NodeView.DEFAULT_RADIUS, DEFAULT_NODE_STYLE);
-    return NodeView.createFromTexture(node, point, NodeView.DEFAULT_RADIUS, texture);
+    const texture: Texture = <Texture>this.getOrCreateTexture(point, ConfService.DEFAULT_RADIUS,
+      ConfService.DEFAULT_NODE_STYLE);
+    return NodeView.createFromTexture(node, point, ConfService.DEFAULT_RADIUS, texture);
   }
 
   public changeToStyle(nodeView: NodeView, nodeStyle: NodeStyle) {
@@ -94,12 +97,12 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
   private textureCacheKeyToNodeStyle(key: string | undefined): NodeStyle {
     if (key == null) {
       console.error('NodeViewFabricService: Invalid texture cache key'); // TODO throw exception
-      return DEFAULT_NODE_STYLE;
+      return ConfService.DEFAULT_NODE_STYLE;
     }
     let parts = key.split('_');
     if (parts.length !== 4) {
       console.error('NodeViewFabricService: Invalid texture cache key'); // TODO throw exception
-      return DEFAULT_NODE_STYLE;
+      return ConfService.DEFAULT_NODE_STYLE;
     }
     return {
       fillNode: parts[1],

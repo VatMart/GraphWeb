@@ -2,18 +2,18 @@ import {Injectable} from '@angular/core';
 import {PixiService} from "../pixi.service";
 import {Container, Renderer} from "pixi.js";
 import {ModeManagerService} from "./mode-manager.service";
-import {EventBusService} from "../event-bus.service";
-import {StateService} from "../state.service";
+import {EventBusService} from "../event/event-bus.service";
+import {StateService} from "../event/state.service";
 import {VisualGrid} from "../../model/graphical-model/visual-grid";
 import {CanvasBorder} from "../../model/graphical-model/canvas-border";
 import {CanvasEventHandler} from "../../logic/handlers/canvas-event-handler";
 import {ServiceManager} from "../../logic/service-manager";
 import {NodeEventHandler} from "../../logic/handlers/node-event-handler";
-import {GraphViewService} from "../graph-view.service";
+import {GraphViewService} from "../graph/graph-view.service";
 import {HistoryService} from "../history.service";
 import {EdgeEventHandler} from "../../logic/handlers/edge-event-handler";
-import {NodeViewFabricService} from "../node-view-fabric.service";
-import {EdgeViewFabricService} from "../edge-view-fabric.service";
+import {NodeViewFabricService} from "../fabric/node-view-fabric.service";
+import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
 
 /**
  * Service to manage the PIXI canvas

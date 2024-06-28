@@ -4,10 +4,10 @@ import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/manager/mode-manager.service";
 import {GraphStateManagerService} from "./service/manager/graph-state-manager.service";
 import {TabNavComponent} from "./component/tab-nav/tab-nav.component";
-import {EnvironmentService} from "./service/environment.service";
+import {EnvironmentService} from "./service/config/environment.service";
 import {NgClass, NgIf} from "@angular/common";
 import {FloatToolBarComponent} from "./component/canvas/float-tool-bar/float-tool-bar.component";
-import {StateService} from "./service/state.service";
+import {StateService} from "./service/event/state.service";
 import {FloatHelperComponent} from "./component/canvas/float-helper/float-helper.component";
 import {
   FloatEdgeWeightInputComponent

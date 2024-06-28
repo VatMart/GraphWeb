@@ -1,20 +1,21 @@
 import {Injectable} from '@angular/core';
-import {Graph} from "../model/graph";
-import {PixiService} from "./pixi.service";
+import {Graph} from "../../model/graph";
+import {PixiService} from "../pixi.service";
 import {GraphModelService} from "./graph-model.service";
-import {NodeView, SELECTED_NODE_STYLE} from "../model/graphical-model/node/node-view";
-import {NodeViewFabricService} from "./node-view-fabric.service";
-import {StateService} from "./state.service";
-import {GraphElement} from "../model/graphical-model/graph-element";
-import {EdgeView, SELECTED_EDGE_STYLE} from "../model/graphical-model/edge/edge-view";
-import {EdgeViewFabricService} from "./edge-view-fabric.service";
-import {Point} from "../utils/graphical-utils";
-import {EdgeOrientation, GraphOrientation} from "../model/orientation";
+import {NodeView} from "../../model/graphical-model/node/node-view";
+import {NodeViewFabricService} from "../fabric/node-view-fabric.service";
+import {StateService} from "../event/state.service";
+import {GraphElement} from "../../model/graphical-model/graph-element";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
+import {Point} from "../../utils/graphical-utils";
+import {EdgeOrientation, GraphOrientation} from "../../model/orientation";
 import {
   DEFAULT_HELPER_ITEM,
   EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM
-} from "../component/canvas/float-helper/float-helper.component";
-import {DefaultGraphViewGenerator} from "../logic/graph-view-generator/default-graph-view-generator";
+} from "../../component/canvas/float-helper/float-helper.component";
+import {DefaultGraphViewGenerator} from "../../logic/graph-view-generator/default-graph-view-generator";
+import {ConfService} from "../config/conf.service";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -185,7 +186,7 @@ export class GraphViewService extends GraphModelService {
    * for new edges.
    */
   public changeEdgeWeightsVisibility(visible: boolean) {
-    EdgeView.SHOW_WEIGHT = visible;
+    ConfService.SHOW_WEIGHT = visible;
     this.edgeViews.forEach((edgeView: EdgeView) => {
       if (edgeView.weightVisible !== visible) {
         edgeView.changeWeightVisible(visible);
@@ -248,9 +249,9 @@ export class GraphViewService extends GraphModelService {
       return; // Element already selected
     }
     if (element instanceof NodeView) {
-      this.nodeFabric.changeToStyle(element, SELECTED_NODE_STYLE);
+      this.nodeFabric.changeToStyle(element, ConfService.SELECTED_NODE_STYLE);
     } else if (element instanceof EdgeView) {
-      this.edgeFabric.changeToStyle(element, SELECTED_EDGE_STYLE);
+      this.edgeFabric.changeToStyle(element, ConfService.SELECTED_EDGE_STYLE);
       this.stateService.changeFloatHelperItem(EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM); // Change float helper item
     }
   }

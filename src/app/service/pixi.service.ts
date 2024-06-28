@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {autoDetectRenderer, Container, Renderer, Ticker} from "pixi.js";
-import {EnvironmentService} from "./environment.service";
+import {EnvironmentService} from "./config/environment.service";
 import {VisualGrid} from "../model/graphical-model/visual-grid";
 import {CanvasBorder} from "../model/graphical-model/canvas-border";
-import {StateService} from "./state.service";
+import {StateService} from "./event/state.service";
 import {Point} from "../utils/graphical-utils";
+import {ConfService} from "./config/conf.service";
 
 /**
  * Service for handling the PixiJS rendering engine.
@@ -24,19 +25,18 @@ export class PixiService {
   private _canvasVisualGrid!: VisualGrid;
 
   // Boundary of panning coordinates
-  // TODO move default values to the environment service
-  private _boundaryXMin: number = -1000;
-  private _boundaryXMax: number = 3000;
-  private _boundaryYMin: number = -1000;
-  private _boundaryYMax: number = 2000;
-  private _boundaryGap: number = 200;
+  private _boundaryXMin: number = ConfService.BOUNDS_X_MIN;
+  private _boundaryXMax: number = ConfService.BOUNDS_X_MAX;
+  private _boundaryYMin: number = ConfService.BOUNDS_Y_MIN;
+  private _boundaryYMax: number = ConfService.BOUNDS_Y_MAX;
+  private _boundaryGap: number = ConfService.BOUNDS_GAP;
 
   // Canvas zooming
   // Initial scale values for calculating zoom percentage
   private initialScaleX: number = 1.0;
   private initialScaleY: number = 1.0;
   private maxScale: number = 3.0;  // Maximum zoom level (300%)
-  private minScale: number = 0.5;  // Minimum zoom level (50%)
+  private minScale: number = 0.25;  // Minimum zoom level (50%)
 
   constructor(private environment: EnvironmentService,
               private stateService: StateService) {

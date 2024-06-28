@@ -28,12 +28,13 @@ export class Edge {
   // Weight of graph (default value is 1.0)
   private _weight: number;
 
-  constructor(firstNode: Node, secondNode: Node, orientation?: EdgeOrientation, weight?: number) {
+  constructor(firstNode: Node, secondNode: Node, orientation?: EdgeOrientation, weight?: number, label?: string) {
     this._firstNode = firstNode;
     this._secondNode = secondNode;
     this._edgeIndex = EdgeIndex.fromNodes(firstNode, secondNode);
     this._weight = weight ? weight : 1.0; // default value
     this._orientation = orientation ? orientation : EdgeOrientation.ORIENTED; // default value
+    this._label = label ? label : "";
   }
 
   /**

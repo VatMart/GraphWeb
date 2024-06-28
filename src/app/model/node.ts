@@ -9,7 +9,6 @@ export class Node {
 
   /**
    * Label of node. Replace index in representations if set
-   * TODO implement label
    */
   private _label: string = "";
 

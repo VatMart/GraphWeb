@@ -1,5 +1,5 @@
 import {NodeView} from "../../model/graphical-model/node/node-view";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {Command} from "./command";
 
 /**

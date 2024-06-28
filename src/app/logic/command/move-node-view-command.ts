@@ -1,7 +1,7 @@
 import {Point} from "../../utils/graphical-utils";
 import {Command} from "./command";
 import {NodeView} from "../../model/graphical-model/node/node-view";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 
 /**
  * Command to move a node view.

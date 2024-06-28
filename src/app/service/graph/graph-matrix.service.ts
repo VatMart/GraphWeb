@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Graph} from "../model/graph";
-import {Node} from "../model/node";
-import {GraphMatrix, TypeMatrix} from "../model/graph-matrix";
-import {AdjacencyMatrixBuilder, GraphMatrixBuilder, IncidenceMatrixBuilder} from "../logic/matrix/graph-matrix-builder";
-import {Edge} from "../model/edge";
+import {Graph} from "../../model/graph";
+import {Node} from "../../model/node";
+import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
+import {AdjacencyMatrixBuilder, GraphMatrixBuilder, IncidenceMatrixBuilder} from "../../logic/matrix/graph-matrix-builder";
+import {Edge} from "../../model/edge";
 
 /**
  * Service for building matrix; matrix operations.
@@ -53,10 +53,10 @@ export class GraphMatrixService {
 
   private getBuilder(matrixType: TypeMatrix): GraphMatrixBuilder {
     if (matrixType === TypeMatrix.ADJACENCY) {
-      console.log("Building adjacency matrix"); // TODO remove
+      //console.log("Building adjacency matrix"); // TODO remove
       return new AdjacencyMatrixBuilder();
     } else if (matrixType === TypeMatrix.INCIDENCE) {
-      console.log("Building incidence matrix"); // TODO remove
+      //console.log("Building incidence matrix"); // TODO remove
       return new IncidenceMatrixBuilder();
     }
     throw new Error("Matrix type not supported: " + matrixType); // TODO change

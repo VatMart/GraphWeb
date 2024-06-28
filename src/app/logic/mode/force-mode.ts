@@ -1,14 +1,15 @@
 import {PixiService} from "../../service/pixi.service";
-import {EventBusService, HandlerNames} from "../../service/event-bus.service";
+import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {HistoryService} from "../../service/history.service";
-import {GraphViewService} from "../../service/graph-view.service";
-import {StateService} from "../../service/state.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
+import {StateService} from "../../service/event/state.service";
 import {InternalGrid} from "../../model/internal-grid";
 import {ForceNodeView} from "../../model/graphical-model/force-node-view";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {NodeEventHandler} from "../handlers/node-event-handler";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {Point} from "../../utils/graphical-utils";
+import {ConfService} from "../../service/config/conf.service";
 
 /**
  * Submode of 'Default Mode' for applying forces to the graph elements.
@@ -18,22 +19,21 @@ export class ForceMode {
   // use modeOn() and modeOff() methods)
   public static isActive: boolean;
   // Used to remember state of force mode when change default mode on other modes and back
-  public static activatedByUserMemory: boolean = true; // This field is used as default value for force mode
+  public static activatedByUserMemory: boolean = ConfService.DEFAULT_FORCE_MODE_ON; // This field is used as default value for force mode
 
-  // TODO make these properties configurable
-  public centerSpringForceEnabled: boolean = true;
-  public linkSpringForceEnabled: boolean = true;
+  public centerSpringForceEnabled: boolean = ConfService.DEFAULT_CENTER_FORCE_ON;
+  public linkSpringForceEnabled: boolean = ConfService.DEFAULT_LINK_FORCE_ON;
 
   private grid: InternalGrid<NodeView>;
   private forceNodes: Map<NodeView, ForceNodeView>;
 
   // Repulsive force
-  private repulsionConstant: number = 15000;
-  private maxDistance: number = NodeView.DEFAULT_RADIUS * 6; // Maximum distance to apply repulsive force
+  private repulsionConstant: number = ConfService.REPULSIVE_CONSTANT;
+  private maxDistance: number = ConfService.DEFAULT_RADIUS * 6; // Maximum distance to apply repulsive force
   // Center-spring force
-  private springForceConstant: number = 1;
+  private springForceConstant: number = ConfService.SPRING_FORCE_CONSTANT;
   // Link-spring force
-  private linkSpringForceConstant: number = 0.04;
+  private linkSpringForceConstant: number = ConfService.LINK_FORCE_CONSTANT;
 
   // For debugging
   private lastTime: number = 0;
@@ -235,7 +235,7 @@ export class ForceMode {
       const dy = posB.y - posA.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      const restLength = NodeView.DEFAULT_RADIUS * 6; // Desired distance between connected nodes
+      const restLength = ConfService.DEFAULT_RADIUS * 6; // Desired distance between connected nodes
       const springForceMagnitude = this.linkSpringForceConstant * (distance - restLength);
 
       const fx = (dx / distance) * springForceMagnitude;
@@ -267,7 +267,7 @@ export class ForceMode {
     const dy = posB.y - posA.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance === 0 || distance > this.maxDistance) return; // Skip if distance is zero or greater than maxDistance
-    const minimumDistance = NodeView.DEFAULT_RADIUS * 2; // Minimum distance to prevent nodes from getting too close
+    const minimumDistance = ConfService.DEFAULT_RADIUS * 2; // Minimum distance to prevent nodes from getting too close
     const clampedDistance = Math.max(distance, minimumDistance);
     const forceMagnitude = this.repulsionConstant / (clampedDistance * clampedDistance); // Adjust the force calculation
     const fx = (dx / clampedDistance) * forceMagnitude;
@@ -294,8 +294,8 @@ export class ForceMode {
    */
   private calculateEquilibriumDistance(draggedNodes?: NodeView[]): number {
     const totalNodes = draggedNodes ? this.forceNodes.size - draggedNodes.length : this.forceNodes.size;
-    const nodeRadius = NodeView.DEFAULT_RADIUS; // Assuming NodeView has a DEFAULT_RADIUS
-    const minimumDistance = NodeView.DEFAULT_RADIUS * 4; // Minimum distance between nodes to prevent overlap
+    const nodeRadius = ConfService.DEFAULT_RADIUS; // Assuming NodeView has a DEFAULT_RADIUS
+    const minimumDistance = ConfService.DEFAULT_RADIUS * 4; // Minimum distance between nodes to prevent overlap
     // Calculate the required area for each node including its minimum spacing
     const areaPerNode = (2 * nodeRadius + minimumDistance) ** 2;
     // Calculate the total area needed for all nodes

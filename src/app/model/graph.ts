@@ -1,6 +1,7 @@
 import {Edge} from "./edge";
 import {Node} from "./node";
 import {GraphOrientation} from "./orientation";
+import {ConfService} from "../service/config/conf.service";
 
 /**
  * Model of graph
@@ -21,7 +22,7 @@ export class Graph {
     if (orientation) {
       this._orientation = orientation;
     } else {
-      this._orientation = GraphOrientation.ORIENTED; // default orientation TODO MOVE TO Property service
+      this._orientation = ConfService.DEFAULT_GRAPH_ORIENTATION; // default orientation
     }
   }
 

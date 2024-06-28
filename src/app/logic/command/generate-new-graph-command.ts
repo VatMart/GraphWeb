@@ -1,7 +1,7 @@
 import {Command} from "./command";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 import {Graph} from "../../model/graph";
 import {GraphOrientation} from "../../model/orientation";
 

@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {Graphics, Rectangle, RenderTexture, Text, Texture} from "pixi.js";
-import {Graph} from "../model/graph";
-import {NodeView} from "../model/graphical-model/node/node-view";
-import {Edge} from "../model/edge";
-import {EdgeStyle, EdgeView} from "../model/graphical-model/edge/edge-view";
-import {AbstractGraphElementFabric} from "../model/graphical-model/abstract-graph-element-fabric";
-import {Weight, WeightStyle} from "../model/graphical-model/edge/weight";
-import {PixiService} from "./pixi.service";
-import {EdgeOrientation, GraphOrientation} from "../model/orientation";
+import {Graph} from "../../model/graph";
+import {NodeView} from "../../model/graphical-model/node/node-view";
+import {Edge} from "../../model/edge";
+import {EdgeStyle, EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {AbstractGraphElementFabric} from "../../model/graphical-model/abstract-graph-element-fabric";
+import {Weight, WeightStyle} from "../../model/graphical-model/edge/weight";
+import {PixiService} from "../pixi.service";
+import {EdgeOrientation, GraphOrientation} from "../../model/orientation";
+import {ConfService} from "../config/conf.service";
 
 /**
  * Fabric for creating edge views.
@@ -109,7 +110,7 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
 
   private calculateWeightHitArea(weightView: Weight): Rectangle {
     const weightViewBounds = weightView.getLocalBounds();
-    const hitAreaPadding = Math.round(EdgeView.HIT_AREA_PADDING/2);
+    const hitAreaPadding = Math.round(ConfService.EDGE_HIT_AREA_PADDING/2);
     return new Rectangle(weightViewBounds.x - hitAreaPadding, weightViewBounds.y - hitAreaPadding,
       weightViewBounds.width + hitAreaPadding*2, weightViewBounds.height + hitAreaPadding*2);
   }

@@ -1,11 +1,9 @@
 import {Sprite, Text} from "pixi.js";
 import {GraphicalUtils, Point} from "../../../utils/graphical-utils";
 import {TextStyleFontWeight} from "pixi.js/lib/scene/text/TextStyle";
+import {ConfService} from "../../../service/config/conf.service";
 
 export class Weight extends Sprite {
-
-  public static readonly MAX_WEIGHT: number = 1000;
-  public static readonly MIN_WEIGHT: number = 1;
 
   private _value: number;
 
@@ -18,7 +16,7 @@ export class Weight extends Sprite {
     this.anchor.set(0.5);
     this._value = value;
     this._text = new Text({text: value.toString(), anchor: 0.5});
-    this._weightStyle = weightStyle ? weightStyle : DEFAULT_WEIGHT_STYLE;
+    this._weightStyle = weightStyle ? weightStyle : ConfService.DEFAULT_WEIGHT_STYLE;
     this.interactive = true;
     this.applyTextStyle(this._weightStyle.text);
     this.addChild(this.text);
@@ -55,7 +53,7 @@ export class Weight extends Sprite {
     this.applyTextStyle(value.text);
   }
 
-  applyTextStyle(textStyle: TextStyle): void {
+  applyTextStyle(textStyle: WeightTextStyle): void {
     this._text.style = {
       fill: textStyle.labelColor,
       fontSize: textStyle.size,
@@ -65,42 +63,14 @@ export class Weight extends Sprite {
   }
 }
 
-export const DEFAULT_TEXT_STYLE: TextStyle = {
-  size: 20,
-  labelColor: 'black',
-  labelFontFamily: 'Nunito Sans',
-  labelFontWeight: 'bold'
-}
-
-export const SELECTED_TEXT_STYLE: TextStyle = {
-  size: 20,
-  labelColor: '#006FFF',
-  labelFontFamily: 'Nunito Sans',
-  labelFontWeight: 'bold'
-}
-
-export const DEFAULT_WEIGHT_STYLE: WeightStyle = {
-  color: 'white',
-  strokeWidth: 4,
-  strokeColor: 'black',
-  text: DEFAULT_TEXT_STYLE
-}
-
-export const SELECTED_WEIGHT_STYLE: WeightStyle = {
-  color: 'white',
-  strokeWidth: 5,
-  strokeColor: '#006FFF',
-  text: SELECTED_TEXT_STYLE
-}
-
 export interface WeightStyle {
   color: string;
   strokeWidth: number;
   strokeColor: string;
-  text: TextStyle;
+  text: WeightTextStyle;
 }
 
-export interface TextStyle {
+export interface WeightTextStyle {
   size: number;
   labelColor: string;
   labelFontFamily: string;

@@ -1,7 +1,7 @@
 import {FederatedPointerEvent} from "pixi.js";
 import {PixiService} from "../../service/pixi.service";
-import {EventBusService, HandlerNames} from "../../service/event-bus.service";
-import {StateService} from "../../service/state.service";
+import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {StateService} from "../../service/event/state.service";
 import {InitializationError} from "../../error/initialization-error";
 import Hammer from "hammerjs";
 import {Subscription} from "rxjs";
@@ -10,7 +10,7 @@ import {GraphicalUtils, Point, Rectangle} from "../../utils/graphical-utils";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {SelectRectangle} from "../../model/graphical-model/select-rectangle";
-import {GraphViewService} from "../../service/graph-view.service";
+import {GraphViewService} from "../../service/graph/graph-view.service";
 
 /**
  * Class for handling events on the canvas. Should be used after pixi canvas is initialized.

@@ -3,6 +3,7 @@ import {Graphics, Sprite, Text, Texture} from "pixi.js";
 import {Point} from "../../../utils/graphical-utils";
 import {Node} from "../../node";
 import {GraphElement} from "../graph-element";
+import {ConfService} from "../../../service/config/conf.service";
 
 /**
  * Graphical representation of node
@@ -17,12 +18,10 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
   private _text: Text;
 
   // Properties of circle of vertex
-  private _nodeStyle: NodeStyle = DEFAULT_NODE_STYLE;
+  private _nodeStyle: NodeStyle = ConfService.DEFAULT_NODE_STYLE;
   // Properties for label
   private _labelText: string;
-  private labelStyle: NodeLabelStyle = DEFAULT_NODE_LABEL_STYLE;
-
-  public static readonly DEFAULT_RADIUS = 30; // TODO move to constants
+  private labelStyle: NodeLabelStyle = ConfService.DEFAULT_NODE_LABEL_STYLE;
 
   public static createFromTexture(node: Node, coordinates: Point, radius: number, texture: Texture): NodeView {
     let nodeGraphical = new NodeView(node, coordinates, radius, texture);
@@ -34,7 +33,7 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
 
   private constructor(node: Node, coordinates: Point, radius: number, texture: Texture) {
     super(texture);
-    this.hitArea = new PIXI.Circle(this.width / 2, this.height / 2, NodeView.DEFAULT_RADIUS);
+    this.hitArea = new PIXI.Circle(this.width / 2, this.height / 2, radius);
     this._node = node;
     this._coordinates = coordinates;
     this._labelText = node.label ? node.label : node.index.toString();
@@ -111,25 +110,6 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this.move();
   }
 }
-
-export const DEFAULT_NODE_STYLE: NodeStyle = {
-  fillNode: '#FFFFFF',
-  strokeColor: '#000000',
-  strokeWidth: 3
-};
-
-export const DEFAULT_NODE_LABEL_STYLE: NodeLabelStyle = {
-  labelColor: '#000000',
-  labelFontSize: 24,
-  labelFontFamily: 'Nunito Sans',
-  labelFontWeight: 'bold'
-};
-
-export const SELECTED_NODE_STYLE: NodeStyle = {
-  fillNode: DEFAULT_NODE_STYLE.fillNode,
-  strokeColor: '#006FFF',
-  strokeWidth: DEFAULT_NODE_STYLE.strokeWidth + 1
-};
 
 export interface NodeStyle {
   fillNode: string;

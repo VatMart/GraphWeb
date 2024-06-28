@@ -4,16 +4,14 @@ import {GraphicalUtils, Point} from "../../../utils/graphical-utils";
 import {NodeView} from "../node/node-view";
 import {Graphics, Polygon} from "pixi.js";
 import {EdgeOrientation} from "../../orientation";
-import {Arrow, ArrowStyle, DEFAULT_ARROW_STYLE, SELECTED_ARROW_STYLE} from "./arrow";
-import {DEFAULT_WEIGHT_STYLE, SELECTED_WEIGHT_STYLE, Weight, WeightStyle} from "./weight";
+import {Arrow, ArrowStyle} from "./arrow";
+import {Weight, WeightStyle} from "./weight";
+import {ConfService} from "../../../service/config/conf.service";
 
 /**
  * Graphical representation of edge
  */
 export class EdgeView extends Graphics implements GraphElement {
-
-  // Default value for showing weight of edge
-  public static SHOW_WEIGHT: boolean; // Default value sets via event handling
 
   // Math model
   private _edge: Edge;
@@ -21,7 +19,7 @@ export class EdgeView extends Graphics implements GraphElement {
   // Representation of arrow, if edge is oriented
   private arrow: Arrow | undefined;
   private _weightView: Weight;
-  private _weightVisible: boolean = EdgeView.SHOW_WEIGHT;
+  private _weightVisible: boolean = ConfService.SHOW_WEIGHT;
 
   private _startNode: NodeView;
   private _endNode: NodeView;
@@ -29,12 +27,10 @@ export class EdgeView extends Graphics implements GraphElement {
   private _startCoordinates: Point;
   private _endCoordinates: Point;
 
-  private _edgeStyle: EdgeStyle = DEFAULT_EDGE_STYLE;
-
-  public static HIT_AREA_PADDING: number = 15;
+  private _edgeStyle: EdgeStyle = ConfService.DEFAULT_EDGE_STYLE;
 
   public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView) : EdgeView {
-    let edgeGraphical = new EdgeView(edge, startNode, endNode, DEFAULT_EDGE_STYLE);
+    let edgeGraphical = new EdgeView(edge, startNode, endNode, ConfService.DEFAULT_EDGE_STYLE);
     edgeGraphical.interactive = true;
     edgeGraphical.move();
     return edgeGraphical;
@@ -85,7 +81,7 @@ export class EdgeView extends Graphics implements GraphElement {
    * Hit area should be larger than the edge itself, so it is easier to click on it.
    */
   private calculateHitArea(startPoint: Point, endPoint: Point) {
-    const padding = EdgeView.HIT_AREA_PADDING;
+    const padding = ConfService.EDGE_HIT_AREA_PADDING;
     // Calculate the direction vector
     const dx = endPoint.x - startPoint.x;
     const dy = endPoint.y - startPoint.y;
@@ -225,20 +221,6 @@ export class EdgeView extends Graphics implements GraphElement {
     this.move();
   }
 }
-
-export const DEFAULT_EDGE_STYLE: EdgeStyle = {
-  strokeColor: '#000000',
-  strokeWidth: 8,
-  arrow: DEFAULT_ARROW_STYLE,
-  weight: DEFAULT_WEIGHT_STYLE
-};
-
-export const SELECTED_EDGE_STYLE: EdgeStyle = {
-  strokeColor: '#006FFF',
-  strokeWidth: 10,
-  arrow: SELECTED_ARROW_STYLE,
-  weight: SELECTED_WEIGHT_STYLE
-};
 
 export interface EdgeStyle {
   strokeColor: string;

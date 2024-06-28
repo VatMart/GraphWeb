@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {GraphMatrix} from "../model/graph-matrix";
-import {GraphModelBuilder} from "../logic/graph-model-builder";
-import {Graph} from "../model/graph";
+import {GraphMatrix} from "../../model/graph-matrix";
+import {GraphModelBuilder} from "../../logic/graph-model-builder";
+import {Graph} from "../../model/graph";
 import {GraphModelService} from "./graph-model.service";
-import {GraphSets} from "../model/graph-set";
+import {GraphSets} from "../../model/graph-set";
 
 /**
  * Service for generating graph model from different inputs.
