@@ -114,8 +114,22 @@ export class ConfService {
 
   // Node properties
   public static DEFAULT_RADIUS = 30;
+  public static MIN_NODE_RADIUS = 15;
+  public static MAX_NODE_RADIUS = 60;
+  // Node stroke
+  public static MIN_NODE_STROKE_WIDTH = 1;
+  public static MAX_NODE_STROKE_WIDTH = 10;
+  // Node label
+  public static MIN_NODE_LABEL_FONT_SIZE = 12;
+  public static MAX_NODE_LABEL_FONT_SIZE = 36;
 
   // Edge properties
+  public static MIN_EDGE_STROKE_WIDTH = 3;
+  public static MAX_EDGE_STROKE_WIDTH = 18;
+  public static MIN_ARROW_SIZE = 15;
+  public static MAX_ARROW_SIZE = 40;
+  public static MIN_WEIGHT_SIZE = 10;
+  public static MAX_WEIGHT_SIZE = 40;
   public static EDGE_HIT_AREA_PADDING: number = 15;
   // Default value for showing weight of edge
   public static SHOW_WEIGHT: boolean = true; // Default value sets via event handling

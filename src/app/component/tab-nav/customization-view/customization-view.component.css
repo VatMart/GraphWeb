@@ -1,0 +1,149 @@
+.customization-view-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.customization-tabview {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 6px;
+  margin-block: 0 18px;
+}
+
+.customization-tabview-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.color-pick-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: center;
+  margin-bottom: 4px;
+}
+
+.color-pick-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-block: 4px;
+}
+
+.subheader-label {
+  color: black;
+  font-weight: bold;
+  padding-left: 4px;
+  padding-bottom: 6px;
+}
+
+.customization-label {
+  color: black;
+  min-width: 60px;
+  padding-right: 4px;
+}
+
+.color-picker {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid var(--main-blue-light-color);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  padding: 1px;
+}
+
+.color-picker:hover {
+  border: 2px solid var(--main-blue-color);
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+}
+
+.color-picker::-moz-color-swatch {
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+}
+
+.size-pick-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-block: 4px;
+}
+
+.custom-slider {
+  flex: 1;
+  margin-left: 8px;
+}
+
+.custom-input-number {
+  margin-left: 8px;
+}
+
+.property-pick-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 40px;
+}
+
+.overlay-container {
+  display: flex;
+  flex-direction: column;
+  padding-block: 4px;
+}
+
+.info-button {
+  margin-left: 4px;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.info-button:hover {
+  color: var(--main-blue-color);
+  background-color: var(--main-hover-color);
+}
+
+.info-button:active {
+  color: var(--main-blue-light-color);
+  background-color: var(--main-hover-color);
+}
+
+.separator {
+  display: block;
+  width: auto;
+  height: 1px;
+  background-color: var(--main-border-color);
+  margin: 0 8px 8px 8px;
+}
+
+.button-panel {
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.apply-changes-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.unsaved-changes-tag {
+  padding-right: 4px;
+}

@@ -34,6 +34,7 @@ export class CanvasComponent implements AfterViewInit {
   }
 
   async ngAfterViewInit(): Promise<void> {
+    await document.fonts.ready; // Wait for fonts to load
     // Start PIXI after the view canvas container is initialized
     await this.pixiManager.startPixi();
     // Resize canvas on container resize
