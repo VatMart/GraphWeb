@@ -10,6 +10,7 @@ import {SvgIconService} from "../../service/svg-icon.service";
 import {SvgIconDirective} from "../../directive/svg-icon.directive";
 import {Sidebar, SidebarModule} from "primeng/sidebar";
 import {InputViewComponent} from "./input-view/input-view.component";
+import {CustomizationViewComponent} from "./customization-view/customization-view.component";
 
 /**
  * Component for the tab navigation.
@@ -20,7 +21,7 @@ import {InputViewComponent} from "./input-view/input-view.component";
   selector: 'app-tab-nav',
   standalone: true,
   imports: [CommonModule, NgClass, NgIf, NgForOf, OutputViewComponent, TabMenuModule, RippleModule,
-    SvgIconDirective, SidebarModule, InputViewComponent],
+    SvgIconDirective, SidebarModule, InputViewComponent, CustomizationViewComponent],
   templateUrl: './tab-nav.component.html',
   styleUrl: './tab-nav.component.css'
 })
@@ -60,8 +61,8 @@ export class TabNavComponent implements OnInit {
       {label: 'Output', id: 'output', icon: 'matrix-icon', header: 'Graph output', customIcon: true},
       {label: 'Input', id: 'input', icon: 'pi pi-pen-to-square', header: 'Input graph data'},
       {label: 'Algorithms', id: 'algorithms', icon: 'algorithm-icon', header: 'Graph algorithms', customIcon: true},
-      {label: 'Generate graph', id: 'generation', icon: 'pi pi-wrench', header: 'Graph generation'},
-      {label: 'Customization', id: 'customization', icon: 'pi pi-palette', header: 'Graph customization'}
+      {label: 'Customization', id: 'customization', icon: 'pi pi-palette', header: 'Graph customization'},
+      {label: 'Generate graph', id: 'generation', icon: 'pi pi-wrench', header: 'Graph generation'}
     ];
   }
 

@@ -35,8 +35,9 @@
         </div>
         <div class="content-separator"></div>
         <div class="left-side-content" #desktopSidebarContent>
-        <app-output-view *ngIf="activeIndex === 0"/>
-        <app-input-view *ngIf="activeIndex === 1"/>
+          <app-output-view *ngIf="activeIndex === 0"/>
+          <app-input-view *ngIf="activeIndex === 1"/>
+          <app-customization-view *ngIf="activeIndex === 3"/>
         </div>
       </div>
     </div>
@@ -81,6 +82,7 @@
         <div class="mobile-sidebar-content" #mobileSidebarContent>
           <app-output-view *ngIf="activeItem?.id === 'output'"/>
           <app-input-view *ngIf="activeItem?.id === 'input'"/>
+          <app-customization-view *ngIf="activeItem?.id === 'customization'"/>
         </div>
       </div>
     </ng-template>
