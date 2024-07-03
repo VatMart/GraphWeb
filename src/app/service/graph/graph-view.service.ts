@@ -16,6 +16,8 @@ import {
 } from "../../component/canvas/float-helper/float-helper.component";
 import {DefaultGraphViewGenerator} from "../../logic/graph-view-generator/default-graph-view-generator";
 import {ConfService} from "../config/conf.service";
+import {GraphView} from "../../model/graphical-model/graph/graph-view";
+import {DynamicRadius} from "../../model/graphical-model/node/radius";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -25,13 +27,8 @@ import {ConfService} from "../config/conf.service";
 })
 export class GraphViewService extends GraphModelService {
 
-  // TODO Create separate class for storing graph elements
-  private _nodeViews: Map<number, NodeView> = new Map<number, NodeView>(); // key is the node index
-
-  private _edgeViews: Map<string, EdgeView> = new Map<string, EdgeView>(); // key is the edge index
-
   // TODO Add support for multiple graphs
-  private _currentGraph: Graph | undefined;
+  private _currentGraphView: GraphView | undefined;
 
   private _selectedElements: GraphElement[] = [];
 
@@ -46,11 +43,11 @@ export class GraphViewService extends GraphModelService {
    * Adds a node to the graph and the graph view.
    * All other methods for adding nodes should call this method.
    */
-  public addNodeToGraphView(graph: Graph, nodeView: NodeView, callModel: boolean = true) {
+  public addNodeToGraphView(graphView: GraphView, nodeView: NodeView, callModel: boolean = true) {
     if (callModel) {
-      super.addNodeToGraph(graph, nodeView.node);
+      super.addNodeToGraph(graphView.graph, nodeView.node);
     }
-    this._nodeViews.set(nodeView.node.index, nodeView);
+    this.nodeViews.set(nodeView.node.index, nodeView);
     this.pixiService.mainContainer.addChild(nodeView); // TODO Add container, not the node itself
     this.stateService.addedNode(nodeView); // Notify state service
     console.log("Added node to graph: " + nodeView.node.index); // TODO remove
@@ -60,15 +57,15 @@ export class GraphViewService extends GraphModelService {
    * Removes a node from the graph and the graph view.
    * All other methods for removing nodes should call this method.
    */
-  public removeNodeFromGraphView(graph: Graph, nodeView: NodeView) {
+  public removeNodeFromGraphView(graphView: GraphView, nodeView: NodeView) {
     if (this._selectedElements.includes(nodeView)) { // remove from selected elements
       this.unselectElement(nodeView);
     }
     // Remove adjacent edges
-    this.removeAdjacentEdges(graph, nodeView);
-    this._nodeViews.delete(nodeView.node.index);
+    this.removeAdjacentEdges(graphView, nodeView);
+    this.nodeViews.delete(nodeView.node.index);
     this.pixiService.mainContainer.removeChild(nodeView);
-    super.removeNodeFromGraph(graph, nodeView.node); // Should be called after removing from view
+    super.removeNodeFromGraph(graphView.graph, nodeView.node); // Should be called after removing from view
     this.stateService.deletedNode(nodeView); // Notify state service
     console.log("Removed node from graph: " + nodeView.node.index); // TODO remove
   }
@@ -77,12 +74,17 @@ export class GraphViewService extends GraphModelService {
    * Adds an edge to the graph and the graph view.
    * All other methods for adding edges should call this method.
    */
-  public addEdgeToGraphView(graph: Graph, edgeView: EdgeView, callModel: boolean = true) {
+  public addEdgeToGraphView(graphView: GraphView, edgeView: EdgeView, callModel: boolean = true) {
     if (callModel) {
-      super.addEdgeToGraph(graph, edgeView.edge);
+      super.addEdgeToGraph(graphView.graph, edgeView.edge);
     }
-    this._edgeViews.set(edgeView.edge.edgeIndex.value, edgeView);
+    this.edgeViews.set(edgeView.edge.edgeIndex.value, edgeView);
     this.pixiService.mainContainer.addChild(edgeView); // TODO Add container, not the edge itself
+    if (ConfService.DYNAMIC_NODE_SIZE) {
+      // Resize nodes
+      this.updateRadiusNodes(edgeView.startNode);
+      this.updateRadiusNodes(edgeView.endNode);
+    }
     this.stateService.addedEdge(edgeView); // Notify state service
     console.log("Added edge to graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
@@ -91,13 +93,18 @@ export class GraphViewService extends GraphModelService {
    * Removes an edge from the graph and the graph view.
    * All other methods for removing edges should call this method.
    */
-  public removeEdgeFromGraphView(graph: Graph, edgeView: EdgeView) {
+  public removeEdgeFromGraphView(graphView: GraphView, edgeView: EdgeView) {
     if (this.isElementSelected(edgeView)) { // remove from selected elements
       this.unselectElement(edgeView);
     }
-    this._edgeViews.delete(edgeView.edge.edgeIndex.value);
+    this.edgeViews.delete(edgeView.edge.edgeIndex.value);
     this.pixiService.mainContainer.removeChild(edgeView);
-    super.removeEdgeFromGraph(graph, edgeView.edge); // Should be called after removing from view
+    super.removeEdgeFromGraph(graphView.graph, edgeView.edge); // Should be called after removing from view
+    if (ConfService.DYNAMIC_NODE_SIZE) {
+      // Resize nodes
+      this.updateRadiusNodes(edgeView.startNode);
+      this.updateRadiusNodes(edgeView.endNode);
+    }
     this.stateService.deletedEdge(edgeView); // Notify state service
     console.log("Removed edge from graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
@@ -106,39 +113,40 @@ export class GraphViewService extends GraphModelService {
    * Clears all elements from the graph view.
    * All other methods for clearing elements should call this method.
    */
-  public clearAllElementsView(graph: Graph) {
+  public clearAllElementsView(graphView: GraphView) {
     this.clearSelection();
-    this._edgeViews.forEach((edgeView: EdgeView) => {
+    this.edgeViews.forEach((edgeView: EdgeView) => {
       this.pixiService.mainContainer.removeChild(edgeView);
     });
-    this._nodeViews.forEach((nodeView: NodeView) => {
+    this.nodeViews.forEach((nodeView: NodeView) => {
+      nodeView.node.clearEdges();
       this.pixiService.mainContainer.removeChild(nodeView);
     });
-    this._nodeViews.clear();
-    this._edgeViews.clear();
-    super.clearAllElements(graph);
+    this.nodeViews.clear();
+    this.edgeViews.clear();
+    super.clearAllElements(graphView.graph);
     console.log("Cleared all elements from graph view"); // TODO remove
   }
 
   /**
    * Populates the graph view of the given graph with node views and edge views.
    */
-  public populateGraphView(graph: Graph, nodeViews: NodeView[], edgeViews: EdgeView[], callModel: boolean = true) {
+  public populateGraphView(graphView: GraphView, nodeViews: NodeView[], edgeViews: EdgeView[], callModel: boolean = true) {
     nodeViews.forEach((nodeView: NodeView) => {
-      this.addNodeToGraphView(graph, nodeView, callModel);
+      this.addNodeToGraphView(graphView, nodeView, callModel);
     });
     edgeViews.forEach((edgeView: EdgeView) => {
-      this.addEdgeToGraphView(graph, edgeView, callModel);
+      this.addEdgeToGraphView(graphView, edgeView, callModel);
     });
   }
 
   /**
-   * Moves the given node view to the given point.
+   * Moves the given node view to the given point and updates adjacent edges positions.
    */
   public moveNodeView(nodeView: NodeView, point: Point) {
     nodeView.coordinates = point; // Move node (called move() inside setter)
     // Move adjacent edges
-    let adjacentEdges: EdgeView[] = this.getAdjacentEdgeViews(this.currentGraph, nodeView);
+    let adjacentEdges: EdgeView[] = this.getAdjacentEdgeViews(this.currentGraphView, nodeView);
     adjacentEdges.forEach((edgeView: EdgeView) => {
       edgeView.move(); // Move edge
     });
@@ -157,8 +165,8 @@ export class GraphViewService extends GraphModelService {
   /**
    * Changes the graph orientation.
    */
-  public changeGraphOrientation(graph: Graph, orientation: GraphOrientation) {
-    graph.orientation = orientation;
+  public changeGraphOrientation(graphView: GraphView, orientation: GraphOrientation) {
+    graphView.graph.orientation = orientation; // TODO call model service method
     console.log("Graph orientation changed: " + orientation); // TODO remove
     if (orientation === GraphOrientation.MIXED) { // If mixed, do not change edge orientations
       this.stateService.graphOrientationChanged(orientation);
@@ -178,25 +186,12 @@ export class GraphViewService extends GraphModelService {
   }
 
   /**
-   * Changes the visibility of the edge weights. Changes the visibility of all edge weights and default value
-   * for new edges.
-   */
-  public changeEdgeWeightsVisibility(visible: boolean) {
-    ConfService.SHOW_WEIGHT = visible;
-    this.edgeViews.forEach((edgeView: EdgeView) => {
-      if (edgeView.weightVisible !== visible) {
-        edgeView.changeWeightVisible(visible);
-      }
-    });
-  }
-
-  /**
    * Returns the edge views adjacent to the given node view.
    */
-  public getAdjacentEdgeViews(graph: Graph, nodeView: NodeView): EdgeView[] {
+  public getAdjacentEdgeViews(graphView: GraphView, nodeView: NodeView): EdgeView[] {
     let edges: EdgeView[] = [];
     nodeView.node.getAdjacentEdges().forEach((edgeIndex: string) => {
-      const edgeView = this._edgeViews.get(edgeIndex);
+      const edgeView = this.edgeViews.get(edgeIndex);
       if (edgeView) {
         edges.push(edgeView);
       }
@@ -206,12 +201,21 @@ export class GraphViewService extends GraphModelService {
 
   // ------------------ Graph view creation ------------------
   /**
+   * Create empty graph view.
+   * Should be called as soon PixiCanvas is started
+   */
+  public initializeGraphView(): void {
+    const graph = new Graph();
+    this.currentGraphView = new GraphView(graph);
+  }
+
+  /**
    * Generate graph view from graph model.
    * Deletes old graph view and creates new one.
    */
   public generateGraphView(newGraph: Graph): void {
     // Clear old graph view elements from canvas and memory
-    this.clearAllElementsView(this.currentGraph);
+    this.clearAllElementsView(this.currentGraphView);
     // Replace current graph with new one
     this.currentGraph = newGraph;
     // Create new graph view elements by default generator
@@ -220,10 +224,11 @@ export class GraphViewService extends GraphModelService {
     const result = generator.generateGraphViewElements(newGraph);
     const nodeViews = result.nodes;
     const edgeViews = result.edges;
+    const graphView = new GraphView(newGraph);
     // Populate graph view with new elements
-    this.populateGraphView(newGraph, nodeViews, edgeViews, false); // Do not call model service methods, because it is already called
+    this.populateGraphView(graphView, nodeViews, edgeViews, false); // Do not call model service methods, because it is already called
     console.log("Graph orientation: " + newGraph.orientation);
-    this.changeGraphOrientation(newGraph, newGraph.orientation); // Change orientation (to update state on UI)
+    this.changeGraphOrientation(graphView, newGraph.orientation); // Change orientation (to update state on UI)
     this.stateService.graphViewGenerated(); // Notify state service about graph view generation
   }
 
@@ -245,9 +250,11 @@ export class GraphViewService extends GraphModelService {
       return; // Element already selected
     }
     if (element instanceof NodeView) {
-      this.nodeFabric.changeToStyle(element, ConfService.SELECTED_NODE_STYLE);
+      this.nodeFabric.changeToStyleAndSave(element, ConfService.SELECTED_GRAPH_STYLE(element).nodeStyle);
+      this.moveNodeView(element, element.coordinates);
     } else if (element instanceof EdgeView) {
-      this.edgeFabric.changeToStyle(element, ConfService.SELECTED_EDGE_STYLE);
+      this.edgeFabric.changeToStyleAndSave(element, ConfService.SELECTED_GRAPH_STYLE(undefined, element)
+        .edgeStyle);
       this.stateService.changeFloatHelperItem(EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM); // Change float helper item
     }
   }
@@ -264,7 +271,8 @@ export class GraphViewService extends GraphModelService {
       return;
     }
     if (element instanceof NodeView) {
-      this.nodeFabric.changeToPreviousStyle(element);
+      this.nodeFabric.changeToStyleAndSave(element, element.nodeStyle);
+      this.moveNodeView(element, element.coordinates);
     } else if (element instanceof EdgeView) {
       this.edgeFabric.changeToPreviousStyle(element);
       // TODO Create helperService to manage helper items
@@ -278,7 +286,8 @@ export class GraphViewService extends GraphModelService {
   public clearSelection() {
     this._selectedElements.forEach((element: GraphElement) => {
       if (element instanceof NodeView) {
-        this.nodeFabric.changeToPreviousStyle(element);
+        this.nodeFabric.changeToStyleAndSave(element, element.nodeStyle);
+        this.moveNodeView(element, element.coordinates);
       } else if (element instanceof EdgeView) {
         this.edgeFabric.changeToPreviousStyle(element);
       }
@@ -294,10 +303,26 @@ export class GraphViewService extends GraphModelService {
     return this._selectedElements.length === 0;
   }
 
-  private removeAdjacentEdges(graph: Graph, nodeView: NodeView) {
-    let adjacentEdges: EdgeView[] = this.getAdjacentEdgeViews(graph, nodeView);
+  private removeAdjacentEdges(graphView: GraphView, nodeView: NodeView) {
+    let adjacentEdges: EdgeView[] = this.getAdjacentEdgeViews(graphView, nodeView);
     adjacentEdges.forEach((edgeView: EdgeView) => {
-      this.removeEdgeFromGraphView(graph, edgeView);
+      this.removeEdgeFromGraphView(graphView, edgeView);
+    });
+  }
+
+  /**
+   * Updates the radius of the nodes connected by the given edge.
+   * Should be called when node radius is changed. Or on each remove/add edge when dynamic node size is enabled.
+   */
+  public updateRadiusNodes(node: NodeView) {
+    if (node.nodeStyle.radius instanceof DynamicRadius) {
+      node.nodeStyle.radius.adjEdges = node.node.getAdjacentEdges().length;
+    }
+    this.nodeFabric.updateTexture(node);
+    // Adjust position of edges
+    let nodeAdjacentEdges = this.getAdjacentEdgeViews(this.currentGraphView, node);
+    nodeAdjacentEdges.forEach((edgeView: EdgeView) => {
+      edgeView.move();
     });
   }
 
@@ -306,18 +331,26 @@ export class GraphViewService extends GraphModelService {
   }
 
   get nodeViews(): Map<number, NodeView> {
-    return this._nodeViews;
+    return this._currentGraphView!.nodeViews;
   }
 
   get edgeViews(): Map<string, EdgeView> {
-    return this._edgeViews;
+    return this._currentGraphView!.edgeViews;
   }
 
   get currentGraph(): Graph {
-    return <Graph>this._currentGraph;
+    return <Graph>this._currentGraphView?.graph;
   }
 
   set currentGraph(value: Graph) {
-    this._currentGraph = value;
+    this._currentGraphView!.graph = value;
+  }
+
+  get currentGraphView(): GraphView {
+    return <GraphView>this._currentGraphView;
+  }
+
+  set currentGraphView(value: GraphView) {
+    this._currentGraphView = value;
   }
 }

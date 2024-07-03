@@ -155,7 +155,9 @@ export class CanvasEventHandler {
     // Resize canvas on UI change
     this.subscriptions.add(
       this.stateService.needResizeCanvas$.subscribe(value => {
-        this.handlerResizeCanvas();
+        if (value) {
+          this.handlerResizeCanvas();
+        }
       })
     );
     // Zoom to a specific percentage on call from UI

@@ -12,11 +12,11 @@ export class AddEdgeViewCommand implements Command {
   }
 
   execute(): void {
-    this.graphService.addEdgeToGraphView(this.graphService.currentGraph, this.edge);
+    this.graphService.addEdgeToGraphView(this.graphService.currentGraphView, this.edge);
   }
 
   undo(): void {
-    this.graphService.removeEdgeFromGraphView(this.graphService.currentGraph, this.edge);
+    this.graphService.removeEdgeFromGraphView(this.graphService.currentGraphView, this.edge);
   }
 
   redo(): void {

@@ -11,11 +11,11 @@ export class RemoveEdgeViewCommand implements Command {
               private edge: EdgeView) {
   }
   execute(): void {
-    this.graphService.removeEdgeFromGraphView(this.graphService.currentGraph, this.edge);
+    this.graphService.removeEdgeFromGraphView(this.graphService.currentGraphView, this.edge);
   }
 
   undo(): void {
-    this.graphService.addEdgeToGraphView(this.graphService.currentGraph, this.edge);
+    this.graphService.addEdgeToGraphView(this.graphService.currentGraphView, this.edge);
   }
 
   redo(): void {

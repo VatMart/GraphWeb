@@ -17,11 +17,11 @@ export class ClearGraphViewCommand implements Command {
   }
 
   execute(): void {
-    this.graphService.clearAllElementsView(this.graphService.currentGraph);
+    this.graphService.clearAllElementsView(this.graphService.currentGraphView);
   }
 
   undo(): void {
-    this.graphService.populateGraphView(this.graphService.currentGraph, this.nodes, this.edges)
+    this.graphService.populateGraphView(this.graphService.currentGraphView, this.nodes, this.edges)
   }
 
   redo(): void {

@@ -88,7 +88,7 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
   private onForceToggleButton(state: boolean) : boolean {
     this.items[1].isActive = state; // Toggle the active state
     const isActive: boolean = state;
-
+    this.cdr.detectChanges(); // Need to detect on init state of components
     // Force toggle the icon gradient fill using temporary removal and re-addition (needed for mobile version)
     const svgIconContainer = document.getElementById('icon-1');
     const svgIcon = svgIconContainer?.querySelector('svg path');

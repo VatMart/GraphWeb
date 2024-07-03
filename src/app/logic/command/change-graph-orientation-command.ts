@@ -22,11 +22,11 @@ export class ChangeGraphOrientationCommand implements Command {
     }
   }
   execute(): void {
-    this.graphService.changeGraphOrientation(this.graphService.currentGraph, this.orientation);
+    this.graphService.changeGraphOrientation(this.graphService.currentGraphView, this.orientation);
   }
 
   undo(): void {
-    this.graphService.changeGraphOrientation(this.graphService.currentGraph, this._previousOrientation);
+    this.graphService.changeGraphOrientation(this.graphService.currentGraphView, this._previousOrientation);
     // Only if the graph is mixed, restore the edge orientations
     if (this._previousOrientation === GraphOrientation.MIXED && this._edgeOrientations.size > 0) {
 

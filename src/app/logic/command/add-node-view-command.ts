@@ -15,11 +15,11 @@ export class AddNodeViewCommand implements Command {
   }
 
   execute(): void {
-    this.graphService.addNodeToGraphView(this.graphService.currentGraph, this.node);
+    this.graphService.addNodeToGraphView(this.graphService.currentGraphView, this.node);
   }
 
   undo(): void {
-    this.graphService.removeNodeFromGraphView(this.graphService.currentGraph, this.node);
+    this.graphService.removeNodeFromGraphView(this.graphService.currentGraphView, this.node);
   }
 
   redo(): void {

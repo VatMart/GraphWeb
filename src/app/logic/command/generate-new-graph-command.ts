@@ -28,11 +28,11 @@ export class GenerateNewGraphCommand implements Command {
   }
 
   undo(): void {
-    this.graphService.clearAllElementsView(this.newGraph);
+    this.graphService.clearAllElementsView(this.graphService.currentGraphView);
     if (this.oldGraphOrientation !== this.newGraph.orientation) { // restore old graph orientation
-      this.graphService.changeGraphOrientation(this.graphService.currentGraph, this.oldGraphOrientation);
+      this.graphService.changeGraphOrientation(this.graphService.currentGraphView, this.oldGraphOrientation);
     }
-    this.graphService.populateGraphView(this.graphService.currentGraph, this.nodes, this.edges);
+    this.graphService.populateGraphView(this.graphService.currentGraphView, this.nodes, this.edges);
   }
 
   redo(): void {

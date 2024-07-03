@@ -27,7 +27,7 @@
 
     <div #leftSideContentContainer>
       <div class="left-side-content-container" *ngIf="activeIndex !== null">
-        <div class="left-side-content-header" #desktopSidebarHeader>
+        <div id="desktopSidebarHeader" class="left-side-content-header" #desktopSidebarHeader>
           <h2>{{ items ? items[activeIndex]['header'] : "No header" }}</h2>
           <i pRipple class="pi pi-times-circle close-button move-right" style="font-size: 1.5rem"
              (click)="onCloseLeftSideContainer()">
@@ -74,7 +74,7 @@
              [modal]="true">
     <ng-template pTemplate="headless">
       <div class="mobile-sidebar">
-        <div class="mobile-sidebar-header" #mobileSidebarHeader>
+        <div id="mobileSidebarHeader" class="mobile-sidebar-header" #mobileSidebarHeader>
           <h2>{{ activeItem ? activeItem['header'] : "No header" }}</h2>
           <a pRipple class="pi pi-angle-double-left collapse-icon move-right" style="font-size: 1.5rem"
              (click)="onCloseMobileSidebar($event)"></a>

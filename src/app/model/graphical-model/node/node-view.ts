@@ -1,9 +1,11 @@
 import * as PIXI from "pixi.js";
-import {Graphics, Sprite, Text, Texture} from "pixi.js";
+import {Sprite, Text, Texture} from "pixi.js";
 import {Point} from "../../../utils/graphical-utils";
 import {Node} from "../../node";
 import {GraphElement} from "../graph-element";
 import {ConfService} from "../../../service/config/conf.service";
+import {NodeStyle} from "../graph/graph-view-properties";
+import {DefaultRadius, DynamicRadius} from "./radius";
 
 /**
  * Graphical representation of node
@@ -14,14 +16,12 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
 
   // Coordinates of node center
   private _coordinates: Point;
-  private _radius: number;
   private _text: Text;
 
   // Properties of circle of vertex
-  private _nodeStyle: NodeStyle = ConfService.DEFAULT_NODE_STYLE;
+  private _nodeStyle: NodeStyle = JSON.parse(JSON.stringify(ConfService.currentNodeStyle)); // Use deep copy, to avoid changing default style
   // Properties for label
   private _labelText: string;
-  private labelStyle: NodeLabelStyle = ConfService.DEFAULT_NODE_LABEL_STYLE;
 
   public static createFromTexture(node: Node, coordinates: Point, radius: number, texture: Texture): NodeView {
     let nodeGraphical = new NodeView(node, coordinates, radius, texture);
@@ -38,7 +38,9 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this._coordinates = coordinates;
     this._labelText = node.label ? node.label : node.index.toString();
     this._text = new Text();
-    this._radius = radius;
+    this.text.visible = ConfService.SHOW_NODE_LABEL;
+    this.nodeStyle.radius = ConfService.DYNAMIC_NODE_SIZE ? new DynamicRadius(radius, 0) :
+      new DefaultRadius(radius);
   }
 
   getIndex(): string | number {
@@ -51,12 +53,10 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
    */
   private draw(): void {
     this._text.text = this._labelText;
-    this._text.style = new PIXI.TextStyle({
-      fill: this.labelStyle.labelColor,
-      fontSize: this.labelStyle.labelFontSize,
-      fontFamily: this.labelStyle.labelFontFamily,
-      fontWeight: 'bold'
-    });
+    this.text.style.fill = this.nodeStyle.labelStyle.labelColor;
+    this.text.style.fontSize = this.nodeStyle.labelStyle.labelFontSize;
+    this.text.style.fontFamily = this.nodeStyle.labelStyle.labelFontFamily;
+    this.text.style.fontWeight = 'bold';
     this._text.anchor.set(0.5);
     this.coordinates = this._coordinates;
     this.zIndex = 1;
@@ -67,6 +67,13 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this.y = this.coordinates.y;
     this._text.x = this.width / 2;
     this._text.y = this.height / 2;
+  }
+
+  /**
+   * Change label (Text) visibility.
+   */
+  public changeLabelVisible(labelVisible: boolean) {
+    this.text.visible = labelVisible;
   }
 
   /**
@@ -82,11 +89,11 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
   }
 
   get radius(): number {
-    return this._radius;
+    return this.nodeStyle.radius.getRadius();
   }
 
   set radius(value: number) {
-    this._radius = value;
+    this.nodeStyle.radius.setRadius(value);
   }
 
   get nodeStyle(): NodeStyle {
@@ -109,17 +116,4 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this._coordinates = value;
     this.move();
   }
-}
-
-export interface NodeStyle {
-  fillNode: string;
-  strokeColor: string;
-  strokeWidth: number;
-}
-
-export interface NodeLabelStyle {
-  labelColor: string;
-  labelFontSize: number;
-  labelFontFamily: string;
-  labelFontWeight: string;
 }
