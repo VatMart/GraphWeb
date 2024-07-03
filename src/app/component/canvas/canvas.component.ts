@@ -8,6 +8,7 @@ import {EventBusService} from "../../service/event/event-bus.service";
 import {NodeViewFabricService} from "../../service/fabric/node-view-fabric.service";
 import {EdgeViewFabricService} from "../../service/fabric/edge-view-fabric.service";
 import {PixiManagerService} from "../../service/manager/pixi-manager.service";
+import {GraphView} from "../../model/graphical-model/graph/graph-view";
 
 /**
  * Component for the main canvas.
@@ -40,35 +41,48 @@ export class CanvasComponent implements AfterViewInit {
     // Resize canvas on container resize
     this.resizeObserver = new ResizeObserver(() => this.onResize());
     this.resizeObserver.observe(this.canvasContainer.nativeElement);
-
+    //this.graphViewService.initializeGraphView(); // Init graph view // TODO uncomment in production
+    //this.stateService.changeMode('default'); // Change mode to default // TODO uncomment in production
 
     // ----------------- TODO Remove below -----------------
-    let graph: Graph = new Graph(); // TODO create graph via graph model service
-    this.graphViewService.currentGraph = graph; // TODO Change creating graph behaviour
+    let graph: Graph = new Graph();
+    let graphView = new GraphView(graph);
+    this.graphViewService.currentGraphView = graphView;
+    this.stateService.changeMode('default'); // Enable default mode
+    // this.stateService.changeForceModeState(false); // Disable force mode
+    // ConfService.DYNAMIC_NODE_SIZE = false; // Disable dynamic node size
 
     let screenCenter = {x: this.pixiService.renderer.screen.width / 2,
       y: this.pixiService.renderer.screen.height / 2};
 
-    let node1 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {
-      x: screenCenter.x + 100,
-      y: screenCenter.y - 100
+    let node1 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graphView, {
+      x: screenCenter.x,
+      y: screenCenter.y + 30
     });
-    this.graphViewService.addNodeToGraphView(graph, node1);
-    let node2 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {
-      x: screenCenter.x + 100,
-      y: screenCenter.y + 100
+    this.graphViewService.addNodeToGraphView(graphView, node1);
+    let node2 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graphView, {
+      x: screenCenter.x - 155,
+      y: screenCenter.y - 160
     });
-    this.graphViewService.addNodeToGraphView(graph, node2);
-    let node3 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graph, {
-      x: screenCenter.x - 100,
-      y: screenCenter.y - 100
+    this.graphViewService.addNodeToGraphView(graphView, node2);
+    let node3 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graphView, {
+      x: screenCenter.x + 170,
+      y: screenCenter.y
     });
-    this.graphViewService.addNodeToGraphView(graph, node3);
+    this.graphViewService.addNodeToGraphView(graphView, node3);
+    let node4 = this.nodeFabric.createDefaultNodeViewWithCoordinates(graphView, {
+      x: screenCenter.x - 30,
+      y: screenCenter.y - 160
+    });
+    this.graphViewService.addNodeToGraphView(graphView, node4);
     // Create edges
-    let edge1 = this.edgeFabric.createDefaultEdgeView(graph, node1, node2);
-    this.graphViewService.addEdgeToGraphView(graph, edge1);
-    let edge2 = this.edgeFabric.createDefaultEdgeView(graph, node2, node3);
-    this.graphViewService.addEdgeToGraphView(graph, edge2);
+    let edge1 = this.edgeFabric.createDefaultEdgeView(graphView, node3, node2);
+    //edge2.changeEdgeOrientation(EdgeOrientation.NON_ORIENTED)
+    this.graphViewService.addEdgeToGraphView(graphView, edge1);
+    let edge2 = this.edgeFabric.createDefaultEdgeView(graphView, node4, node2);
+    this.graphViewService.addEdgeToGraphView(graphView, edge2);
+    let edge3 = this.edgeFabric.createDefaultEdgeView(graphView, node4, node3);
+    this.graphViewService.addEdgeToGraphView(graphView, edge3);
 
     (window as any).__PIXI_DEVTOOLS__ = { // TODO remove in production
       pixi: PIXI,

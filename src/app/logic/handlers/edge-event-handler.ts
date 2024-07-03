@@ -7,7 +7,7 @@ import {HistoryService} from "../../service/history.service";
 import {FederatedPointerEvent} from "pixi.js";
 import {EventUtils} from "../../utils/event-utils";
 import {Weight} from "../../model/graphical-model/edge/weight";
-import {NodeStyle, NodeView} from "../../model/graphical-model/node/node-view";
+import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeIndex} from "../../model/edge";
 import {AddEdgeViewCommand} from "../command/add-edge-view-command";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
@@ -15,6 +15,7 @@ import {RemoveEdgeViewCommand} from "../command/remove-edge-view-command";
 import {NodeViewFabricService} from "../../service/fabric/node-view-fabric.service";
 import {EdgeViewFabricService} from "../../service/fabric/edge-view-fabric.service";
 import {ConfService} from "../../service/config/conf.service";
+import {NodeStyle} from "../../model/graphical-model/graph/graph-view-properties";
 
 /**
  * Handles all events related to the edge views.
@@ -42,11 +43,7 @@ export class EdgeEventHandler {
   private clickDelay = 300; // Time in milliseconds to distinguish single and double clicks
 
   // Edge adding
-  public static startNodeStyle: NodeStyle = {
-    fillNode: ConfService.DEFAULT_NODE_STYLE.fillNode,
-    strokeColor: '#FFC618',
-    strokeWidth: ConfService.DEFAULT_NODE_STYLE.strokeWidth + 1
-  };
+  public static startNodeStyle: NodeStyle = ConfService.START_NODE_STYLE;
   private static startNode: NodeView | undefined;
   private static endNode: NodeView | undefined;
 
@@ -130,7 +127,7 @@ export class EdgeEventHandler {
           return;
         }
         // Add edge to graph
-        const edgeView = this.edgeFabric.createDefaultEdgeView(this.graphViewService.currentGraph,
+        const edgeView = this.edgeFabric.createDefaultEdgeView(this.graphViewService.currentGraphView,
           EdgeEventHandler.startNode, EdgeEventHandler.endNode);
         let command = new AddEdgeViewCommand(this.graphViewService, edgeView);
         this.historyService.execute(command);
@@ -157,11 +154,12 @@ export class EdgeEventHandler {
 
   public switchStartNodeStyle(nodeView: NodeView | undefined, enable: boolean): void {
     if (enable && nodeView) {
+      EdgeEventHandler.startNodeStyle.radius = nodeView.nodeStyle.radius;
       EdgeEventHandler.startNodeStyle.fillNode = nodeView.nodeStyle.fillNode;
       EdgeEventHandler.startNodeStyle.strokeWidth = nodeView.nodeStyle.strokeWidth + 1;
-      this.nodeFabric.changeToStyle(nodeView, EdgeEventHandler.startNodeStyle);
+      this.nodeFabric.changeToStyle(nodeView, EdgeEventHandler.startNodeStyle, ConfService.CHOOSE_STROKE_GRADIENT);
     } else if (nodeView) {
-      this.nodeFabric.changeToPreviousStyle(nodeView);
+      this.nodeFabric.changeToStyle(nodeView, nodeView.nodeStyle);
     }
   }
 }

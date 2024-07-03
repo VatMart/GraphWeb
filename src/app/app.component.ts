@@ -46,7 +46,10 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     // Subscribe to pixi started event
     this.subscriptions.add(
-      this.stateService.pixiStarted$.subscribe(() => {
+      this.stateService.pixiStarted$.subscribe((value) => {
+        if (value === null) {
+          return;
+        }
         this.cdr.detectChanges();
         // Show float toolbar and helper
         this.showFloatToolBar = true;

@@ -14,18 +14,18 @@ export class RemoveNodeViewCommand implements Command {
   constructor(node: NodeView, graphService: GraphViewService) {
     this.node = node;
     this.graphService = graphService;
-    this.adjacentEdges = this.graphService.getAdjacentEdgeViews(this.graphService.currentGraph, this.node);
+    this.adjacentEdges = this.graphService.getAdjacentEdgeViews(this.graphService.currentGraphView, this.node);
     console.log(`adjacentEdges: ${this.adjacentEdges.length}`);
   }
 
   execute(): void {
-    this.graphService.removeNodeFromGraphView(this.graphService.currentGraph, this.node);
+    this.graphService.removeNodeFromGraphView(this.graphService.currentGraphView, this.node);
   }
 
   undo(): void {
-    this.graphService.addNodeToGraphView(this.graphService.currentGraph, this.node);
+    this.graphService.addNodeToGraphView(this.graphService.currentGraphView, this.node);
     this.adjacentEdges.forEach((edge: EdgeView) => {
-      this.graphService.addEdgeToGraphView(this.graphService.currentGraph, edge);
+      this.graphService.addEdgeToGraphView(this.graphService.currentGraphView, edge);
     });
   }
 

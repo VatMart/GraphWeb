@@ -42,7 +42,7 @@ export class DefaultGraphViewGenerator extends GraphViewGenerator {
     const canvasCenter = this.pixiService.getCenterCanvasPoint();
     // Calculate the maximum radius for the circles
     const canvasRadius = Math.min(this.pixiService.getCanvasBorderWidth(),
-      this.pixiService.getCanvasBorderHeight()) / 2 - ConfService.DEFAULT_RADIUS;
+      this.pixiService.getCanvasBorderHeight()) / 2 - ConfService.currentNodeStyle.radius.getRadius();
 
     // Get all nodes from the graph
     const nodes = [...graph.getNodes().values()];
@@ -50,8 +50,8 @@ export class DefaultGraphViewGenerator extends GraphViewGenerator {
 
     const positions: NodeViewPosition[] = [];
     let nodeIndex = 0;
-    let currentRadius = ConfService.DEFAULT_RADIUS + 50; // Initial radius for the first circle
-    const minDistance = 100 + ConfService.DEFAULT_RADIUS*2; // Minimum distance between nodes
+    let currentRadius = ConfService.currentNodeStyle.radius.getRadius() + 50; // Initial radius for the first circle
+    const minDistance = 100 + ConfService.currentNodeStyle.radius.getRadius()*2; // Minimum distance between nodes
 
     while (nodeIndex < totalNodes && currentRadius <= canvasRadius) {
       // Calculate the circumference of the current circle

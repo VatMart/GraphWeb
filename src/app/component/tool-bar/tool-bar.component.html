@@ -1,4 +1,4 @@
-<div id="toolbar" class="toolbar-main-container">
+<div class="toolbar-main-container">
 
   <!-- Common gradient -->
   <svg style="height: 0; width: 0; position: absolute;" aria-hidden="true" focusable="false">
@@ -130,12 +130,6 @@
     <div>
       <p-menu #settingMenu [model]="settingsItems" [popup]="true">
         <ng-template pTemplate="item" let-item>
-          <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
-                      [formControl]="showWeights"
-                      [binary]="true" inputId="binary"
-                      (click)="onCheckboxClick($event, 'showWeights')"
-                      *ngIf="item.id === 'showWeights'">
-          </p-checkbox>
           <p-checkbox pRipple class="p-menuitem-link" [label]="item.label"
                       [formControl]="showGrid"
                       [binary]="true" inputId="binary"

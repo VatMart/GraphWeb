@@ -59,8 +59,6 @@ export class ModeManagerService implements ServiceManager {
       // TODO Add selection mode for mobile devices (for multiple selection)
     };
     this.initSubscriptions();
-    // Set default mode
-    this.currentModeState = 'default';
   }
 
   /**
@@ -70,6 +68,9 @@ export class ModeManagerService implements ServiceManager {
     // Subscribe to the currentMode$ mode state
     this.subscriptions.add(
       this.stateService.currentMode$.subscribe(mode => {
+        if (mode === null) {
+          return;
+        }
         if (this.currentModeState !== mode) {
           this.updateModeState(mode);
           this.updateHelperItem(mode);
@@ -80,6 +81,9 @@ export class ModeManagerService implements ServiceManager {
     // Subscribe to mode states
     this.subscriptions.add(
       this.stateService.currentAddVertexState.subscribe(state => {
+        if (state === null) {
+          return;
+        }
         const newState: ModeState = state ? 'AddRemoveVertex' : 'default';
         this.stateService.changeMode(newState);
       })
@@ -87,6 +91,9 @@ export class ModeManagerService implements ServiceManager {
     // Subscribe to edge mode state
     this.subscriptions.add(
       this.stateService.currentAddEdgesState.subscribe(state => {
+        if (state === null) {
+          return;
+        }
         const newState: ModeState = state ? 'AddRemoveEdge' : 'default';
         this.stateService.changeMode(newState);
       })
@@ -164,13 +171,17 @@ export class ModeManagerService implements ServiceManager {
       })
     );
     this.subscriptions.add(
-      this.stateService.undoInvoked$.subscribe(() => {
-        this.onUndoInvoked();
+      this.stateService.undoInvoked$.subscribe((value) => {
+        if (value !== null) {
+          this.onUndoInvoked();
+        }
       })
     );
     this.subscriptions.add(
-      this.stateService.redoInvoked$.subscribe(() => {
-        this.onRedoInvoked();
+      this.stateService.redoInvoked$.subscribe((value) => {
+        if (value !== null) {
+          this.onRedoInvoked();
+        }
       })
     );
   }

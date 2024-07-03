@@ -1,14 +1,15 @@
 import {Injectable} from '@angular/core';
 import {Graphics, Rectangle, RenderTexture, Text, Texture} from "pixi.js";
-import {Graph} from "../../model/graph";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {Edge} from "../../model/edge";
-import {EdgeStyle, EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {AbstractGraphElementFabric} from "../../model/graphical-model/abstract-graph-element-fabric";
-import {Weight, WeightStyle} from "../../model/graphical-model/edge/weight";
+import {Weight} from "../../model/graphical-model/edge/weight";
 import {PixiService} from "../pixi.service";
 import {EdgeOrientation, GraphOrientation} from "../../model/orientation";
 import {ConfService} from "../config/conf.service";
+import {EdgeStyle, WeightStyle} from "../../model/graphical-model/graph/graph-view-properties";
+import {GraphView} from "../../model/graphical-model/graph/graph-view";
 
 /**
  * Fabric for creating edge views.
@@ -48,12 +49,12 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
 
   /**
    * Create default edge view from start and end node views.
-   * @param graph - graph to which edge belongs
+   * @param graphView - graph to which edge belongs
    * @param startNodeView - start node view
    * @param endNodeView - end node view
    */
-  public createDefaultEdgeView(graph: Graph, startNodeView: NodeView, endNodeView: NodeView): EdgeView {
-    const edgeOrientation = graph.orientation === GraphOrientation.NON_ORIENTED ?
+  public createDefaultEdgeView(graphView: GraphView, startNodeView: NodeView, endNodeView: NodeView): EdgeView {
+    const edgeOrientation = graphView.graph.orientation === GraphOrientation.NON_ORIENTED ?
       EdgeOrientation.NON_ORIENTED : EdgeOrientation.ORIENTED
     let newEdge: Edge = new Edge(startNodeView.node, endNodeView.node, edgeOrientation);
     const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView);
@@ -84,9 +85,20 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     edge.move();
   }
 
-  changeToStyle(edge: EdgeView, style: EdgeStyle): void {
+  /**
+   * Change edge style to the given style and save current style to cache.
+   */
+  changeToStyleAndSave(edge: EdgeView, style: EdgeStyle): void {
     // Save current style to cache before changing
     this.styleCache.set(edge.getIndex(), edge.edgeStyle);
+    this.switchEdgeStyle(edge, style);
+    edge.move(); // Move edge to new position by redraw
+  }
+
+  /**
+   * Change edge style to the given style.
+   */
+  changeToStyle(edge: EdgeView, style: EdgeStyle): void {
     this.switchEdgeStyle(edge, style);
     edge.move(); // Move edge to new position by redraw
   }
@@ -100,6 +112,15 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     } else {
       console.error("Previous style not found in cache for edge: " + edge.getIndex());
     }
+  }
+
+  /**
+   * Update edge weight texture.
+   */
+  updateTexture(edgeView: EdgeView) {
+    const weightTexture: Texture = <Texture>this.getOrCreateWeightTexture(edgeView.weightView.text, edgeView.edgeStyle.weight);
+    edgeView.weightView.texture = weightTexture;
+    edgeView.weightView.hitArea = this.calculateWeightHitArea(edgeView.weightView);
   }
 
   private switchEdgeStyle(edgeView: EdgeView, style: EdgeStyle) {

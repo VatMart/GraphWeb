@@ -37,6 +37,13 @@ export class Node {
   }
 
   /**
+   * Clear all adjacent edges
+   */
+  clearEdges() {
+    this._edges = [];
+  }
+
+  /**
    * Get adjacent edges
    */
   public getAdjacentEdges(): string[] {

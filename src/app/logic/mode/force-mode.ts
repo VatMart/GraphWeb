@@ -29,7 +29,6 @@ export class ForceMode {
 
   // Repulsive force
   private repulsionConstant: number = ConfService.REPULSIVE_CONSTANT;
-  private maxDistance: number = ConfService.DEFAULT_RADIUS * 6; // Maximum distance to apply repulsive force
   // Center-spring force
   private springForceConstant: number = ConfService.SPRING_FORCE_CONSTANT;
   // Link-spring force
@@ -238,7 +237,7 @@ export class ForceMode {
       const dy = posB.y - posA.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      const restLength = ConfService.DEFAULT_RADIUS * 6; // Desired distance between connected nodes
+      const restLength = ConfService.MAX_DISTANCE_FORCE; // Desired distance between connected nodes
       const springForceMagnitude = this.linkSpringForceConstant * (distance - restLength);
 
       const fx = (dx / distance) * springForceMagnitude;
@@ -269,8 +268,8 @@ export class ForceMode {
     const dx = posB.x - posA.x;
     const dy = posB.y - posA.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance === 0 || distance > this.maxDistance) return; // Skip if distance is zero or greater than maxDistance
-    const minimumDistance = ConfService.DEFAULT_RADIUS * 2; // Minimum distance to prevent nodes from getting too close
+    if (distance === 0 || distance > ConfService.MAX_DISTANCE_FORCE) return; // Skip if distance is zero or greater than maxDistance
+    const minimumDistance = ConfService.currentNodeStyle.radius.getRadius() * 2; // Minimum distance to prevent nodes from getting too close
     const clampedDistance = Math.max(distance, minimumDistance);
     const forceMagnitude = this.repulsionConstant / (clampedDistance * clampedDistance); // Adjust the force calculation
     const fx = (dx / clampedDistance) * forceMagnitude;
@@ -297,14 +296,20 @@ export class ForceMode {
    */
   private calculateEquilibriumDistance(draggedNodes?: NodeView[]): number {
     const totalNodes = draggedNodes ? this.forceNodes.size - draggedNodes.length : this.forceNodes.size;
-    const nodeRadius = ConfService.DEFAULT_RADIUS; // Assuming NodeView has a DEFAULT_RADIUS
-    const minimumDistance = ConfService.DEFAULT_RADIUS * 4; // Minimum distance between nodes to prevent overlap
-    // Calculate the required area for each node including its minimum spacing
-    const areaPerNode = (2 * nodeRadius + minimumDistance) ** 2;
+    const nodeRadius = Math.min(Math.max(ConfService.currentNodeStyle.radius.getRadius(), 30), 50); // Assuming all nodes have the same radius
+    const minDistanceFactor = 2; // Minimum distance factor to ensure nodes do not overlap
+    const minimumDistance = nodeRadius * minDistanceFactor; // Adjusted minimum distance to prevent overlap
+    const minimumDistanceThreshold = 100;
+    const areaPerNode = (nodeRadius * 2 + minimumDistance) ** 2;
     // Calculate the total area needed for all nodes
     const totalArea = areaPerNode * totalNodes;
-    // Assuming the nodes are placed in a roughly circular layout, calculate the radius of this circle
-    return Math.sqrt(totalArea / Math.PI);
+    // Calculate the radius of the circle that can accommodate all nodes
+    const radiusOfCircle = Math.sqrt(totalArea / Math.PI);
+    // Apply a scaling factor to moderately adjust the equilibrium distance
+    const scalingFactor = 1.5;
+    const equilibriumDistance = radiusOfCircle * scalingFactor;
+    // Ensure the equilibrium distance is not less than the minimum distance threshold
+    return Math.max(equilibriumDistance, minimumDistanceThreshold);
   }
 
   /**

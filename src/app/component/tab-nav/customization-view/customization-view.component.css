@@ -10,6 +10,7 @@
 }
 
 .customization-tabview-item {
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   padding: 8px;
@@ -105,6 +106,12 @@
   padding-block: 4px;
 }
 
+.hint-image {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
 .info-button {
   margin-left: 4px;
   padding: 4px;
@@ -146,4 +153,43 @@
 
 .unsaved-changes-tag {
   padding-right: 4px;
+}
+
+.template-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+}
+
+.template-image {
+  width: 100%;
+  max-width: 250px;
+  max-height: 250px;
+  border-radius: 8px;
+  transition: .5s ease;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.template-image:hover {
+  cursor: pointer;
+  opacity: 70%;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.template-image:active {
+  opacity: 40%;
+}
+
+.default-tag {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%); /* Center the element */
+}
+
+.template-name-label {
+  padding-top: 8px;
+  font-weight: bold;
 }

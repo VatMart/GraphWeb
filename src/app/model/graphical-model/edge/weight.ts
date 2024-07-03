@@ -1,7 +1,7 @@
 import {Sprite, Text} from "pixi.js";
 import {GraphicalUtils, Point} from "../../../utils/graphical-utils";
-import {TextStyleFontWeight} from "pixi.js/lib/scene/text/TextStyle";
 import {ConfService} from "../../../service/config/conf.service";
+import {WeightStyle, WeightTextStyle} from "../graph/graph-view-properties";
 
 export class Weight extends Sprite {
 
@@ -21,7 +21,7 @@ export class Weight extends Sprite {
     this.anchor.set(0.5);
     this._value = value;
     this._text = new Text({text: value.toString(), anchor: 0.5});
-    this._weightStyle = weightStyle ? weightStyle : ConfService.DEFAULT_WEIGHT_STYLE;
+    this._weightStyle = weightStyle ? weightStyle : ConfService.currentEdgeStyle.weight;
     this.interactive = true;
     this.applyTextStyle(this._weightStyle.text);
     this.addChild(this.text);
@@ -74,18 +74,4 @@ export class Weight extends Sprite {
       fontWeight: textStyle.labelFontWeight
     };
   }
-}
-
-export interface WeightStyle {
-  color: string;
-  strokeWidth: number;
-  strokeColor: string;
-  text: WeightTextStyle;
-}
-
-export interface WeightTextStyle {
-  size: number;
-  labelColor: string;
-  labelFontFamily: string;
-  labelFontWeight: TextStyleFontWeight;
 }

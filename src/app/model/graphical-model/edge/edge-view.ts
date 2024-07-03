@@ -4,9 +4,10 @@ import {GraphicalUtils, Point} from "../../../utils/graphical-utils";
 import {NodeView} from "../node/node-view";
 import {Graphics, Polygon} from "pixi.js";
 import {EdgeOrientation} from "../../orientation";
-import {Arrow, ArrowStyle} from "./arrow";
-import {Weight, WeightStyle} from "./weight";
+import {Arrow} from "./arrow";
+import {Weight} from "./weight";
 import {ConfService} from "../../../service/config/conf.service";
+import {EdgeStyle} from "../graph/graph-view-properties";
 
 /**
  * Graphical representation of edge
@@ -27,10 +28,10 @@ export class EdgeView extends Graphics implements GraphElement {
   private _startCoordinates: Point;
   private _endCoordinates: Point;
 
-  private _edgeStyle: EdgeStyle = ConfService.DEFAULT_EDGE_STYLE;
+  private _edgeStyle: EdgeStyle = JSON.parse(JSON.stringify(ConfService.currentEdgeStyle));
 
   public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView) : EdgeView {
-    let edgeGraphical = new EdgeView(edge, startNode, endNode, ConfService.DEFAULT_EDGE_STYLE);
+    let edgeGraphical = new EdgeView(edge, startNode, endNode, ConfService.currentEdgeStyle);
     edgeGraphical.interactive = true;
     edgeGraphical.move();
     return edgeGraphical;
@@ -47,7 +48,7 @@ export class EdgeView extends Graphics implements GraphElement {
       this.addChild(this.arrow);
     }
     this._weightView = new Weight(this._edge.weight);
-    this.weightView.renderable = this._weightVisible;
+    this.weightView.visible = this._weightVisible;
     this.addChild(this._weightView);
     const points = this.resolveConnectors();
     this._startCoordinates = points[0];
@@ -165,9 +166,8 @@ export class EdgeView extends Graphics implements GraphElement {
   }
 
   public changeWeightVisible(bool: boolean) {
-    // TODO Test implementation
     this._weightVisible = bool;
-    this.weightView.renderable = this._weightVisible;
+    this.weightView.visible = this._weightVisible;
     if (this.weightVisible) {
       this.moveWeight();
     }
@@ -235,11 +235,4 @@ export class EdgeView extends Graphics implements GraphElement {
     }
     this.move();
   }
-}
-
-export interface EdgeStyle {
-  strokeColor: string;
-  strokeWidth: number;
-  weight: WeightStyle;
-  arrow?: ArrowStyle;
 }

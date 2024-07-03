@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   background-color: #F5F5F5; /* TODO CHANGE to same as canvas*/
+  max-height: 100vh;
+  overflow-y: hidden;
 }
 
 .main-body-mobile-container {

@@ -1,6 +1,7 @@
 import {Graphics} from "pixi.js";
 import {GraphicalUtils, Point} from "../../../utils/graphical-utils";
 import {ConfService} from "../../../service/config/conf.service";
+import {ArrowStyle} from "../graph/graph-view-properties";
 
 /**
  * Graphical representation of arrow for edge
@@ -11,7 +12,7 @@ export class Arrow extends Graphics {
 
   constructor(arrowStyle?: ArrowStyle) {
     super();
-    this._arrowStyle = arrowStyle ? arrowStyle : ConfService.DEFAULT_ARROW_STYLE;
+    this._arrowStyle = arrowStyle ? arrowStyle : ConfService.currentEdgeStyle.arrow;
   }
 
   /**
@@ -54,11 +55,4 @@ export class Arrow extends Graphics {
   set arrowStyle(value: ArrowStyle) {
     this._arrowStyle = value;
   }
-}
-
-export interface ArrowStyle {
-  size: number;
-  color: string;
-  strokeWidth: number;
-  strokeColor: string;
 }

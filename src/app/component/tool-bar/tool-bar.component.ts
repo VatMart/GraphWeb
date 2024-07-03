@@ -56,7 +56,6 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   // Settings button
   settingsItems: MenuItem[] | undefined;
   // Dropdown components states
-  showWeights =  new FormControl(ConfService.SHOW_WEIGHT);
   showGrid = new FormControl(ConfService.SHOW_GRID);
   hideHelper = new FormControl(ConfService.ALWAYS_HIDE_HELPER_TEXT);
   // Force options
@@ -87,14 +86,12 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
     this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
     // Zooming button
-    this.subscriptions.add(this.stateService.zoomChanged$.subscribe(state => this.zoomPercentage = state));
-    // Cog dropdown components
-    // Show weights
-    this.showWeights.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onToggleShowWeights(value)
+    this.subscriptions.add(this.stateService.zoomChanged$.subscribe(state => {
+      if (state !== null) {
+        this.zoomPercentage = state;
       }
-    });
+    }));
+    // Cog dropdown components
     this.showGrid.valueChanges.subscribe(value => {
       if (value !== null) {
         this.onToggleShowGrid(value);
@@ -205,23 +202,6 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         ],
       },
     ];
-    // Default values
-    const showWeights = this.showWeights.value;
-    if (showWeights) {
-      this.onToggleShowWeights(showWeights); // Set initial state
-    }
-    const showGrid = this.showGrid.value;
-    if (showGrid) {
-      this.onToggleShowGrid(showGrid); // Set initial state
-    }
-    const hideHelper = this.hideHelper.value;
-    if (hideHelper) {
-      this.onToggleAlwaysHideHelper(hideHelper); // Set initial state
-    }
-    const orientation = this.selectedOrientation.value;
-    if (orientation) {
-      this.onChoseGraphOrientation(orientation); // Set initial state
-    }
   }
 
   ngOnDestroy(): void {
@@ -253,10 +233,6 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   onClearGraph() {
     this.historyService.execute(new ClearGraphViewCommand(this.graphViewService)); // TODO move to GraphStateManagerService
     this.stateService.graphCleared();
-  }
-
-  onToggleShowWeights(value: boolean) {
-    this.stateService.changeShowWeights(value);
   }
 
   private onToggleShowGrid(value: boolean) {
@@ -297,9 +273,6 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     if (event.target?.constructor.name === "HTMLElement") { // Clicked on menu item, but not on checkbox directly
       switch (type) {
-        case 'showWeights':
-          this.showWeights.setValue(!this.showWeights.value);
-          break;
         case 'showGrid':
           this.showGrid.setValue(!this.showGrid.value);
           break;

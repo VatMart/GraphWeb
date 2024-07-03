@@ -16,7 +16,7 @@ import {ConfService} from "../../../service/config/conf.service";
   styleUrl: './float-edge-weight-input.component.css',
   providers: [MessageService],
 })
-export class FloatEdgeWeightInputComponent{
+export class FloatEdgeWeightInputComponent {
   @ViewChild('floatingInput') floatingInput!: ElementRef;
   @ViewChild('floatingInputContainer') floatingInputContainer!: ElementRef;
   @ViewChild('mirrorSpan') mirrorSpan!: ElementRef;

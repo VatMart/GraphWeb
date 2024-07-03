@@ -125,6 +125,7 @@ body {
   background: var(--main-bg-color);
   padding: 0;
   color: black;
+  overflow-x: hidden; overflow-y: scroll;
 }
 
 .unsaved-changes-tag .p-tag {

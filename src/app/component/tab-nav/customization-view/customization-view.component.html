@@ -1,247 +1,261 @@
 <div class="customization-view-container">
-  <p-tabView class="customization-tabview">
-    <!-- Node customization -->
-    <p-tabPanel header="Node">
-      <div class="customization-tabview-item">
-        <label class="subheader-label">Node colors:</label>
-        <div class="color-pick-group">
-          <div class="color-pick-item">
-            <label class="customization-label">Node:</label>
-            <input class="color-picker" type="color" [value]="nodeColor"/>
+  <p-toast position="top-center"/>
+  <form [formGroup]="form">
+    <p-tabView class="customization-tabview">
+      <!-- Node customization -->
+      <p-tabPanel header="Node">
+        <div class="customization-tabview-item">
+          <label class="subheader-label">Node colors:</label>
+          <div class="color-pick-group">
+            <div class="color-pick-item">
+              <label class="customization-label">Node:</label>
+              <input class="color-picker" type="color" formControlName="nodeColor"/>
+            </div>
+            <div class="color-pick-item">
+              <label class="customization-label">Stroke:</label>
+              <input class="color-picker" type="color" formControlName="nodeStrokeColor"/>
+            </div>
+            <div class="color-pick-item">
+              <label class="customization-label">Label:</label>
+              <input class="color-picker" type="color" formControlName="nodeLabelColor"/>
+            </div>
           </div>
-          <div class="color-pick-item">
-            <label class="customization-label">Stroke:</label>
-            <input class="color-picker" type="color" [value]="nodeStrokeColor"/>
+          <label class="subheader-label">Node sizes:</label>
+          <div class="size-pick-group">
+            <label class="customization-label">Radius:</label>
+            <div class="size-pick-item">
+              <p-slider
+                class="custom-slider"
+                formControlName="nodeRadius"
+                [min]="ConfService.MIN_NODE_RADIUS"
+                [max]="ConfService.MAX_NODE_RADIUS"
+                (onChange)="onNodeRadiusChange($event)"/>
+              <p-inputNumber
+                class="custom-input-number"
+                formControlName="nodeRadius"
+                mode="decimal"
+                size="4"
+                [maxlength]="2"
+                suffix="px"
+                allowEmpty="false"
+                [readonly]="true"
+                [min]="ConfService.MIN_NODE_RADIUS"
+                [max]="ConfService.MAX_NODE_RADIUS"/>
+            </div>
+            <label class="customization-label">Stroke width:</label>
+            <div class="size-pick-item">
+              <p-slider
+                class="custom-slider"
+                formControlName="nodeStrokeWidth"
+                [min]="ConfService.MIN_NODE_STROKE_WIDTH"
+                [max]="ConfService.MAX_NODE_STROKE_WIDTH"
+                (onChange)="onNodeStrokeWidthChange($event)"/>
+              <p-inputNumber
+                class="custom-input-number"
+                formControlName="nodeStrokeWidth"
+                mode="decimal"
+                size="4"
+                [maxlength]="2"
+                suffix="px"
+                allowEmpty="false"
+                [readonly]="true"
+                [min]="ConfService.MIN_NODE_STROKE_WIDTH"
+                [max]="ConfService.MAX_NODE_STROKE_WIDTH"/>
+            </div>
+            <label class="customization-label">Text size:</label>
+            <div class="size-pick-item">
+              <p-slider
+                class="custom-slider"
+                formControlName="nodeLabelFontSize"
+                [min]="ConfService.MIN_NODE_LABEL_FONT_SIZE"
+                [max]="ConfService.MAX_NODE_LABEL_FONT_SIZE"
+                (onChange)="onNodeLabelSizeChange($event)"/>
+              <p-inputNumber
+                class="custom-input-number"
+                formControlName="nodeLabelFontSize"
+                mode="decimal"
+                size="4"
+                [maxlength]="2"
+                suffix="px"
+                allowEmpty="false"
+                [readonly]="true"
+                [min]="ConfService.MIN_NODE_LABEL_FONT_SIZE"
+                [max]="ConfService.MAX_NODE_LABEL_FONT_SIZE"/>
+            </div>
           </div>
-          <div class="color-pick-item">
-            <label class="customization-label">Label:</label>
-            <input class="color-picker" type="color" [value]="nodeLabelColor"/>
-          </div>
-        </div>
-        <label class="subheader-label">Node sizes:</label>
-        <div class="size-pick-group">
-          <label class="customization-label">Radius:</label>
-          <div class="size-pick-item">
-            <p-slider
-              class="custom-slider"
-              [(ngModel)]="nodeRadius"
-              [min]="ConfService.MIN_NODE_RADIUS"
-              [max]="ConfService.MAX_NODE_RADIUS"/>
-            <p-inputNumber
-              class="custom-input-number"
-              [(ngModel)]="nodeRadius"
-              mode="decimal"
-              size="4"
-              [maxlength]="2"
-              suffix="px"
-              allowEmpty="false"
-              [readonly]="true"
-              [min]="ConfService.MIN_NODE_RADIUS"
-              [max]="ConfService.MAX_NODE_RADIUS" />
-          </div>
-          <label class="customization-label">Stroke width:</label>
-          <div class="size-pick-item">
-            <p-slider
-              class="custom-slider"
-              [(ngModel)]="nodeStrokeWidth"
-              [min]="ConfService.MIN_NODE_STROKE_WIDTH"
-              [max]="ConfService.MAX_NODE_STROKE_WIDTH"/>
-            <p-inputNumber
-              class="custom-input-number"
-              [(ngModel)]="nodeStrokeWidth"
-              mode="decimal"
-              size="4"
-              [maxlength]="2"
-              suffix="px"
-              allowEmpty="false"
-              [readonly]="true"
-              [min]="ConfService.MIN_NODE_STROKE_WIDTH"
-              [max]="ConfService.MAX_NODE_STROKE_WIDTH" />
-          </div>
-          <label class="customization-label">Text size:</label>
-          <div class="size-pick-item">
-            <p-slider
-              class="custom-slider"
-              [(ngModel)]="nodeLabelFontSize"
-              [min]="ConfService.MIN_NODE_LABEL_FONT_SIZE"
-              [max]="ConfService.MAX_NODE_LABEL_FONT_SIZE"/>
-            <p-inputNumber
-              class="custom-input-number"
-              [(ngModel)]="nodeLabelFontSize"
-              mode="decimal"
-              size="4"
-              [maxlength]="2"
-              suffix="px"
-              allowEmpty="false"
-              [readonly]="true"
-              [min]="ConfService.MIN_NODE_LABEL_FONT_SIZE"
-              [max]="ConfService.MAX_NODE_LABEL_FONT_SIZE" />
-          </div>
-        </div>
-        <label class="subheader-label">Node properties:</label>
-        <div class="property-pick-group">
-          <div class="property-pick-item">
-            <p-checkbox
-              [(ngModel)]="showNodeLabel"
-              [binary]="true"
-              label="Show labels"
-              inputId="binary" />
-          </div>
-          <div class="property-pick-item">
-            <p-checkbox
-              [(ngModel)]="showNodeStroke"
-              [binary]="true"
-              label="Show node stroke"
-              inputId="binary" />
-          </div>
-          <div class="property-pick-item">
-            <p-overlayPanel #dynamicNodeInfo>
-              <div class="overlay-container">
-                <label><b>Dynamic node size.</b></label>
-                <label>When enabled, the node size will be calculated <br>based on the number of edges connected to it.</label>
-                <!-- TODO add example image -->
-              </div>
-            </p-overlayPanel>
-            <p-checkbox
-              [(ngModel)]="dynamicNodeSize"
-              [binary]="true"
-              label="Dynamic node size"
-              inputId="binary" />
-            <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
-               (click)="dynamicNodeInfo.toggle($event)">
-            </i>
-          </div>
-      </div>
-    </div>
-    </p-tabPanel>
-    <!-- Edge customization -->
-    <p-tabPanel header="Edge">
-      <div class="customization-tabview-item">
-        <label class="subheader-label">Edge colors:</label>
-        <div class="color-pick-group">
-          <div class="color-pick-item">
-            <label class="customization-label">Color:</label>
-            <input class="color-picker" type="color" [value]="edgeColor"/>
-          </div>
-          <div class="color-pick-item">
-            <label class="customization-label">Arrow:</label>
-            <input class="color-picker" type="color" [value]="edgeArrowColor"/>
-          </div>
-          <div class="color-pick-item">
-            <label class="customization-label">Weight:</label>
-            <input class="color-picker" type="color" [value]="edgeWeightColor"/>
+          <label class="subheader-label">Node properties:</label>
+          <div class="property-pick-group">
+            <div class="property-pick-item">
+              <p-checkbox
+                formControlName="showNodeLabel"
+                [binary]="true"
+                label="Show labels"
+                inputId="binary"/>
+            </div>
+            <div class="property-pick-item">
+              <p-overlayPanel #dynamicNodeInfo>
+                <div class="overlay-container">
+                  <label><b>Dynamic node size.</b></label>
+                  <label>
+                    When enabled, the node size will be calculated <br>based on the number of edges connected to
+                    it.
+                  </label>
+                  <img src="assets/hints/dynamicNodeSizes.jpg" alt="Dynamic Node Sizes Example" class="hint-image">
+                </div>
+              </p-overlayPanel>
+              <p-checkbox
+                formControlName="dynamicNodeSize"
+                [binary]="true"
+                label="Dynamic node size"
+                inputId="binary"/>
+              <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
+                 (click)="dynamicNodeInfo.toggle($event)">
+              </i>
+            </div>
           </div>
         </div>
-        <label class="subheader-label">Edge sizes:</label>
-        <div class="size-pick-group">
-          <label class="customization-label">Edge stroke width:</label>
-          <div class="size-pick-item">
-            <p-slider
-              class="custom-slider"
-              [(ngModel)]="edgeStrokeWidth"
-              [min]="ConfService.MIN_EDGE_STROKE_WIDTH"
-              [max]="ConfService.MAX_EDGE_STROKE_WIDTH"/>
-            <p-inputNumber
-              class="custom-input-number"
-              [(ngModel)]="edgeStrokeWidth"
-              mode="decimal"
-              size="4"
-              [maxlength]="2"
-              suffix="px"
-              allowEmpty="false"
-              [readonly]="true"
-              [min]="ConfService.MIN_EDGE_STROKE_WIDTH"
-              [max]="ConfService.MAX_EDGE_STROKE_WIDTH" />
+      </p-tabPanel>
+      <!-- Edge customization -->
+      <p-tabPanel header="Edge">
+        <div class="customization-tabview-item">
+          <label class="subheader-label">Edge colors:</label>
+          <div class="color-pick-group">
+            <div class="color-pick-item">
+              <label class="customization-label">Color:</label>
+              <input class="color-picker" type="color" formControlName="edgeColor"/>
+            </div>
+            <div class="color-pick-item">
+              <label class="customization-label">Arrow:</label>
+              <input class="color-picker" type="color" formControlName="edgeArrowColor"/>
+            </div>
+            <div class="color-pick-item">
+              <label class="customization-label">Weight:</label>
+              <input class="color-picker" type="color" formControlName="edgeWeightColor"/>
+            </div>
           </div>
-          <label class="customization-label">Arrow size:</label>
-          <div class="size-pick-item">
-            <p-slider
-              class="custom-slider"
-              [(ngModel)]="edgeArrowSize"
-              [min]="ConfService.MIN_ARROW_SIZE"
-              [max]="ConfService.MAX_ARROW_SIZE"/>
-            <p-inputNumber
-              class="custom-input-number"
-              [(ngModel)]="edgeArrowSize"
-              mode="decimal"
-              size="4"
-              [maxlength]="2"
-              suffix="px"
-              allowEmpty="false"
-              [readonly]="true"
-              [min]="ConfService.MIN_ARROW_SIZE"
-              [max]="ConfService.MAX_ARROW_SIZE" />
+          <label class="subheader-label">Edge sizes:</label>
+          <div class="size-pick-group">
+            <label class="customization-label">Edge stroke width:</label>
+            <div class="size-pick-item">
+              <p-slider
+                class="custom-slider"
+                formControlName="edgeStrokeWidth"
+                [min]="ConfService.MIN_EDGE_STROKE_WIDTH"
+                [max]="ConfService.MAX_EDGE_STROKE_WIDTH"
+                (onChange)="onEdgeStrokeWidthChange($event)"/>
+              <p-inputNumber
+                class="custom-input-number"
+                formControlName="edgeStrokeWidth"
+                mode="decimal"
+                size="4"
+                [maxlength]="2"
+                suffix="px"
+                allowEmpty="false"
+                [readonly]="true"
+                [min]="ConfService.MIN_EDGE_STROKE_WIDTH"
+                [max]="ConfService.MAX_EDGE_STROKE_WIDTH"/>
+            </div>
+            <label class="customization-label">Arrow size:</label>
+            <div class="size-pick-item">
+              <p-slider
+                class="custom-slider"
+                formControlName="edgeArrowSize"
+                [min]="ConfService.MIN_ARROW_SIZE"
+                [max]="ConfService.MAX_ARROW_SIZE"
+                (onChange)="onEdgeArrowSizeChange($event)"/>
+              <p-inputNumber
+                class="custom-input-number"
+                formControlName="edgeArrowSize"
+                mode="decimal"
+                size="4"
+                [maxlength]="2"
+                suffix="px"
+                allowEmpty="false"
+                [readonly]="true"
+                [min]="ConfService.MIN_ARROW_SIZE"
+                [max]="ConfService.MAX_ARROW_SIZE"/>
+            </div>
+            <label class="customization-label">Weight text size:</label>
+            <div class="size-pick-item">
+              <p-slider
+                class="custom-slider"
+                formControlName="edgeWeightSize"
+                [min]="ConfService.MIN_WEIGHT_SIZE"
+                [max]="ConfService.MAX_WEIGHT_SIZE"
+                (onChange)="onEdgeWeightSizeChange($event)"/>
+              <p-inputNumber
+                class="custom-input-number"
+                formControlName="edgeWeightSize"
+                mode="decimal"
+                size="4"
+                [maxlength]="2"
+                suffix="px"
+                allowEmpty="false"
+                [readonly]="true"
+                [min]="ConfService.MIN_WEIGHT_SIZE"
+                [max]="ConfService.MAX_WEIGHT_SIZE"/>
+            </div>
           </div>
-          <label class="customization-label">Weight text size:</label>
-          <div class="size-pick-item">
-            <p-slider
-              class="custom-slider"
-              [(ngModel)]="edgeWeightSize"
-              [min]="ConfService.MIN_WEIGHT_SIZE"
-              [max]="ConfService.MAX_WEIGHT_SIZE"/>
-            <p-inputNumber
-              class="custom-input-number"
-              [(ngModel)]="edgeWeightSize"
-              mode="decimal"
-              size="4"
-              [maxlength]="2"
-              suffix="px"
-              allowEmpty="false"
-              [readonly]="true"
-              [min]="ConfService.MIN_WEIGHT_SIZE"
-              [max]="ConfService.MAX_WEIGHT_SIZE" />
+          <label class="subheader-label">Edge properties:</label>
+          <div class="property-pick-group">
+            <div class="property-pick-item">
+              <p-checkbox
+                formControlName="showEdgeWeight"
+                [binary]="true"
+                label="Show edge weights"
+                inputId="binary"/>
+            </div>
+            <!-- Hidden till implementation will be ready -->
+            <div class="property-pick-item" *ngIf="false">
+              <p-overlayPanel #dynamicEdgeInfo>
+                <div class="overlay-container">
+                  <label><b>Dynamic edge weight values.</b></label>
+                  <label>When enabled, the edge weight value will be<br> calculated based on the distance of
+                    adjacent<br>nodes.</label>
+                  <!-- TODO add example image -->
+                </div>
+              </p-overlayPanel>
+              <p-checkbox
+                formControlName="dynamicEdgeWeight"
+                [binary]="true"
+                label="Dynamic edge weight"
+                inputId="binary"/>
+              <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
+                 (click)="dynamicEdgeInfo.toggle($event)">
+              </i>
+            </div>
           </div>
         </div>
-        <label class="subheader-label">Edge properties:</label>
-        <div class="property-pick-group">
-          <div class="property-pick-item">
-            <p-checkbox
-              [(ngModel)]="showEdgeWeight"
-              [binary]="true"
-              label="Show edge weights"
-              inputId="binary" />
+      </p-tabPanel>
+      <!-- Templates of customization -->
+      <p-tabPanel header="Templates">
+        <div class="customization-tabview-item">
+          <div *ngFor="let item of templateItems"
+               class="template-item"
+               (click)="onTemplateSelect(item)">
+            <img [src]="item.imageSrc" [alt]="item.name" class="template-image">
+            <label class="template-name-label">{{item.name}}</label>
           </div>
-          <div class="property-pick-item">
-            <p-overlayPanel #dynamicEdgeInfo>
-              <div class="overlay-container">
-                <label><b>Dynamic edge weight values.</b></label>
-                <label>When enabled, the edge weight value will be<br> calculated based on the distance of adjacent<br>nodes.</label>
-                <!-- TODO add example image -->
-              </div>
-            </p-overlayPanel>
-            <p-checkbox
-              [(ngModel)]="dynamicEdgeWeight"
-              [binary]="true"
-              label="Dynamic edge weight"
-              inputId="binary" />
-            <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
-               (click)="dynamicEdgeInfo.toggle($event)">
-            </i>
-          </div>
-      </div>
-    </div>
-    </p-tabPanel>
-    <!-- Templates of customization -->
-    <p-tabPanel header="Templates">
-      <div class="customization-tabview-item">
-
-      </div>
-    </p-tabPanel>
-    <div class="separator"></div>
-    <div class="button-panel">
-      <p-button pTooltip="Reset options to default" tooltipPosition="right"
-                severity="contrast"
-                label="Default"
-                [outlined]="true">
-      </p-button>
-      <div class="apply-changes-container">
-        <p-tag *ngIf="unsavedChanges" severity="warning" value="Unsaved" class="unsaved-changes-tag"/>
-        <p-button icon="pi pi-check"
+        </div>
+      </p-tabPanel>
+      <div class="separator"></div>
+      <div id="customizationButtonPanel" class="button-panel">
+        <p-button pTooltip="Reset options to default" tooltipPosition="right"
                   severity="contrast"
-                  label="Apply"
-                  [raised]="true">
+                  label="Default"
+                  [outlined]="true"
+                  (click)="resetToDefault()">
         </p-button>
+        <div class="apply-changes-container">
+          <p-tag *ngIf="unsavedChanges" severity="warning" value="Unsaved" class="unsaved-changes-tag"/>
+          <p-button icon="pi pi-check"
+                    severity="contrast"
+                    label="Apply"
+                    [raised]="true"
+                    (click)="applyChanges()">
+          </p-button>
+        </div>
       </div>
-    </div>
-  </p-tabView>
+    </p-tabView>
+  </form>
 </div>

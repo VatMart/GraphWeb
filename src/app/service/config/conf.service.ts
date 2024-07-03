@@ -1,9 +1,16 @@
 import {Injectable} from '@angular/core';
-import {NodeLabelStyle, NodeStyle} from "../../model/graphical-model/node/node-view";
-import {ArrowStyle} from "../../model/graphical-model/edge/arrow";
-import {WeightStyle, WeightTextStyle} from "../../model/graphical-model/edge/weight";
-import {EdgeStyle} from "../../model/graphical-model/edge/edge-view";
 import {GraphOrientation} from "../../model/orientation";
+import {
+  EdgeStyle,
+  GraphViewProperties,
+  GraphViewStyle,
+  NodeStyle
+} from "../../model/graphical-model/graph/graph-view-properties";
+import {selectedStyle} from "../../model/graphical-model/graph/style-template/selected-style";
+import {NodeView} from "../../model/graphical-model/node/node-view";
+import {EdgeView} from "../../model/graphical-model/edge/edge-view";
+import {GradientColor} from "../fabric/node-view-fabric.service";
+import {BLACK_WHITE_SMALL_STYLE} from "../../model/graphical-model/graph/style-template/black-white-small-style";
 
 /**
  * Service for managing the configuration of the application.
@@ -13,83 +20,31 @@ import {GraphOrientation} from "../../model/orientation";
 })
 export class ConfService {
 
-  // Properties of application
   // Styles
-  public static DEFAULT_NODE_STYLE: NodeStyle = {
-    fillNode: '#FFFFFF',
-    strokeColor: '#000000',
-    strokeWidth: 3
-  };
-
-  public static DEFAULT_NODE_LABEL_STYLE: NodeLabelStyle = {
-    labelColor: '#000000',
-    labelFontSize: 24,
-    labelFontFamily: 'Nunito Sans',
-    labelFontWeight: 'bold'
-  };
-
-  public static SELECTED_NODE_STYLE: NodeStyle = {
-    fillNode: ConfService.DEFAULT_NODE_STYLE.fillNode,
-    strokeColor: '#006FFF',
-    strokeWidth: ConfService.DEFAULT_NODE_STYLE.strokeWidth + 1
-  };
-
-  public static DEFAULT_ARROW_STYLE: ArrowStyle = {
-    size: 25,
-    color: 'black',
-    strokeWidth: 0,
-    strokeColor: 'black'
-  };
-
-  public static SELECTED_ARROW_STYLE: ArrowStyle = {
-    size: 25,
-    color: '#006FFF',
-    strokeWidth: 1,
-    strokeColor: '#006FFF'
-  };
-
-  public static DEFAULT_TEXT_WEIGHT_STYLE: WeightTextStyle = {
-    size: 20,
-    labelColor: 'black',
-    labelFontFamily: 'Nunito Sans',
-    labelFontWeight: 'bold'
+  public static CURRENT_GRAPH_STYLE: GraphViewStyle = BLACK_WHITE_SMALL_STYLE();
+  public static DEFAULT_GRAPH_STYLE: GraphViewStyle = BLACK_WHITE_SMALL_STYLE(); // Default style uses when user resets style to default
+  public static SELECTED_GRAPH_STYLE(node?: NodeView, edge?: EdgeView): GraphViewStyle {
+    return selectedStyle(node, edge);
   }
 
-  public static SELECTED_TEXT_WEIGHT_STYLE: WeightTextStyle = {
-    size: 20,
-    labelColor: '#006FFF',
-    labelFontFamily: 'Nunito Sans',
-    labelFontWeight: 'bold'
-  }
-
-  public static DEFAULT_WEIGHT_STYLE: WeightStyle = {
-    color: 'white',
-    strokeWidth: 4,
-    strokeColor: 'black',
-    text: ConfService.DEFAULT_TEXT_WEIGHT_STYLE
-  }
-
-  public static SELECTED_WEIGHT_STYLE: WeightStyle = {
-    color: 'white',
-    strokeWidth: 5,
-    strokeColor: '#006FFF',
-    text: ConfService.SELECTED_TEXT_WEIGHT_STYLE
-  }
-
-  public static DEFAULT_EDGE_STYLE: EdgeStyle = {
-    strokeColor: '#000000',
-    strokeWidth: 8,
-    arrow: ConfService.DEFAULT_ARROW_STYLE,
-    weight: ConfService.DEFAULT_WEIGHT_STYLE
+  /**
+   * Style for the start node when adding an edge.
+   */
+  public static START_NODE_STYLE: NodeStyle = {
+    radius: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.radius,
+    fillNode: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.fillNode,
+    strokeColor: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.strokeColor,
+    strokeWidth: Math.max(ConfService.CURRENT_GRAPH_STYLE.nodeStyle.strokeWidth + 1, 4),
+    labelStyle: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.labelStyle
   };
 
-  public static SELECTED_EDGE_STYLE: EdgeStyle = {
-    strokeColor: '#006FFF',
-    strokeWidth: 10,
-    arrow: ConfService.SELECTED_ARROW_STYLE,
-    weight: ConfService.SELECTED_WEIGHT_STYLE
-  };
+  /**
+   * Gradient color for the chosen node. Used when adding an edge or in algorithms.
+   * Gradient used for better visibility. In case if user customized graph elements.
+   */
+  public static CHOOSE_STROKE_GRADIENT: GradientColor = {startColor: '#FFC618', endColor: '#FF0000'};
 
+  // Properties of application
   // App properties
   public static ALWAYS_HIDE_HELPER_TEXT: boolean = false;
 
@@ -100,6 +55,7 @@ export class ConfService {
   public static REPULSIVE_CONSTANT: number = 15000;
   public static SPRING_FORCE_CONSTANT: number = 1;
   public static LINK_FORCE_CONSTANT: number = 0.04;
+  public static MAX_DISTANCE_FORCE: number = 180; // Max distance for applying force
 
   // Canvas properties
   public static SHOW_GRID: boolean = false;
@@ -113,11 +69,12 @@ export class ConfService {
   public static DEFAULT_GRAPH_ORIENTATION = GraphOrientation.ORIENTED;
 
   // Node properties
-  public static DEFAULT_RADIUS = 30;
+  public static DYNAMIC_NODE_SIZE: boolean = true; // Dynamic size changes according to number of adjacent edges
+  public static SHOW_NODE_LABEL: boolean = true;
   public static MIN_NODE_RADIUS = 15;
   public static MAX_NODE_RADIUS = 60;
   // Node stroke
-  public static MIN_NODE_STROKE_WIDTH = 1;
+  public static MIN_NODE_STROKE_WIDTH = 0;
   public static MAX_NODE_STROKE_WIDTH = 10;
   // Node label
   public static MIN_NODE_LABEL_FONT_SIZE = 12;
@@ -128,14 +85,43 @@ export class ConfService {
   public static MAX_EDGE_STROKE_WIDTH = 18;
   public static MIN_ARROW_SIZE = 15;
   public static MAX_ARROW_SIZE = 40;
-  public static MIN_WEIGHT_SIZE = 10;
-  public static MAX_WEIGHT_SIZE = 40;
+  public static MIN_WEIGHT_SIZE = 15;
+  public static MAX_WEIGHT_SIZE = 30;
   public static EDGE_HIT_AREA_PADDING: number = 15;
   // Default value for showing weight of edge
   public static SHOW_WEIGHT: boolean = true; // Default value sets via event handling
   public static MAX_WEIGHT: number = 1000;
   public static MIN_WEIGHT: number = 1;
+  public static DYNAMIC_EDGE_WEIGHT_VALUE: boolean = false; // Dynamic value changes according to edge length
 
-  constructor() {
+  /**
+   * Getter for current graph properties.
+   */
+  public static get CURRENT_GRAPH_PROPERTIES(): GraphViewProperties {
+    return {
+      graphStyle: ConfService.CURRENT_GRAPH_STYLE,
+      nodeProperties: {
+        showLabel: ConfService.SHOW_NODE_LABEL,
+        dynamicNodeSize: ConfService.DYNAMIC_NODE_SIZE
+      },
+      edgeProperties: {
+        showWeight: ConfService.SHOW_WEIGHT,
+        dynamicEdgeWeightValue: ConfService.DYNAMIC_EDGE_WEIGHT_VALUE
+      }
+    };
+  }
+
+  /**
+   * Quick access to the current node style.
+   */
+  static get currentNodeStyle(): NodeStyle {
+    return ConfService.CURRENT_GRAPH_STYLE.nodeStyle;
+  }
+
+  /**
+   * Quick access to the current edge style.
+   */
+  static get currentEdgeStyle(): EdgeStyle {
+    return ConfService.CURRENT_GRAPH_STYLE.edgeStyle;
   }
 }

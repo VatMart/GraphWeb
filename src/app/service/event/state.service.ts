@@ -15,6 +15,7 @@ import {
   GraphSetRequest, GraphSetParseResult
 } from "../../component/tab-nav/input-view/input-view.component";
 import {SetValidationResult} from "../graph/graph-set.service";
+import {CustomizationFormValues} from "../../component/tab-nav/customization-view/customization-view.component";
 
 /**
  * Service for managing the state of the application.
@@ -33,23 +34,23 @@ export class StateService {
   private canRedoSource = new BehaviorSubject<boolean>(false);
   public canRedo$ = this.canRedoSource.asObservable();
 
-  private undoInvokedSource = new BehaviorSubject<boolean>(false);
+  private undoInvokedSource = new BehaviorSubject<boolean | null>(null);
   public undoInvoked$ = this.undoInvokedSource.asObservable();
 
-  private redoInvokedSource = new BehaviorSubject<boolean>(false);
+  private redoInvokedSource = new BehaviorSubject<boolean | null>(null);
   public redoInvoked$ = this.redoInvokedSource.asObservable();
 
   private showGridSource = new BehaviorSubject<boolean>(false);
   public showGrid$ = this.showGridSource.asObservable();
 
   // Current mode (default, add vertex, add edges etc.)
-  private modeStateSource = new BehaviorSubject<ModeState>('default');
+  private modeStateSource = new BehaviorSubject<ModeState | null>(null);
   public currentMode$ = this.modeStateSource.asObservable();
 
   // All modes
-  private stateAddVertexSource = new BehaviorSubject<boolean>(false);
+  private stateAddVertexSource = new BehaviorSubject<boolean | null>(null);
   public currentAddVertexState = this.stateAddVertexSource.asObservable();
-  private stateAddEdgesSource = new BehaviorSubject<boolean>(false);
+  private stateAddEdgesSource = new BehaviorSubject<boolean| null>(null);
   public currentAddEdgesState = this.stateAddEdgesSource.asObservable();
 
   // --------------------------------------------------
@@ -110,9 +111,15 @@ export class StateService {
   public generateGraphBySets$ = this.generateGraphBySetsSource.asObservable();
 
   // --------------------------------------------------
+  // UI component states. Nav bar components. Customization view
+  // --------------------------------------------------
+  private applyCustomizationSource = new BehaviorSubject<Partial<CustomizationFormValues> | null>(null);
+  public applyCustomization$ = this.applyCustomizationSource.asObservable();
+
+  // --------------------------------------------------
   // UI component states. Canvas
   // --------------------------------------------------
-  private pixiStartedSource = new BehaviorSubject<boolean>(false);
+  private pixiStartedSource = new BehaviorSubject<boolean | null>(null);
   public pixiStarted$ = this.pixiStartedSource.asObservable();
 
   // Canvas cursor coordinates
@@ -121,7 +128,7 @@ export class StateService {
   public currentCursorX = this.cursorXSource.asObservable();
   public currentCursorY = this.cursorYSource.asObservable();
 
-  private needResizeCanvasSource = new BehaviorSubject<boolean>(false);
+  private needResizeCanvasSource = new BehaviorSubject<boolean | null>(null);
   public needResizeCanvas$ = this.needResizeCanvasSource.asObservable();
 
   private rendererResizedSource = new BehaviorSubject<{width: number, height: number}>({width: 0, height: 0});
@@ -130,7 +137,7 @@ export class StateService {
   private zoomToChangeSource = new BehaviorSubject<number | null>(null);
   public zoomToChange$ = this.zoomToChangeSource.asObservable();
 
-  private zoomChangedSource = new BehaviorSubject<number>(100);
+  private zoomChangedSource = new BehaviorSubject<number | null>(null);
   public zoomChanged$ = this.zoomChangedSource.asObservable();
 
   // --------------------------------------------------
@@ -201,9 +208,6 @@ export class StateService {
   private graphClearedSource = new BehaviorSubject<boolean | null>(null);
   public graphCleared$ = this.graphClearedSource.asObservable();
 
-  private showWeightsSource = new BehaviorSubject<boolean>(true);
-  public showWeights$ = this.showWeightsSource.asObservable();
-
   private graphOrientationSource = new BehaviorSubject<GraphOrientation>(GraphOrientation.ORIENTED);
   public graphOrientation$ = this.graphOrientationSource.asObservable();
 
@@ -256,13 +260,6 @@ export class StateService {
   graphCleared() {
    this.graphClearedSource.next(true);
    this.graphChangedSource.next(true);
-  }
-
-  /**
-   * Change the state of showing weights.
-   */
-  changeShowWeights(state: boolean) {
-    this.showWeightsSource.next(state);
   }
 
   /**
@@ -406,6 +403,13 @@ export class StateService {
    */
   generateGraphBySets(sets: GraphSets) {
     this.generateGraphBySetsSource.next(sets);
+  }
+
+  /**
+   * Apply customization values.
+   */
+  applyCustomization(values: Partial<CustomizationFormValues>) {
+    this.applyCustomizationSource.next(values);
   }
 
   /**

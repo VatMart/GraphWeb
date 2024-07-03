@@ -221,21 +221,20 @@ export class NodeEventHandler {
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);
   }
 
-
   private handlePointerDown(event: FederatedPointerEvent): void {
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
     const position = event.getLocalPosition(this.pixiService.mainContainer); // Get position relative to main container
     if (event.target === this.pixiService.stage) {
-      if (!this.pixiService.isPointWithinCanvasBoundaries(position.x, position.y, ConfService.DEFAULT_RADIUS)) {
+      if (!this.pixiService.isPointWithinCanvasBoundaries(position.x, position.y, ConfService.currentNodeStyle.radius.getRadius())) {
         // TODO implement notification to user, outside of borders
         return;
       }
-      const positionNode = {x: position.x - ConfService.DEFAULT_RADIUS,
-        y: position.y - ConfService.DEFAULT_RADIUS};
+      const positionNode = {x: position.x - ConfService.currentNodeStyle.radius.getRadius(),
+        y: position.y - ConfService.currentNodeStyle.radius.getRadius()};
       let newNodeView: NodeView = this.nodeFabric
-        .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraph, positionNode);
+        .createDefaultNodeViewWithCoordinates(this.graphViewService.currentGraphView, positionNode);
       let command = new AddNodeViewCommand(newNodeView, this.graphViewService);
       this.historyService.execute(command);
       //this.graphViewService.addNodeToCurrentGraphView(mode.globalX, mode.globalY);
