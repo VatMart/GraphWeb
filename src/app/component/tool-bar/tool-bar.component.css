@@ -3,6 +3,7 @@
   display: flex;
   justify-content: flex-start;
   flex-wrap: nowrap;
+  align-items: center;
   padding-inline: 4px;
   background-color: var(--main-bg-color);
   border-bottom-width: 1px;
@@ -11,9 +12,39 @@
   box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px;
 }
 
+.logo-container {
+  display: flex;
+  align-items: center;
+  padding-inline: 10px;
+  border-right: var(--main-border-color) 2px solid;
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  background-color: var(--main-button-color);
+}
+
+.logo-container img {
+  padding: 6px;
+}
+
+.logo-toolbar {
+  max-width: 39px;
+  max-height: 39px;
+}
+
+.logo-label {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
 .coordinates-panel {
   display: inline-grid;
-  padding-inline: 10px;
+  padding-inline: 4px;
+  margin-left: 8px;
   width: 95px;
   border-width: 2px;
   border-color: black;

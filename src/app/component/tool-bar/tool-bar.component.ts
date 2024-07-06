@@ -1,5 +1,5 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {DecimalPipe, NgIf} from "@angular/common";
+import {ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {DecimalPipe, NgForOf, NgIf} from "@angular/common";
 import {StateService} from "../../service/event/state.service";
 import {EnvironmentService} from "../../service/config/environment.service";
 import {HistoryService} from "../../service/history.service";
@@ -8,23 +8,25 @@ import {GraphViewService} from "../../service/graph/graph-view.service";
 import {ClearGraphViewCommand} from "../../logic/command/clear-graph-view-command";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GraphOrientation} from "../../model/orientation";
-import {MenuModule} from "primeng/menu";
+import {Menu, MenuModule} from "primeng/menu";
 import {ButtonModule} from "primeng/button";
 import {MenuItem, PrimeNGConfig} from "primeng/api";
 import {RippleModule} from "primeng/ripple";
 import {CheckboxModule} from "primeng/checkbox";
 import {DropdownModule} from "primeng/dropdown";
 import {ConfService} from "../../service/config/conf.service";
+import {BadgeModule} from "primeng/badge";
+import {FileService} from "../../service/file.service";
 
 @Component({
   selector: 'app-tool-bar',
   standalone: true,
-  imports: [NgIf, DecimalPipe, FormsModule, ReactiveFormsModule, MenuModule, ButtonModule, RippleModule, CheckboxModule, DropdownModule],
+  imports: [NgIf, DecimalPipe, FormsModule, ReactiveFormsModule, MenuModule, ButtonModule, RippleModule, CheckboxModule, DropdownModule, NgForOf, BadgeModule],
   templateUrl: './tool-bar.component.html',
   styleUrl: './tool-bar.component.css'
 })
 export class ToolBarComponent implements OnInit, OnDestroy {
-  private subscriptions = new Subscription();
+  private subscriptions!: Subscription;
 
   isMobileDevice: boolean;
 
@@ -64,6 +66,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   orientations: SelectOrientationItem[] | undefined;
   selectedOrientation = new FormControl<GraphOrientation | null>(ConfService.DEFAULT_GRAPH_ORIENTATION);
 
+  // Save/load graph
+  filename: string = 'graph.json';  // Default filename
+  showSaveFileForm: boolean = false;  // Control the visibility of the save file form
+
   // Gradient colors
   gradientColorStart: string = '#FFC618';
   gradientColorEnd: string = '#ff0000';
@@ -72,69 +78,15 @@ export class ToolBarComponent implements OnInit, OnDestroy {
               private environmentService: EnvironmentService,
               private historyService: HistoryService,
               private graphViewService: GraphViewService,
-              private primengConfig: PrimeNGConfig) {
+              private fileService: FileService,
+              private primengConfig: PrimeNGConfig,
+              private cdr: ChangeDetectorRef) {
     this.isMobileDevice = this.environmentService.isMobile();
   }
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
-    // Init subscriptions
-    // Cursor coordinates
-    this.subscriptions.add(this.stateService.currentCursorX.subscribe(state => this.xCursor = state));
-    this.subscriptions.add(this.stateService.currentCursorY.subscribe(state => this.yCursor = state));
-    // Undo/Redo buttons
-    this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
-    this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
-    // Zooming button
-    this.subscriptions.add(this.stateService.zoomChanged$.subscribe(state => {
-      if (state !== null) {
-        this.zoomPercentage = state;
-      }
-    }));
-    // Cog dropdown components
-    this.showGrid.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onToggleShowGrid(value);
-      }
-    });
-    this.hideHelper.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onToggleAlwaysHideHelper(value);
-      }
-    });
-    // Force options
-    this.enableCenterForce.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onCenterForceToggle(value);
-      }
-    });
-    this.enableLinkForce.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onLinkForceToggle(value)
-      }
-    });
-    // Graph orientation
-    this.subscriptions.add(this.selectedOrientation.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onChoseGraphOrientation(value);
-      }
-    }));
-    this.subscriptions.add(this.stateService.graphOrientationChanged$.subscribe(state => {
-      if (state !== this.selectedOrientation.value) {
-        this.selectedOrientation.setValue(state);
-      }
-    }));
-    // Mode buttons
-    this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
-      if (this.isAddVertexButtonActive && state !== 'AddRemoveVertex') {
-        console.log("Switching add vertex button");
-        this.switchAddVertexButton(); // Turn off add vertex mode
-      }
-      if (this.isAddEdgesButtonActive && state !== 'AddRemoveEdge') {
-        console.log("Switching add edges button");
-        this.switchAddEdgesButton(); // Turn off add edges mode
-      }
-    }));
+    this.initSubscriptions();
     // Init zooming button dropdown items
     this.zoomItems = [
       {
@@ -158,8 +110,25 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     ];
     this.settingsItems = [
       {
+        label: 'File',
+        items: [
+          {
+            id: 'saveGraph',
+            label: 'Save graph'
+          },
+          {
+            id: 'loadGraph',
+            label: 'Open graph',
+          }
+        ]
+      },
+      {
         label: 'View options',
         items: [
+          {
+            id: 'zoomLevels',
+            label: 'Zoom',
+          },
           {
             id: 'showWeights',
             label: 'Show weights',
@@ -260,6 +229,20 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.stateService.undoInvoked();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && event.key.toLowerCase() === 'y') {
+      this.redoAction();
+    }
+    if (event.ctrlKey && event.key.toLowerCase() === 'z') {
+      this.undoAction();
+    }
+    if (event.ctrlKey && event.key.toLowerCase() === 's') {
+      event.preventDefault();
+      this.saveGraphClick();
+    }
+  }
+
   redoAction() {
     this.historyService.redo()
     this.stateService.redoInvoked();
@@ -267,6 +250,82 @@ export class ToolBarComponent implements OnInit, OnDestroy {
 
   onZoomDropdownItemClick(number: number) {
     this.stateService.changeZoomTo(number);
+  }
+
+  /**
+   * On save graph button click.
+   */
+  async saveGraphClick() {
+    console.log("Save graph button clicked");
+    const appData = this.fileService.serializeCurrentGraphAndSettings();
+    await this.saveFile(appData, 'graph.json');
+  }
+
+  private async saveFile(data: string, filename: string): Promise<void> {
+    try {
+      if ('showSaveFilePicker' in window) {
+        // Show the file save dialog
+        const options = {
+          suggestedName: filename,
+          types: [{
+            description: 'JSON Files',
+            accept: {'application/json': ['.json']},
+          }],
+        };
+        const fileHandle = await (window as any).showSaveFilePicker(options);
+        // Create a writable stream
+        const writableStream = await fileHandle.createWritable();
+        // Write the data to the stream
+        await writableStream.write(new Blob([data], { type: 'application/json' }));
+        // Close the file and write the contents to disk.
+        await writableStream.close();
+        console.log("File saved successfully"); // TODO remove
+      } else {
+        // Fallback to the Blob API if the File System Access API is not supported
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        console.log("File downloaded successfully"); // TODO remove
+      }
+    } catch (error) {
+      console.error("Error saving file:", error);
+    }
+  }
+
+  loadGraphClick() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = (event: any) => this.handleFileSelect(event);
+    input.click();
+  }
+
+  private handleFileSelect(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result;
+        if (typeof content === 'string') {
+          this.importGraph(content);
+        }
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  private importGraph(jsonContent: string) {
+    try {
+      const appData = this.fileService.deserializeGraphAndSettings(jsonContent);
+      //console.log("Graph loaded successfully:", appData); // TODO: Remove
+      this.stateService.loadApp(appData);
+    } catch (error) {
+      console.error("Error importing graph:", error);
+    }
   }
 
   onCheckboxClick(event: Event, type: string) {
@@ -287,6 +346,15 @@ export class ToolBarComponent implements OnInit, OnDestroy {
           break;
       }
     }
+  }
+
+  /**
+   * Open zoom sub menu in settings menu.
+   * Only for mobile version.
+   */
+  openZoomSubMenu(event: MouseEvent, zoomSubMenu: Menu) {
+    event.stopPropagation();
+    zoomSubMenu.toggle(event);
   }
 
   buttonAddVertexMouseLeave() {
@@ -337,6 +405,88 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.gradientColorStart = '#FFC618';
     this.gradientColorEnd = '#ff0000';
     this.useAddEdgesGradient = false;
+  }
+
+  private initSubscriptions() {
+    this.subscriptions = new Subscription();
+    // Cursor coordinates
+    this.subscriptions.add(this.stateService.currentCursorX.subscribe(state => this.xCursor = state));
+    this.subscriptions.add(this.stateService.currentCursorY.subscribe(state => this.yCursor = state));
+    // Undo/Redo buttons
+    this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
+    this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
+    // Zooming button
+    this.subscriptions.add(this.stateService.zoomChanged$.subscribe(state => {
+      this.zoomPercentage = state;
+    }));
+    // Cog dropdown components
+    this.subscriptions.add(this.showGrid.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onToggleShowGrid(value);
+      }
+    }));
+    this.subscriptions.add(this.hideHelper.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onToggleAlwaysHideHelper(value);
+      }
+    }));
+    // Force options
+    this.subscriptions.add(this.enableCenterForce.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onCenterForceToggle(value);
+      }
+    }));
+    this.subscriptions.add(this.enableLinkForce.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onLinkForceToggle(value)
+      }
+    }));
+    // Graph orientation
+    this.subscriptions.add(this.selectedOrientation.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onChoseGraphOrientation(value);
+      }
+    }));
+    this.subscriptions.add(this.stateService.graphOrientationChanged$.subscribe(state => {
+      if (state !== this.selectedOrientation.value) {
+        this.selectedOrientation.setValue(state);
+      }
+    }));
+    // Mode buttons
+    this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
+      if (this.isAddVertexButtonActive && state !== 'AddRemoveVertex') {
+        console.log("Switching add vertex button");
+        this.switchAddVertexButton(); // Turn off add vertex mode
+      }
+      if (this.isAddEdgesButtonActive && state !== 'AddRemoveEdge') {
+        console.log("Switching add edges button");
+        this.switchAddEdgesButton(); // Turn off add edges mode
+      }
+    }));
+    // On reset UI state
+    this.subscriptions.add(
+      this.stateService.resetUiState$.subscribe((value) => {
+        if (value) {
+          this.resetUiState();
+        }
+      })
+    );
+  }
+
+  private resetUiState() {
+    this.subscriptions.unsubscribe();
+    this.initDefaultValues();
+    this.initSubscriptions();
+  }
+
+  private initDefaultValues() {
+    this.cdr.detectChanges();
+    this.showGrid.setValue(ConfService.SHOW_GRID);
+    this.hideHelper.setValue(ConfService.ALWAYS_HIDE_HELPER_TEXT);
+    this.enableCenterForce.setValue(ConfService.DEFAULT_CENTER_FORCE_ON);
+    this.enableLinkForce.setValue(ConfService.DEFAULT_LINK_FORCE_ON);
+    this.selectedOrientation.setValue(ConfService.DEFAULT_GRAPH_ORIENTATION);
+    this.cdr.detectChanges();
   }
 }
 

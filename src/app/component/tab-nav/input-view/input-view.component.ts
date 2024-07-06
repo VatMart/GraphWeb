@@ -45,7 +45,7 @@ import {GraphSet} from "../../../model/graph-set";
   styleUrl: './input-view.component.css'
 })
 export class InputViewComponent implements OnInit, OnDestroy {
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions!: Subscription;
   isMobileDevice: boolean;
 
   @ViewChild('fileInput') fileInput!: ElementRef;
@@ -118,6 +118,7 @@ export class InputViewComponent implements OnInit, OnDestroy {
     this.currentEdgeValidationType = this.validationTypes[0];
     // Subscriptions
     // On matrix type change
+    this.subscriptions = new Subscription();
     this.subscriptions.add(
       this.matrixType.valueChanges.subscribe(value => {
         if (value !== null) {
@@ -128,35 +129,25 @@ export class InputViewComponent implements OnInit, OnDestroy {
     // On matrix parse result
     this.subscriptions.add(
       this.stateService.currentMatrixParseResult$.subscribe(result => {
-        if (result !== null) {
-          this.onMatrixParseResult(result);
-          this.stateService.changeMatrixParseResult(null); // Reset parse result
-        }
+        this.onMatrixParseResult(result);
       })
     );
     // On vertices set validation result
     this.subscriptions.add(
       this.stateService.currentInputVerticesSetValidationResult$.subscribe(result => {
-        if (result !== null) {
-          this.onValidationVerticesSetResult(result);
-        }
+        this.onValidationVerticesSetResult(result);
       })
     );
     // On edges set validation result
     this.subscriptions.add(
       this.stateService.currentInputEdgesSetValidationResult$.subscribe(result => {
-        if (result !== null) {
-          this.onValidationEdgesSetResult(result);
-        }
+        this.onValidationEdgesSetResult(result);
       })
     );
     // On graph set parse result
     this.subscriptions.add(
       this.stateService.currentInputGraphSetParseResult$.subscribe(result => {
-        if (result !== null) {
-          this.onGraphSetParseResult(result);
-          this.stateService.changeInputGraphSetParseResult(null); // Reset parse result
-        }
+        this.onGraphSetParseResult(result);
       })
     );
   }

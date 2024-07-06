@@ -14,6 +14,9 @@ import {HistoryService} from "../history.service";
 import {EdgeEventHandler} from "../../logic/handlers/edge-event-handler";
 import {NodeViewFabricService} from "../fabric/node-view-fabric.service";
 import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
+import {GraphStateManagerService} from "./graph-state-manager.service";
+import {GraphSetViewManagerService} from "./graph-set-view-manager.service";
+import {GraphMatrixViewStateManagerService} from "./graph-matrix-view-state-manager.service";
 
 /**
  * Service to manage the PIXI canvas
@@ -31,6 +34,9 @@ export class PixiManagerService implements ServiceManager {
               private eventBus: EventBusService,
               private stateService: StateService,
               private modeManagerService: ModeManagerService,
+              private graphManagerService: GraphStateManagerService,
+              private setViewManager: GraphSetViewManagerService,
+              private matrixManagerService: GraphMatrixViewStateManagerService,
               private graphViewService: GraphViewService,
               private historyService: HistoryService,
               private nodeFabric: NodeViewFabricService,
@@ -47,18 +53,39 @@ export class PixiManagerService implements ServiceManager {
     console.log("Pixi initialized. Renderer: " + this.pixiService.renderer.constructor.name); // TODO remove
     // Initialize pixi global listeners. Init all handlers
     this.initSubscriptions();
-    // Initialize mode listeners
+    // Initialize all managers
     this.modeManagerService.initialize();
-    // Notify state service that PIXI is started
-    this.stateService.pixiStarted();
+    this.graphManagerService.initialize();
+    this.setViewManager.initialize();
+    this.matrixManagerService.initialize();
+    console.log("Pixi started"); // TODO remove
   }
 
   /**
-   * Stop the PIXI rendering. Clean up the resources.
+   * Stop the PIXI rendering. Destroy all subscriptions.
    */
   public stopPixi() {
-    // TODO implement
-    this.destroySubscriptions();
+    this.pixiService.stopRendering();
+    this.historyService.clear(); // Clear history
+    this.destroySubscriptions(); // Stop default canvas event listeners
+    this.modeManagerService.destroy();
+    this.graphManagerService.destroy();
+    this.setViewManager.destroy();
+    this.matrixManagerService.destroy();
+    this.edgeFabric.destroy();
+    this.nodeFabric.destroy();
+    this.eventBus.destroy(); // Clear all non-state listeners, handlers
+    // Destroy pixi Canvas
+    this.destroyDefaultPixiCanvas();
+    this.pixiService.stage = undefined;
+    this.pixiService.renderer = undefined;
+    this.pixiService.ticker = undefined;
+    this.pixiService.mainContainer = undefined;
+    this.pixiService.canvasBoundaries = undefined;
+    this.pixiService.canvasVisualGrid = undefined;
+    console.log("MANAGER.Pixi stopped"); // TODO remove
+    // Notify state service that PIXI is stopped
+    this.stateService.pixiStopped();
   }
 
   // Set up the default PIXI canvas
@@ -109,22 +136,26 @@ export class PixiManagerService implements ServiceManager {
    * Resizing window, cursor move, etc.
    */
   initSubscriptions() {
-    try {
-      // Initialize all event handlers
-      this.canvasEventHandler = CanvasEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
-        this.graphViewService);
-      this.nodeEventHandler = NodeEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
-        this.graphViewService, this.historyService, this.nodeFabric);
-      this.edgeEventHandler = EdgeEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
-        this.graphViewService, this.historyService, this.nodeFabric, this.edgeFabric);
-      // Initialize default canvas event handlers (zoom, drag canvas etc)
-      this.canvasEventHandler.initializeDefaultEventHandlers();
-    } catch (e) {
-      console.error("Error initializing event handlers: " + e);
-    }
+    // Initialize all event handlers
+    this.canvasEventHandler = CanvasEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
+      this.graphViewService);
+    this.nodeEventHandler = NodeEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
+      this.graphViewService, this.historyService, this.nodeFabric);
+    this.edgeEventHandler = EdgeEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
+      this.graphViewService, this.historyService, this.nodeFabric, this.edgeFabric);
+    // Initialize default canvas event handlers (zoom, drag canvas etc)
+    this.canvasEventHandler.initializeDefaultEventHandlers();
   }
 
   destroySubscriptions(): void {
     this.canvasEventHandler.destroyDefaultEventHandlers();
+  }
+
+  private destroyDefaultPixiCanvas() {
+    const htmlContainer = document.getElementById('pixiCanvas');
+    if (htmlContainer == null) {
+      throw new Error('Canvas container not found');
+    }
+    htmlContainer.removeChild(this.pixiService.renderer.canvas); // Remove pixi canvas from DOM
   }
 }

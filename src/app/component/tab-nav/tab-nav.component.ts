@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {CommonModule, NgClass, NgForOf, NgIf} from "@angular/common";
 import {OutputViewComponent} from "./output-view/output-view.component";
 import {StateService} from "../../service/event/state.service";
@@ -11,6 +11,7 @@ import {SvgIconDirective} from "../../directive/svg-icon.directive";
 import {Sidebar, SidebarModule} from "primeng/sidebar";
 import {InputViewComponent} from "./input-view/input-view.component";
 import {CustomizationViewComponent} from "./customization-view/customization-view.component";
+import {Subscription} from "rxjs";
 
 /**
  * Component for the tab navigation.
@@ -25,7 +26,8 @@ import {CustomizationViewComponent} from "./customization-view/customization-vie
   templateUrl: './tab-nav.component.html',
   styleUrl: './tab-nav.component.css'
 })
-export class TabNavComponent implements OnInit {
+export class TabNavComponent implements OnInit, OnDestroy {
+  private subscriptions!: Subscription;
 
   isMobileDevice: boolean;
   items: MenuItem[] | undefined;
@@ -64,6 +66,20 @@ export class TabNavComponent implements OnInit {
       {label: 'Customization', id: 'customization', icon: 'pi pi-palette', header: 'Graph customization'},
       {label: 'Generate graph', id: 'generation', icon: 'pi pi-wrench', header: 'Graph generation'}
     ];
+    this.subscriptions = new Subscription();
+    this.subscriptions.add(
+      this.stateService.closeNavBarMenu$.subscribe((value) => {
+        if (value) {
+          if (!this.isMobileDevice) { // Only for desktop version
+            this.onCloseLeftSideContainer();
+          }
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
   }
 
   onCloseLeftSideContainer() {

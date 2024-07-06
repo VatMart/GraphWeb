@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ToolBarComponent} from "./component/tool-bar/tool-bar.component";
 import {CanvasComponent} from "./component/canvas/canvas.component";
 import {ModeManagerService} from "./service/manager/mode-manager.service";
@@ -15,6 +15,9 @@ import {
 import {Subscription} from "rxjs";
 import {GraphSetViewManagerService} from "./service/manager/graph-set-view-manager.service";
 import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix-view-state-manager.service";
+import {ConfService} from "./service/config/conf.service";
+import {PixiManagerService} from "./service/manager/pixi-manager.service";
+import {ImportService} from "./service/import.service";
 
 @Component({
   selector: 'app-root',
@@ -24,8 +27,8 @@ import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
-  private subscriptions: Subscription = new Subscription();
+export class AppComponent implements OnInit, OnDestroy {
+  private subscriptions!: Subscription;
   @ViewChild('floatingEdgeWeightInput') floatingEdgeWeightInput!: FloatEdgeWeightInputComponent;
   title = 'GraphWeb';
 
@@ -37,6 +40,8 @@ export class AppComponent implements OnInit {
               private graphStateManager: GraphStateManagerService,
               private matrixManager: GraphMatrixViewStateManagerService,
               private graphSetManager: GraphSetViewManagerService,
+              private importService: ImportService,
+              private pixiManager: PixiManagerService,
               private environmentService: EnvironmentService,
               private stateService: StateService,
               private cdr: ChangeDetectorRef) {
@@ -44,10 +49,38 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subscriptions = new Subscription();
+    // Subscribe to call pixi start event
+    this.subscriptions.add(
+      this.stateService.pixiStartCall$.subscribe(async (value) => {
+        if (value) {
+          await this.pixiManager.startPixi();
+        }
+      })
+    );
+
+    // On import graph from JSON
+    this.subscriptions.add(
+      this.stateService.loadApp$.subscribe((value) => {
+        console.log("Importing graph from JSON"); // TODO remove
+        // Load graph from JSON
+        this.importService.importAppData(value);
+      })
+    );
+
+    // Subscribe to pixi stop event
+    this.subscriptions.add(
+      this.stateService.pixiStopCall$.subscribe((value) => {
+        if (value) {
+          this.pixiManager.stopPixi();
+        }
+      })
+    );
+
     // Subscribe to pixi started event
     this.subscriptions.add(
       this.stateService.pixiStarted$.subscribe((value) => {
-        if (value === null) {
+        if (!value) {
           return;
         }
         this.cdr.detectChanges();
@@ -57,9 +90,23 @@ export class AppComponent implements OnInit {
       })
     );
 
+    // Subscribe to pixi stopped event
+    this.subscriptions.add(
+      this.stateService.pixiStopped$.subscribe((value) => {
+        if (!value) {
+          return;
+        }
+        this.cdr.detectChanges();
+        // Hide float toolbar and helper
+        this.showFloatToolBar = false;
+        this.showFloatHelper = false;
+      })
+    );
+
     // Subscribe to changes of float helper visibility
     this.subscriptions.add(
       this.stateService.alwaysHideFloatHelper$.subscribe((value) => {
+        ConfService.ALWAYS_HIDE_HELPER_TEXT = value;
         if (this.showFloatHelper === value) {
           this.showFloatHelper = !value;
         }
@@ -69,11 +116,12 @@ export class AppComponent implements OnInit {
     // Subscribe to changes of float change edge weight input visibility
     this.subscriptions.add(
       this.stateService.showEditEdgeWeight$.subscribe((value) => {
-        if (value !== null) {
-          this.floatingEdgeWeightInput.showInput(value);
-        }
+        this.floatingEdgeWeightInput.showInput(value);
       })
     );
-    // TODO implement handling for pixi stop event
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

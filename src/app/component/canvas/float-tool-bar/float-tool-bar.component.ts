@@ -6,6 +6,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {StateService} from "../../../service/event/state.service";
 import {TooltipModule} from "primeng/tooltip";
 import {Subscription} from "rxjs";
+import {ConfService} from "../../../service/config/conf.service";
 
 @Component({
   selector: 'app-float-tool-bar',
@@ -21,7 +22,7 @@ import {Subscription} from "rxjs";
   styleUrl: './float-tool-bar.component.css'
 })
 export class FloatToolBarComponent implements OnInit, OnDestroy {
-  private subscriptions = new Subscription();
+  private subscriptions!: Subscription;
 
   items!: FloatToolBarItem[];
 
@@ -57,6 +58,7 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
         disabled: false,
       }
     ];
+    this.subscriptions = new Subscription();
     // Subscribe to force mode disabled state changes
     this.subscriptions.add(
       this.stateService.forceModeDisabled$.subscribe((value) => {
@@ -71,6 +73,9 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
         }
       })
     );
+    if (ConfService.DEFAULT_FORCE_MODE_ON) {
+      this.toggleForceMode();
+    }
   }
 
   ngOnDestroy(): void {

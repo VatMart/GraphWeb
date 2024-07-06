@@ -31,7 +31,7 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     return nodeGraphical;
   }
 
-  private constructor(node: Node, coordinates: Point, radius: number, texture: Texture) {
+  private constructor(node: Node, coordinates: Point, radius: number, texture?: Texture) {
     super(texture);
     this.hitArea = new PIXI.Circle(this.width / 2, this.height / 2, radius);
     this._node = node;
@@ -39,7 +39,7 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     this._labelText = node.label ? node.label : node.index.toString();
     this._text = new Text();
     this.text.visible = ConfService.SHOW_NODE_LABEL;
-    this.nodeStyle.radius = ConfService.DYNAMIC_NODE_SIZE ? new DynamicRadius(radius, 0) :
+    this.nodeStyle.radius = ConfService.DYNAMIC_NODE_SIZE ? new DynamicRadius(radius, node.getAdjacentEdges().length) :
       new DefaultRadius(radius);
   }
 
@@ -82,6 +82,29 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
    */
   public centerCoordinates(): Point {
     return {x: this.x + this.width / 2, y: this.y + this.height / 2};
+  }
+
+  toJSON() {
+    return {
+      node: this._node.toJSON(),
+      coordinates: this._coordinates,
+      labelText: this._labelText,
+      nodeStyle: this._nodeStyle,
+      radius: this.nodeStyle.radius instanceof DynamicRadius ? this.nodeStyle.radius.baseValue
+        : this.nodeStyle.radius.getRadius(),
+    };
+  }
+
+  static fromJSON(json: any, nodes: Map<number, Node>): NodeView {
+    const node = nodes.get(json.node.index)!;
+    const coordinates: Point = json.coordinates;
+    const radius = json.radius;
+    const nodeView = new NodeView(node, coordinates, radius);
+    const radiusImpl = nodeView.nodeStyle.radius;
+    nodeView.nodeStyle = json.nodeStyle;
+    nodeView.nodeStyle.radius = radiusImpl;
+    nodeView.text.visible = ConfService.SHOW_NODE_LABEL;
+    return nodeView;
   }
 
   get node(): Node {

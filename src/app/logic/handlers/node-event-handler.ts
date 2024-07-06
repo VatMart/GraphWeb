@@ -67,7 +67,6 @@ export class NodeEventHandler {
 
   /**
    * Initializes the NodeEventHandler.
-   * Method should be called only once.
    */
   public static initialize(pixiService: PixiService,
                            eventBus: EventBusService,
@@ -75,9 +74,6 @@ export class NodeEventHandler {
                            graphViewService: GraphViewService,
                            historyService: HistoryService,
                            nodeFabric: NodeViewFabricService): NodeEventHandler {
-    if (this.instance !== undefined) {
-      throw new InitializationError("NodeEventHandler has already been initialized");
-    }
     this.instance = new NodeEventHandler(pixiService, eventBus, stateService, graphViewService, historyService,
       nodeFabric);
     return this.instance;

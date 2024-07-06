@@ -57,6 +57,19 @@ export class Node {
     return node;
   }
 
+  toJSON() {
+    return {
+      index: this._index,
+      label: this._label
+      // Do not copy adj edges
+    };
+  }
+
+  static fromJSON(json: any): Node {
+    const node = new Node(json.index, json.label);
+    return node;
+  }
+
   get index(): number {
     return this._index;
   }

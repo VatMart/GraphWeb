@@ -83,6 +83,18 @@ body {
   padding: 0.25rem 0.25rem;
 }
 
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {
+  color: var(--main-button-color);
+}
+
+/* PrimeNG badge */
+.p-badge {
+  padding: 0 .25rem;
+  font-size: 0.75rem;
+  height: 1.25rem;
+  line-height: 1.25rem;
+}
+
 /* PrimeNG card */
 .p-card {
   background: var(--main-bg-color);

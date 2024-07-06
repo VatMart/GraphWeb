@@ -78,6 +78,17 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     return result;
   }
 
+  /**
+   * Create edge view from imported edge view.
+   */
+  public createFromImportedEdgeView(edgeView: EdgeView): EdgeView {
+    const result: EdgeView = EdgeView.createFrom(edgeView.edge, edgeView.startNode, edgeView.endNode);
+    const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
+    result.weightView.texture = weightTexture;
+    result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
+    return result;
+  }
+
   public updateEdgeViewWeightTexture(edge: EdgeView): void {
     const weightTexture: Texture = <Texture>this.getOrCreateWeightTexture(edge.weightView.text, edge.edgeStyle.weight);
     edge.weightView.texture = weightTexture;
@@ -134,5 +145,10 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     const hitAreaPadding = Math.round(ConfService.EDGE_HIT_AREA_PADDING/2);
     return new Rectangle(weightViewBounds.x - hitAreaPadding, weightViewBounds.y - hitAreaPadding,
       weightViewBounds.width + hitAreaPadding*2, weightViewBounds.height + hitAreaPadding*2);
+  }
+
+  destroy() {
+    this.textureWeightCache.clear();
+    this.styleCache.clear();
   }
 }

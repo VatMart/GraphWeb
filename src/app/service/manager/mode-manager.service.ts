@@ -27,18 +27,16 @@ import {ChangeForceModeCommand, NodePosition} from "../../logic/command/change-f
 })
 export class ModeManagerService implements ServiceManager {
   // TODO call unsubscribe on destroy app
-  private subscriptions = new Subscription();
+  private subscriptions!: Subscription;
 
-  private defaultMode!: DefaultMode;
-  private modeStateActions!: { [key in ModeState]: ModeBehavior };
+  private defaultMode?: DefaultMode;
+  private modeStateActions?: { [key in ModeState]: ModeBehavior };
 
-  private currentModeState!: ModeState;
+  private currentModeState?: ModeState;
 
   constructor(private stateService: StateService,
               private eventBus: EventBusService,
               private pixiService: PixiService,
-              private nodeViewFabricService: NodeViewFabricService,
-              private edgeViewFabricService: EdgeViewFabricService,
               private historyService: HistoryService,
               private graphViewService: GraphViewService) {
   }
@@ -65,25 +63,20 @@ export class ModeManagerService implements ServiceManager {
    * Initialize subscriptions for the mode manager service
    */
   initSubscriptions(): void {
+    // Create a new Subscription object
+    this.subscriptions = new Subscription();
     // Subscribe to the currentMode$ mode state
     this.subscriptions.add(
       this.stateService.currentMode$.subscribe(mode => {
-        if (mode === null) {
-          return;
-        }
         if (this.currentModeState !== mode) {
           this.updateModeState(mode);
           this.updateHelperItem(mode);
         }
       })
     );
-
     // Subscribe to mode states
     this.subscriptions.add(
       this.stateService.currentAddVertexState.subscribe(state => {
-        if (state === null) {
-          return;
-        }
         const newState: ModeState = state ? 'AddRemoveVertex' : 'default';
         this.stateService.changeMode(newState);
       })
@@ -91,9 +84,6 @@ export class ModeManagerService implements ServiceManager {
     // Subscribe to edge mode state
     this.subscriptions.add(
       this.stateService.currentAddEdgesState.subscribe(state => {
-        if (state === null) {
-          return;
-        }
         const newState: ModeState = state ? 'AddRemoveEdge' : 'default';
         this.stateService.changeMode(newState);
       })
@@ -101,12 +91,9 @@ export class ModeManagerService implements ServiceManager {
     // Subscribe to force mode state
     this.subscriptions.add(
       this.stateService.forceModeState$.subscribe(mode => {
-        if (mode === null) {
-          return;
-        }
         const nodePositions: NodePosition[] = [...this.graphViewService.nodeViews.values()]
           .map(node => new NodePosition(node, node.coordinates));
-        const command = new ChangeForceModeCommand(this.graphViewService, this.stateService, this.defaultMode,
+        const command = new ChangeForceModeCommand(this.graphViewService, this.stateService, this.defaultMode!,
           nodePositions, mode)
         this.historyService.execute(command);
       })
@@ -114,32 +101,24 @@ export class ModeManagerService implements ServiceManager {
     // Subscribe to center force mode state
     this.subscriptions.add(
       this.stateService.centerForceState$.subscribe(value => {
-        if (value !== null) {
-          this.defaultMode.centerForceToggle(value)
-        }
+        this.defaultMode!.centerForceToggle(value)
       })
     );
     // Subscribe to link force mode state
     this.subscriptions.add(
       this.stateService.linkForceState$.subscribe(value => {
-        if (value !== null) {
-          this.defaultMode.linkForceToggle(value)
-        }
+        this.defaultMode!.linkForceToggle(value)
       })
     );
     // Subscribe to changes in the graph
     this.subscriptions.add(
       this.stateService.nodeAdded$.subscribe(nodeView => {
-        if (nodeView) {
-          this.onAddedNode(nodeView);
-        }
+        this.onAddedNode(nodeView);
       })
     );
     this.subscriptions.add(
       this.stateService.nodeDeleted$.subscribe(nodeView => {
-        if (nodeView) {
-          this.onRemovedNode(nodeView);
-        }
+        this.onRemovedNode(nodeView);
       })
     );
     this.subscriptions.add(
@@ -151,35 +130,33 @@ export class ModeManagerService implements ServiceManager {
     );
     this.subscriptions.add(
       this.stateService.edgeDeleted$.subscribe(edgeView => {
-        if (edgeView) {
-          this.onRemovedEdge(edgeView);
-        }
+        this.onRemovedEdge(edgeView);
       })
     );
     this.subscriptions.add(
       this.stateService.graphCleared$.subscribe((value) => {
-        if (value !== null) {
+        if (value) {
           this.onGraphCleared();
         }
       })
     );
     this.subscriptions.add(
       this.stateService.graphViewGenerated$.subscribe((value) => {
-        if (value !== null) {
+        if (value) {
           this.onGraphViewGenerated();
         }
       })
     );
     this.subscriptions.add(
       this.stateService.undoInvoked$.subscribe((value) => {
-        if (value !== null) {
+        if (value) {
           this.onUndoInvoked();
         }
       })
     );
     this.subscriptions.add(
       this.stateService.redoInvoked$.subscribe((value) => {
-        if (value !== null) {
+        if (value) {
           this.onRedoInvoked();
         }
       })
@@ -193,12 +170,23 @@ export class ModeManagerService implements ServiceManager {
     this.subscriptions.unsubscribe();
   }
 
+  /**
+   * Destroy the mode manager service
+   */
+  destroy() {
+    this.destroySubscriptions();
+    this.modeStateActions![this.currentModeState!].modeOff(); // Turn off current mode
+    this.defaultMode = undefined;
+    this.modeStateActions = undefined;
+    this.currentModeState = undefined;
+  }
+
   private updateModeState(newState: ModeState) {
-    if (this.modeStateActions[this.currentModeState]) {
-      this.modeStateActions[this.currentModeState].modeOff(); // Turn off current mode
+    if (this.modeStateActions![this.currentModeState!]) {
+      this.modeStateActions![this.currentModeState!].modeOff(); // Turn off current mode
     }
-    if (this.modeStateActions[newState]) {
-      this.modeStateActions[newState].modeOn();
+    if (this.modeStateActions![newState]) {
+      this.modeStateActions![newState].modeOn();
     }
     this.currentModeState = newState;
   }
@@ -220,56 +208,56 @@ export class ModeManagerService implements ServiceManager {
    * On added node handling, while mode is active
    */
   public onAddedNode(nodeView: NodeView) {
-    this.modeStateActions[this.currentModeState].onAddedNode(nodeView);
+    this.modeStateActions![this.currentModeState!].onAddedNode(nodeView);
   }
 
   /**
    * On removed node handling, while mode is active
    */
   public onRemovedNode(nodeView: NodeView) {
-    this.modeStateActions[this.currentModeState].onRemovedNode(nodeView);
+    this.modeStateActions![this.currentModeState!].onRemovedNode(nodeView);
   }
 
   /**
    * On added edge handling, while mode is active
    */
   public onAddedEdge(edgeView: EdgeView) {
-    this.modeStateActions[this.currentModeState].onAddedEdge(edgeView);
+    this.modeStateActions![this.currentModeState!].onAddedEdge(edgeView);
   }
 
   /**
    * On removed edge handling, while mode is active
    */
   public onRemovedEdge(edgeView: EdgeView) {
-    this.modeStateActions[this.currentModeState].onRemovedEdge(edgeView);
+    this.modeStateActions![this.currentModeState!].onRemovedEdge(edgeView);
   }
 
   /**
    * On graph cleared handling, while mode is active
    */
   public onGraphCleared() {
-    this.modeStateActions[this.currentModeState].onGraphCleared();
+    this.modeStateActions![this.currentModeState!].onGraphCleared();
   }
 
   /**
    * On graph view generated handling, while mode is active
    */
   public onGraphViewGenerated() {
-    this.modeStateActions[this.currentModeState].onGraphViewGenerated();
+    this.modeStateActions![this.currentModeState!].onGraphViewGenerated();
   }
 
   /**
    * On undo invoked handling, while mode is active
    */
   public onUndoInvoked() {
-    this.modeStateActions[this.currentModeState].onUndoInvoked();
+    this.modeStateActions![this.currentModeState!].onUndoInvoked();
   }
 
   /**
    * On redo invoked handling, while mode is active
    */
   public onRedoInvoked() {
-    this.modeStateActions[this.currentModeState].onRedoInvoked();
+    this.modeStateActions![this.currentModeState!].onRedoInvoked();
   }
 }
 

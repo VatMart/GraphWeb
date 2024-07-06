@@ -27,20 +27,16 @@ export class VisualGrid extends Graphics {
    * Draw grid on canvas
    */
   drawGrid(): void {
-
     this.clear();
-
     for (let x = this.boundaryXMin; x <= this.boundaryXMax; x += this.cellSize) {
       this.moveTo(x, this.boundaryYMin);
       this.lineTo(x, this.boundaryYMax);
     }
-
     for (let y = this.boundaryYMin; y <= this.boundaryYMax; y += this.cellSize) {
       this.moveTo(this.boundaryXMin, y);
       this.lineTo(this.boundaryXMax, y);
     }
     this.stroke({width: 1, color: '#C0C0C0', alpha: 0.5});
-
     this.zIndex = -1001;
   }
 }

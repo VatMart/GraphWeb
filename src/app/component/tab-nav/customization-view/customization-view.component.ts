@@ -27,6 +27,9 @@ import {BLUE_ORANGE_STYLE} from "../../../model/graphical-model/graph/style-temp
 import {MessageService} from "primeng/api";
 import {ToastModule} from "primeng/toast";
 
+/**
+ * Component for the customization graph elements view.
+ */
 @Component({
   selector: 'app-customization-view',
   standalone: true,
@@ -54,7 +57,7 @@ import {ToastModule} from "primeng/toast";
   styleUrl: './customization-view.component.css'
 })
 export class CustomizationViewComponent implements OnInit, OnDestroy, AfterViewInit {
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions!: Subscription;
 
   protected readonly ConfService = ConfService;
 
@@ -71,6 +74,7 @@ export class CustomizationViewComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   ngOnInit(): void {
+    this.subscriptions = new Subscription();
     this.templateItems = [
       {
         name: 'Black&White Small (Default style)',

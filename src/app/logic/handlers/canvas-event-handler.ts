@@ -11,6 +11,7 @@ import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {SelectRectangle} from "../../model/graphical-model/select-rectangle";
 import {GraphViewService} from "../../service/graph/graph-view.service";
+import {ConfService} from "../../service/config/conf.service";
 
 /**
  * Class for handling events on the canvas. Should be used after pixi canvas is initialized.
@@ -35,7 +36,7 @@ export class CanvasEventHandler {
     return this.instance;
   }
 
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions!: Subscription;
 
   // Touchscreen manager events
   private hammerManager!: HammerManager;
@@ -115,13 +116,9 @@ export class CanvasEventHandler {
 
   /**
    * Initializes the CanvasEventHandler.
-   * Method should be called only once.
    */
   public static initialize(pixiService: PixiService, eventBus: EventBusService,
                            stateService: StateService, graphViewService: GraphViewService): CanvasEventHandler {
-    if (this.instance !== undefined) {
-      throw new InitializationError("CanvasEventHandler has already been initialized");
-    }
     this.instance = new CanvasEventHandler(pixiService, eventBus, stateService, graphViewService);
     return this.instance;
   }
@@ -152,6 +149,7 @@ export class CanvasEventHandler {
   }
 
   private initSubscriptions() {
+    this.subscriptions = new Subscription();
     // Resize canvas on UI change
     this.subscriptions.add(
       this.stateService.needResizeCanvas$.subscribe(value => {
@@ -163,14 +161,13 @@ export class CanvasEventHandler {
     // Zoom to a specific percentage on call from UI
     this.subscriptions.add(
       this.stateService.zoomToChange$.subscribe(percentage => {
-        if (percentage !== null) {
-          this.zoomCanvasTo(percentage);
-        }
+        this.zoomCanvasTo(percentage);
       })
     );
     this.subscriptions.add(
       this.stateService.showGrid$.subscribe(value => {
         this.pixiService.canvasVisualGrid.renderable = value;
+        ConfService.SHOW_GRID = value;
         if (value) {
           this.pixiService.canvasVisualGrid.drawGrid();
         }
