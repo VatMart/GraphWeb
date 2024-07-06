@@ -38,6 +38,8 @@ export class CanvasComponent implements AfterViewInit {
     await document.fonts.ready; // Wait for fonts to load
     // Start PIXI after the view canvas container is initialized
     await this.pixiManager.startPixi();
+    // Notify state service that PIXI is started
+    this.stateService.pixiStarted();
     // Resize canvas on container resize
     this.resizeObserver = new ResizeObserver(() => this.onResize());
     this.resizeObserver.observe(this.canvasContainer.nativeElement);

@@ -15,17 +15,21 @@ import {ValidationError} from "../../error/validation-error";
   providedIn: 'root'
 })
 export class GraphSetViewManagerService implements ServiceManager {
-  private subscriptions: any = new Subscription();
+  private subscriptions!: Subscription;
 
   isGraphSetViewVisible: boolean = false;
 
   constructor(private stateService: StateService,
               private graphSetService: GraphSetService,
               private graphService: GraphViewService) {
+  }
+
+  public initialize() {
     this.initSubscriptions();
   }
 
   initSubscriptions(): void {
+    this.subscriptions = new Subscription();
     // Subscribe to state changes
     // Matrix view visibility
     this.subscriptions.add(
@@ -47,45 +51,39 @@ export class GraphSetViewManagerService implements ServiceManager {
     // Validate vertices set
     this.subscriptions.add(
       this.stateService.validateVerticesInput$.subscribe((input) => {
-        if (input !== null) {
-          this.validateVerticesSet(input);
-        }
+        this.validateVerticesSet(input);
       })
     );
     // Validate edges set
     this.subscriptions.add(
       this.stateService.validateEdgesInput$.subscribe((input) => {
-        if (input !== null) {
-          this.validateEdgesSet(input);
-        }
+        this.validateEdgesSet(input);
       })
     );
     // Validate and build matrix on UI request
     this.subscriptions.add(
       this.stateService.currentInputGraphSet$.subscribe(value => {
-        if (value !== null) {
-          // Validate
-          const verticesResult = this.graphSetService.validateVerticesSet(value.verticesSetInput);
-          const edgesResult = this.graphSetService.validateEdgesSet(value);
-          if (verticesResult.isValid && edgesResult.isValid) { // Build if valid
-            const verticesSet = this.graphSetService.buildGraphSetFromString(verticesResult.value!,
-              TypeGraphSet.VERTICES);
-            const edgesSet = this.graphSetService.buildGraphSetFromString(edgesResult.value!,
-              TypeGraphSet.EDGES);
-            this.stateService.changeInputGraphSetParseResult({
-              valid: true, vertices: verticesSet,
-              edges: edgesSet
-            });
-          } else {
-            let error: SetValidationResult[] = [];
-            if (!verticesResult.isValid) {
-              error.push(verticesResult)
-            }
-            if (!edgesResult.isValid) {
-              error.push(edgesResult)
-            }
-            this.stateService.changeInputGraphSetParseResult({valid: false, error: error})
+        // Validate
+        const verticesResult = this.graphSetService.validateVerticesSet(value.verticesSetInput);
+        const edgesResult = this.graphSetService.validateEdgesSet(value);
+        if (verticesResult.isValid && edgesResult.isValid) { // Build if valid
+          const verticesSet = this.graphSetService.buildGraphSetFromString(verticesResult.value!,
+            TypeGraphSet.VERTICES);
+          const edgesSet = this.graphSetService.buildGraphSetFromString(edgesResult.value!,
+            TypeGraphSet.EDGES);
+          this.stateService.changeInputGraphSetParseResult({
+            valid: true, vertices: verticesSet,
+            edges: edgesSet
+          });
+        } else {
+          let error: SetValidationResult[] = [];
+          if (!verticesResult.isValid) {
+            error.push(verticesResult)
           }
+          if (!edgesResult.isValid) {
+            error.push(edgesResult)
+          }
+          this.stateService.changeInputGraphSetParseResult({valid: false, error: error})
         }
       })
     );
@@ -115,5 +113,9 @@ export class GraphSetViewManagerService implements ServiceManager {
   private validateEdgesSet(input: GraphSetRequest) {
     const result = this.graphSetService.validateEdgesSet(input);
     this.stateService.changeInputEdgesSetValidationResult(result);
+  }
+
+  destroy() {
+    this.destroySubscriptions();
   }
 }

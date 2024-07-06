@@ -52,12 +52,14 @@ export class ForceMode {
     this.initializeForceNodes();
     this.enableForces();
     ForceMode.isActive = true;
+    ConfService.DEFAULT_FORCE_MODE_ON = true;
   }
 
   modeOff(): void {
     this.disableForces();
     this.destroyForceNodes();
     ForceMode.isActive = false;
+    ConfService.DEFAULT_FORCE_MODE_ON = false;
   }
 
   onAddedNode(nodeView: NodeView): void {
@@ -350,6 +352,7 @@ export class ForceMode {
    */
   centerForceToggle(value: boolean) {
     this.centerSpringForceEnabled = value;
+    ConfService.DEFAULT_CENTER_FORCE_ON = value;
   }
 
   /**
@@ -357,5 +360,6 @@ export class ForceMode {
    */
   linkForceToggle(value: boolean) {
     this.linkSpringForceEnabled = value;
+    ConfService.DEFAULT_LINK_FORCE_ON = value;
   }
 }

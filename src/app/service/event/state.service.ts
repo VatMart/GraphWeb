@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subject} from "rxjs";
 import {ModeState} from "../manager/mode-manager.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
@@ -16,6 +16,7 @@ import {
 } from "../../component/tab-nav/input-view/input-view.component";
 import {SetValidationResult} from "../graph/graph-set.service";
 import {CustomizationFormValues} from "../../component/tab-nav/customization-view/customization-view.component";
+import {AppData} from "../file.service";
 
 /**
  * Service for managing the state of the application.
@@ -24,6 +25,9 @@ import {CustomizationFormValues} from "../../component/tab-nav/customization-vie
   providedIn: 'root'
 })
 export class StateService {
+
+  private resetUiStateSource = new Subject<boolean>();
+  public resetUiState$ = this.resetUiStateSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Tool bar
@@ -34,93 +38,111 @@ export class StateService {
   private canRedoSource = new BehaviorSubject<boolean>(false);
   public canRedo$ = this.canRedoSource.asObservable();
 
-  private undoInvokedSource = new BehaviorSubject<boolean | null>(null);
+  private undoInvokedSource = new Subject<boolean>();
   public undoInvoked$ = this.undoInvokedSource.asObservable();
 
-  private redoInvokedSource = new BehaviorSubject<boolean | null>(null);
+  private redoInvokedSource = new Subject<boolean>();
   public redoInvoked$ = this.redoInvokedSource.asObservable();
 
-  private showGridSource = new BehaviorSubject<boolean>(false);
+  private showGridSource = new Subject<boolean>();
   public showGrid$ = this.showGridSource.asObservable();
 
   // Current mode (default, add vertex, add edges etc.)
-  private modeStateSource = new BehaviorSubject<ModeState | null>(null);
+  private modeStateSource = new Subject<ModeState>();
   public currentMode$ = this.modeStateSource.asObservable();
 
   // All modes
-  private stateAddVertexSource = new BehaviorSubject<boolean | null>(null);
+  private stateAddVertexSource = new Subject<boolean>();
   public currentAddVertexState = this.stateAddVertexSource.asObservable();
-  private stateAddEdgesSource = new BehaviorSubject<boolean| null>(null);
+  private stateAddEdgesSource = new Subject<boolean>();
   public currentAddEdgesState = this.stateAddEdgesSource.asObservable();
+
+  private loadAppSource = new Subject<AppData>();
+  public loadApp$ = this.loadAppSource.asObservable();
+
+  // --------------------------------------------------
+  // UI component states. Nav bar components.
+  // --------------------------------------------------
+  private closeNavBarMenuSource = new Subject<boolean>();
+  public closeNavBarMenu$ = this.closeNavBarMenuSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Nav bar components. Output view
   // --------------------------------------------------
-  private outputViewVisibilitySource = new BehaviorSubject<boolean>(false);
+  private outputViewVisibilitySource = new Subject<boolean>();
   public outputViewVisibility$ = this.outputViewVisibilitySource.asObservable();
 
-  private outputMatrixTypeSource = new BehaviorSubject<TypeMatrix>(TypeMatrix.ADJACENCY);
+  private outputMatrixTypeSource = new Subject<TypeMatrix>();
   public currentOutputMatrixType$ = this.outputMatrixTypeSource.asObservable();
 
-  private outputMatrixSource = new BehaviorSubject<GraphMatrix | null>(null);
+  private outputMatrixSource = new Subject<GraphMatrix>();
   public currentOutputMatrix$ = this.outputMatrixSource.asObservable();
 
-  private needUpdateOutputMatrixSource = new BehaviorSubject<boolean>(false);
+  private needUpdateOutputMatrixSource = new Subject<boolean>();
   public needUpdateOutputMatrix$ = this.needUpdateOutputMatrixSource.asObservable();
 
-  private verticesGraphSetSource = new BehaviorSubject<GraphSet | null>(null);
+  private verticesGraphSetSource = new Subject<GraphSet>();
   public currentVerticesGraphSet$ = this.verticesGraphSetSource.asObservable();
 
-  private edgesGraphSetSource = new BehaviorSubject<GraphSet | null>(null);
+  private edgesGraphSetSource = new Subject<GraphSet>();
   public currentEdgesGraphSet$ = this.edgesGraphSetSource.asObservable();
 
-  private needUpdateGraphSetSource = new BehaviorSubject<boolean>(false);
+  private needUpdateGraphSetSource = new Subject<boolean>();
   public needUpdateGraphSet$ = this.needUpdateGraphSetSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Nav bar components. Input view
   // --------------------------------------------------
-  private inputMatrixSource = new BehaviorSubject<MatrixStringInput | null>(null);
+  private inputMatrixSource = new Subject<MatrixStringInput>();
   public currentMatrixInput$ = this.inputMatrixSource.asObservable();
 
-  private inputMatrixParseResultSource = new BehaviorSubject<MatrixParseResult | null>(null);
+  private inputMatrixParseResultSource = new Subject<MatrixParseResult>();
   public currentMatrixParseResult$ = this.inputMatrixParseResultSource.asObservable();
 
-  private generateGraphByMatrixSource = new BehaviorSubject<GraphMatrix | null>(null);
+  private generateGraphByMatrixSource = new Subject<GraphMatrix>();
   public generateGraphByMatrix$ = this.generateGraphByMatrixSource.asObservable();
 
-  private validateVerticesInputSource = new BehaviorSubject<string | null>(null);
+  private validateVerticesInputSource = new Subject<string>();
   public validateVerticesInput$ = this.validateVerticesInputSource.asObservable();
 
-  private currentInputVerticesSetValidationResultSource = new BehaviorSubject<SetValidationResult | null>(null);
+  private currentInputVerticesSetValidationResultSource = new Subject<SetValidationResult>();
   public currentInputVerticesSetValidationResult$ = this.currentInputVerticesSetValidationResultSource.asObservable();
 
-  private validateEdgesInputSource = new BehaviorSubject<GraphSetRequest | null>(null);
+  private validateEdgesInputSource = new Subject<GraphSetRequest>();
   public validateEdgesInput$ = this.validateEdgesInputSource.asObservable();
 
-  private currentInputEdgesSetValidationResultSource = new BehaviorSubject<SetValidationResult | null>(null);
+  private currentInputEdgesSetValidationResultSource = new Subject<SetValidationResult>();
   public currentInputEdgesSetValidationResult$ = this.currentInputEdgesSetValidationResultSource.asObservable();
 
-  private inputGraphSetSource = new BehaviorSubject<GraphSetRequest | null>(null);
+  private inputGraphSetSource = new Subject<GraphSetRequest>();
   public currentInputGraphSet$ = this.inputGraphSetSource.asObservable();
 
-  private inputGraphSetParseResultSource = new BehaviorSubject<GraphSetParseResult | null>(null);
+  private inputGraphSetParseResultSource = new Subject<GraphSetParseResult>();
   public currentInputGraphSetParseResult$ = this.inputGraphSetParseResultSource.asObservable();
 
-  private generateGraphBySetsSource = new BehaviorSubject<GraphSets | null>(null);
+  private generateGraphBySetsSource = new Subject<GraphSets>();
   public generateGraphBySets$ = this.generateGraphBySetsSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Nav bar components. Customization view
   // --------------------------------------------------
-  private applyCustomizationSource = new BehaviorSubject<Partial<CustomizationFormValues> | null>(null);
+  private applyCustomizationSource = new Subject<Partial<CustomizationFormValues>>();
   public applyCustomization$ = this.applyCustomizationSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas
   // --------------------------------------------------
-  private pixiStartedSource = new BehaviorSubject<boolean | null>(null);
+  private pixiStartCallSource = new Subject<boolean>();
+  public pixiStartCall$ = this.pixiStartCallSource.asObservable();
+
+  private pixiStartedSource = new Subject<boolean>();
   public pixiStarted$ = this.pixiStartedSource.asObservable();
+
+  private pixiStopCallSource = new Subject<boolean>();
+  public pixiStopCall$ = this.pixiStopCallSource.asObservable();
+
+  private pixiStoppedSource = new Subject<boolean>();
+  public pixiStopped$ = this.pixiStoppedSource.asObservable();
 
   // Canvas cursor coordinates
   private cursorXSource = new BehaviorSubject<number>(0);
@@ -128,73 +150,73 @@ export class StateService {
   public currentCursorX = this.cursorXSource.asObservable();
   public currentCursorY = this.cursorYSource.asObservable();
 
-  private needResizeCanvasSource = new BehaviorSubject<boolean | null>(null);
+  private needResizeCanvasSource = new Subject<boolean>();
   public needResizeCanvas$ = this.needResizeCanvasSource.asObservable();
 
-  private rendererResizedSource = new BehaviorSubject<{width: number, height: number}>({width: 0, height: 0});
+  private rendererResizedSource = new Subject<{width: number, height: number}>();
   public rendererResized$ = this.rendererResizedSource.asObservable();
 
-  private zoomToChangeSource = new BehaviorSubject<number | null>(null);
+  private zoomToChangeSource = new Subject<number>();
   public zoomToChange$ = this.zoomToChangeSource.asObservable();
 
-  private zoomChangedSource = new BehaviorSubject<number | null>(null);
+  private zoomChangedSource = new Subject<number>();
   public zoomChanged$ = this.zoomChangedSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas Float toolbar
   // --------------------------------------------------
 
-  private needCenterCanvasViewSource = new BehaviorSubject<boolean>(false);
+  private needCenterCanvasViewSource = new Subject<boolean>();
   public needCenterCanvasView$ = this.needCenterCanvasViewSource.asObservable();
 
-  private forceModeDisabledSource = new BehaviorSubject<boolean>(false);
+  private forceModeDisabledSource = new Subject<boolean>();
   public forceModeDisabled$ = this.forceModeDisabledSource.asObservable();
 
-  private forceModeStateSource = new BehaviorSubject<boolean | null>(null);
+  private forceModeStateSource = new Subject<boolean>();
   public forceModeState$ = this.forceModeStateSource.asObservable();
 
-  private forceModeStateChangedSource = new BehaviorSubject<boolean>(false);
+  private forceModeStateChangedSource = new Subject<boolean>();
   public forceModeStateChanged$ = this.forceModeStateChangedSource.asObservable();
 
-  private centerForceStateSource = new BehaviorSubject<boolean | null>(null);
+  private centerForceStateSource = new Subject<boolean>();
   public centerForceState$ = this.centerForceStateSource.asObservable();
 
-  private linkForceStateSource = new BehaviorSubject<boolean | null>(null);
+  private linkForceStateSource = new Subject<boolean>();
   public linkForceState$ = this.linkForceStateSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas Float helper
   // --------------------------------------------------
-  private alwaysHideFloatHelperSource = new BehaviorSubject<boolean>(false);
+  private alwaysHideFloatHelperSource = new Subject<boolean>();
   public alwaysHideFloatHelper$ = this.alwaysHideFloatHelperSource.asObservable();
 
-  private currentFloatHelperItemSource = new BehaviorSubject<FloatHelperItem>(DEFAULT_HELPER_ITEM);
+  private currentFloatHelperItemSource = new Subject<FloatHelperItem>();
   public currentFloatHelperItem$ = this.currentFloatHelperItemSource.asObservable();
 
   // --------------------------------------------------
   // Graph elements and graph states
   // --------------------------------------------------
   // Node related events
-  private nodeAddedSource = new BehaviorSubject<NodeView | null>(null);
+  private nodeAddedSource = new Subject<NodeView>();
   public nodeAdded$ = this.nodeAddedSource.asObservable();
 
-  private nodeDeletedSource = new BehaviorSubject<NodeView | null>(null);
+  private nodeDeletedSource = new Subject<NodeView>();
   public nodeDeleted$ = this.nodeDeletedSource.asObservable();
 
   // Edge related events
-  private edgeAddedSource = new BehaviorSubject<EdgeView | null>(null);
+  private edgeAddedSource = new Subject<EdgeView>();
   public edgeAdded$ = this.edgeAddedSource.asObservable();
 
-  private edgeDeletedSource = new BehaviorSubject<EdgeView | null>(null);
+  private edgeDeletedSource = new Subject<EdgeView>();
   public edgeDeleted$ = this.edgeDeletedSource.asObservable();
 
-  private showEditEdgeWeightSource = new BehaviorSubject<Weight | null>(null);
+  private showEditEdgeWeightSource = new Subject<Weight>();
   public showEditEdgeWeight$ = this.showEditEdgeWeightSource.asObservable();
 
-  private edgeWeightToChangeSource = new BehaviorSubject<WeightToChange | null>(null);
+  private edgeWeightToChangeSource = new Subject<WeightToChange>();
   public edgeWeightToChange$ = this.edgeWeightToChangeSource.asObservable();
 
-  private edgeWeightChangedSource = new BehaviorSubject<EdgeView | null>(null);
+  private edgeWeightChangedSource = new Subject<EdgeView>();
   public edgeWeightChanged$ = this.edgeWeightChangedSource.asObservable();
 
   // Graph related events
@@ -202,22 +224,29 @@ export class StateService {
    * State of any changes with graph (added node/edge, deleted node/edge, changed weight, changed orientation etc.).
    * Be careful with this event, if you already subscribed to child events (nodeAdded$, nodeDeleted$ etc.).
    */
-  private graphChangedSource = new BehaviorSubject<boolean>(false);
+  private graphChangedSource = new Subject<boolean>();
   public graphChanged$ = this.graphChangedSource.asObservable();
 
-  private graphClearedSource = new BehaviorSubject<boolean | null>(null);
+  private graphClearedSource = new Subject<boolean>();
   public graphCleared$ = this.graphClearedSource.asObservable();
 
-  private graphOrientationSource = new BehaviorSubject<GraphOrientation>(GraphOrientation.ORIENTED);
+  private graphOrientationSource = new Subject<GraphOrientation>();
   public graphOrientation$ = this.graphOrientationSource.asObservable();
 
-  private graphOrientationChangedSource = new BehaviorSubject<GraphOrientation>(GraphOrientation.ORIENTED);
+  private graphOrientationChangedSource = new Subject<GraphOrientation>();
   public graphOrientationChanged$ = this.graphOrientationChangedSource.asObservable();
 
-  private graphViewGeneratedSource = new BehaviorSubject<boolean | null>(null);
+  private graphViewGeneratedSource = new Subject<boolean>();
   public graphViewGenerated$ = this.graphViewGeneratedSource.asObservable();
 
   constructor() { }
+
+  /**
+   * Reset the UI state.
+   */
+  resetUiState() {
+    this.resetUiStateSource.next(true);
+  }
 
   /**
    * Change the undo state.
@@ -293,10 +322,16 @@ export class StateService {
   }
 
   /**
+   * Close the nav bar menu.
+   */
+  closeSidebarMenu() {
+    this.closeNavBarMenuSource.next(true);
+  }
+
+  /**
    * Change the visibility of the matrix view.
    */
   changedOutputViewVisibility(value: boolean) {
-    //console.log("Output view visibility changed: " + value); // TODO Remove
     this.outputViewVisibilitySource.next(value);
   }
 
@@ -345,7 +380,7 @@ export class StateService {
   /**
    * Change the input matrix parse result.
    */
-  changeMatrixParseResult(result: MatrixParseResult | null) {
+  changeMatrixParseResult(result: MatrixParseResult) {
     this.inputMatrixParseResultSource.next(result);
   }
 
@@ -394,7 +429,7 @@ export class StateService {
   /**
    * Change the input graph set parse result.
    */
-  changeInputGraphSetParseResult(result: GraphSetParseResult | null) {
+  changeInputGraphSetParseResult(result: GraphSetParseResult) {
     this.inputGraphSetParseResultSource.next(result);
   }
 
@@ -420,10 +455,31 @@ export class StateService {
   }
 
   /**
+   * Notify that the PIXI renderer needs to be started.
+   */
+  pixiStartCall() {
+    this.pixiStartCallSource.next(true);
+  }
+
+  /**
    * Notify that the PIXI renderer has been started.
    */
   pixiStarted() {
     this.pixiStartedSource.next(true);
+  }
+
+  /**
+   * Notify that the PIXI renderer needs to be stopped.
+   */
+  pixiStopCall() {
+    this.pixiStopCallSource.next(true);
+  }
+
+  /**
+   * Notify that the PIXI renderer has been stopped.
+   */
+  pixiStopped() {
+    this.pixiStoppedSource.next(true);
   }
 
   /**
@@ -480,6 +536,7 @@ export class StateService {
    */
   changeForceModeDisabledState(state: boolean) {
     this.forceModeDisabledSource.next(state);
+    this.isForceModeDisabledBool = state;
   }
 
   /**
@@ -536,6 +593,13 @@ export class StateService {
    */
   changeAddEdgesModeState(state: boolean) {
     this.stateAddEdgesSource.next(state);
+  }
+
+  /**
+   * Load the application state.
+   */
+  loadApp(appData: AppData) {
+    this.loadAppSource.next(appData);
   }
 
   /**
@@ -598,8 +662,10 @@ export class StateService {
     return ForceMode.isActive;
   }
 
+  private isForceModeDisabledBool: boolean = false;
+
   isForceModeDisabled(): boolean {
-    return this.forceModeDisabledSource.value;
+    return this.isForceModeDisabledBool;
   }
 }
 

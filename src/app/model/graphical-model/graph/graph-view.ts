@@ -17,6 +17,21 @@ export class GraphView {
     this._edgeViews = edgeViews ? edgeViews : new Map<string, EdgeView>();
   }
 
+  toJSON() {
+    return {
+      graph: this._graph.toJSON(),
+      nodeViews: Array.from(this._nodeViews.entries()).map(([key, value]) => [key, value.toJSON()]),
+      edgeViews: Array.from(this._edgeViews.entries()).map(([key, value]) => [key, value.toJSON()])
+    };
+  }
+
+  static fromJSON(json: any): GraphView {
+    const graph = Graph.fromJSON(json.graph); // Assuming Graph class has a fromJSON method
+    const nodeViews = new Map<number, NodeView>(json.nodeViews.map(([key, value]: [number, any]) => [key, NodeView.fromJSON(value, graph.getNodes())]));
+    const edgeViews = new Map<string, EdgeView>(json.edgeViews.map(([key, value]: [string, any]) => [key, EdgeView.fromJSON(value, graph.getEdges(), nodeViews)]));
+    return new GraphView(graph, nodeViews, edgeViews);
+  }
+
   get graph(): Graph {
     return this._graph;
   }

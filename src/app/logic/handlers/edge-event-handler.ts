@@ -64,7 +64,6 @@ export class EdgeEventHandler {
 
   /**
    * Initializes the EdgeEventHandler.
-   * Method should be called only once.
    */
   public static initialize(pixiService: PixiService,
                            eventBus: EventBusService,
@@ -73,9 +72,6 @@ export class EdgeEventHandler {
                            historyService: HistoryService,
                            nodeFabric: NodeViewFabricService,
                            edgeFabric: EdgeViewFabricService): EdgeEventHandler {
-    if (this.instance !== undefined) {
-      throw new InitializationError("EdgeEventHandler has already been initialized");
-    }
     this.instance = new EdgeEventHandler(pixiService, eventBus, stateService, graphViewService, historyService, nodeFabric,
       edgeFabric);
     return this.instance;

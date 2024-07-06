@@ -1,5 +1,6 @@
 import {TextStyleFontWeight} from "pixi.js/lib/scene/text/TextStyle";
 import {Radius} from "../node/radius";
+import {GraphOrientation} from "../../orientation";
 
 /**
  * Graph view properties class.
@@ -8,6 +9,11 @@ export interface GraphViewProperties {
   graphStyle: GraphViewStyle;
   nodeProperties: NodeProperties;
   edgeProperties: EdgeProperties;
+  graphOrientation: GraphOrientation;
+  showGrid: boolean;
+  enableForceMode: boolean;
+  enableCenterForce: boolean;
+  enableLinkForce: boolean;
 }
 
 /**

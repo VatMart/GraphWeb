@@ -75,12 +75,21 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
   }
 
   /**
+   * Initialize imported node view.
+   * @param nodeView - node view to initialize
+   */
+  public createFromImportedNodeView(nodeView: NodeView) {
+    const texture: Texture = <Texture>this.getOrCreateTexture(nodeView.nodeStyle);
+    const result = NodeView.createFromTexture(nodeView.node, nodeView.coordinates, nodeView.radius, texture);
+    return result;
+  }
+
+  /**
    * Change node style and save current style in cache.
    */
   public changeToStyleAndSave(nodeView: NodeView, nodeStyle: NodeStyle, gradientColor?: GradientColor) {
     // Save current key of texture in cache
-    const textureKey = `${nodeView.radius}_${nodeView.nodeStyle.fillNode}_${nodeView.nodeStyle.strokeColor}
-    _${nodeView.nodeStyle.strokeWidth}`;
+    const textureKey = `${nodeView.radius}_${nodeView.nodeStyle.fillNode}_${nodeView.nodeStyle.strokeColor}_${nodeView.nodeStyle.strokeWidth}`;
     this.styleCache.set(nodeView.node.index, textureKey);
     // Build new style
     this.switchNodeStyle(nodeView, nodeStyle, gradientColor);
@@ -154,6 +163,11 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
     return new FillGradient(fullRadius, 0, fullRadius, (2 * fullRadius))
     .addColorStop(0, gradientColor.startColor)
     .addColorStop(1, gradientColor.endColor);
+  }
+
+  destroy() {
+    this.textureCache.clear();
+    this.styleCache.clear();
   }
 }
 

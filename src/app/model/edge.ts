@@ -50,6 +50,26 @@ export class Edge {
     return edge;
   }
 
+  toJSON() {
+    return {
+      firstNode: this._firstNode.toJSON(),
+      secondNode: this._secondNode.toJSON(),
+      edgeIndex: this._edgeIndex.toJSON(),
+      label: this._label,
+      orientation: this._orientation,
+      weight: this._weight
+    };
+  }
+
+  static fromJSON(json: any, nodes: Map<number, Node>): Edge {
+    const firstNode = nodes.get(json.firstNode.index)!;
+    const secondNode = nodes.get(json.secondNode.index)!;
+    const edgeIndex = EdgeIndex.fromString(json.edgeIndex.value); // Using fromString to reconstruct EdgeIndex
+    const edge = new Edge(firstNode, secondNode, json.orientation, json.weight, json.label);
+    edge._edgeIndex = edgeIndex;
+    return edge;
+  }
+
   get firstNode(): Node {
     return this._firstNode;
   }
@@ -131,6 +151,18 @@ export class EdgeIndex {
     }
 
     return new this(from, to);
+  }
+
+  toJSON() {
+    return {
+      value: this._value,
+      from: this.from,
+      to: this.to
+    };
+  }
+
+  static fromJSON(json: any): EdgeIndex {
+    return new EdgeIndex(json.from, json.to);
   }
 
   get value(): string {

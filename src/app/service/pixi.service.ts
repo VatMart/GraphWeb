@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {autoDetectRenderer, Container, Renderer, Ticker} from "pixi.js";
+import {autoDetectRenderer, Container, ContainerChild, Renderer, Ticker, WebGLRenderer, WebGPURenderer} from "pixi.js";
 import {EnvironmentService} from "./config/environment.service";
 import {VisualGrid} from "../model/graphical-model/visual-grid";
 import {CanvasBorder} from "../model/graphical-model/canvas-border";
@@ -15,14 +15,14 @@ import {ConfService} from "./config/conf.service";
 })
 export class PixiService {
 
-  // Those properties should be initialized by PixiManager
-  private _stage!: Container;
-  private _renderer!: Renderer;
-  private _ticker!: Ticker;
+  // These properties should be initialized by PixiManager
+  private _stage?: Container;
+  private _renderer?: Renderer;
+  private _ticker?: Ticker;
   // Main container for all the elements
-  private _mainContainer!: Container;
-  private _canvasBoundaries!: CanvasBorder;
-  private _canvasVisualGrid!: VisualGrid;
+  private _mainContainer?: Container;
+  private _canvasBoundaries?: CanvasBorder;
+  private _canvasVisualGrid?: VisualGrid;
 
   // Boundary of panning coordinates
   private _boundaryXMin: number = ConfService.BOUNDS_X_MIN;
@@ -200,42 +200,42 @@ export class PixiService {
   // Getters and Setters
   // ------------------
   get stage(): Container {
-    return this._stage;
+    return <Container<ContainerChild>>this._stage;
   }
 
-  set stage(value: Container) {
+  set stage(value: Container | undefined) {
     this._stage = value;
   }
 
   get renderer(): Renderer {
-    return this._renderer;
+    return <WebGLRenderer<HTMLCanvasElement> | WebGPURenderer<HTMLCanvasElement>>this._renderer;
   }
 
-  set renderer(value: Renderer) {
+  set renderer(value: Renderer | undefined) {
     this._renderer = value;
   }
 
   get ticker(): Ticker {
-    return this._ticker;
+    return <Ticker>this._ticker;
   }
 
-  set ticker(value: Ticker) {
+  set ticker(value: Ticker | undefined) {
     this._ticker = value;
   }
 
   get mainContainer(): Container {
-    return this._mainContainer;
+    return <Container<ContainerChild>>this._mainContainer;
   }
 
-  set mainContainer(value: Container) {
+  set mainContainer(value: Container | undefined) {
     this._mainContainer = value;
   }
 
   get canvasBoundaries(): CanvasBorder {
-    return this._canvasBoundaries;
+    return <CanvasBorder>this._canvasBoundaries;
   }
 
-  set canvasBoundaries(value: CanvasBorder) {
+  set canvasBoundaries(value: CanvasBorder | undefined) {
     this._canvasBoundaries = value;
   }
 
@@ -275,11 +275,11 @@ export class PixiService {
     return this._boundaryGap;
   }
 
-  set canvasVisualGrid(value: VisualGrid) {
+  set canvasVisualGrid(value: VisualGrid | undefined) {
     this._canvasVisualGrid = value;
   }
 
   get canvasVisualGrid(): VisualGrid {
-    return this._canvasVisualGrid;
+    return <VisualGrid>this._canvasVisualGrid;
   }
 }

@@ -107,7 +107,12 @@ export class ConfService {
       edgeProperties: {
         showWeight: ConfService.SHOW_WEIGHT,
         dynamicEdgeWeightValue: ConfService.DYNAMIC_EDGE_WEIGHT_VALUE
-      }
+      },
+      graphOrientation: ConfService.DEFAULT_GRAPH_ORIENTATION,
+      showGrid: ConfService.SHOW_GRID,
+      enableForceMode: ConfService.DEFAULT_FORCE_MODE_ON,
+      enableCenterForce: ConfService.DEFAULT_CENTER_FORCE_ON,
+      enableLinkForce: ConfService.DEFAULT_LINK_FORCE_ON
     };
   }
 

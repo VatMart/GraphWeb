@@ -27,7 +27,7 @@ import {Subscription} from "rxjs";
   ]
 })
 export class FloatHelperComponent implements OnInit, OnDestroy {
-  private subscriptions = new Subscription();
+  private subscriptions!: Subscription;
 
   showHelper: boolean = true;
   currentHelperItem!: FloatHelperItem;
@@ -36,6 +36,7 @@ export class FloatHelperComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.subscriptions = new Subscription();
     // Subscribe to changes of float helper item
     this.subscriptions.add(
       this.stateService.currentFloatHelperItem$.subscribe(item => {
@@ -45,9 +46,7 @@ export class FloatHelperComponent implements OnInit, OnDestroy {
         this.currentHelperItem = item;
       }));
     // Set default helper item if not set by state service
-    if (this.currentHelperItem) {
-      this.currentHelperItem = DEFAULT_HELPER_ITEM;
-    }
+    this.currentHelperItem = DEFAULT_HELPER_ITEM;
   }
 
   ngOnDestroy(): void {

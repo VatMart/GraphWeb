@@ -207,6 +207,15 @@ export class EventBusService {
     }
     return this.handlers.delete(name);
   }
+
+  /**
+   * Destroys all subscriptions and clears the handlers map.
+   */
+  public destroy() {
+    this.handlers.clear();
+    this.eventSubjects.clear();
+    this.eventSubscriptions.clear();
+  }
 }
 
 /**

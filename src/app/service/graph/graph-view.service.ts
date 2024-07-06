@@ -167,7 +167,7 @@ export class GraphViewService extends GraphModelService {
    */
   public changeGraphOrientation(graphView: GraphView, orientation: GraphOrientation) {
     graphView.graph.orientation = orientation; // TODO call model service method
-    console.log("Graph orientation changed: " + orientation); // TODO remove
+    ConfService.DEFAULT_GRAPH_ORIENTATION = orientation; // Update default orientation
     if (orientation === GraphOrientation.MIXED) { // If mixed, do not change edge orientations
       this.stateService.graphOrientationChanged(orientation);
       return;
@@ -207,6 +207,33 @@ export class GraphViewService extends GraphModelService {
   public initializeGraphView(): void {
     const graph = new Graph();
     this.currentGraphView = new GraphView(graph);
+  }
+
+  /**
+   * Creates graphView from deserialized and configured graphView.
+   */
+  public importFromGraphView(graph: GraphView) {
+    this.initializeGraphView(); // Replace current graph view with new one
+    const newEdgeViews = [...graph.edgeViews.entries()];
+    // Import nodes
+    graph.nodeViews.forEach((nodeView) => {
+      // Create new node view from imported node view
+      let newNodeView: NodeView = this.nodeFabric.createFromImportedNodeView(nodeView);
+      // Add node view to graph view
+      this.addNodeToGraphView(this.currentGraphView, newNodeView);
+      // Update adjacent edges references
+      newEdgeViews.filter((entry) => entry[1].startNode.node.index === nodeView.node.index)
+        .forEach((entry) => entry[1].startNode = newNodeView);
+      newEdgeViews.filter((entry) => entry[1].endNode.node.index === nodeView.node.index)
+        .forEach((entry) => entry[1].endNode = newNodeView);
+    });
+    // Import edges
+    newEdgeViews.forEach((edgeView) => {
+      // Create new edge view from imported edge view
+      let newEdgeView: EdgeView = this.edgeFabric.createFromImportedEdgeView(edgeView[1]);
+      // Add edge view to graph view
+      this.addEdgeToGraphView(this.currentGraphView, newEdgeView);
+    });
   }
 
   /**

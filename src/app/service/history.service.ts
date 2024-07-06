@@ -13,7 +13,6 @@ export class HistoryService {
   private redoStack: Command[] = [];
   private readonly maxCommands = 15;
 
-  // TODO Limit the number of commands stored in the history
   constructor(private stateService: StateService) {
   }
 
@@ -57,6 +56,15 @@ export class HistoryService {
     if (this.commands.length > this.maxCommands) {
       this.commands.shift(); // Remove the oldest command if limit is exceeded
     }
+    this.updateStates();
+  }
+
+  /**
+   * Clear the history.
+   */
+  public clear() {
+    this.commands = [];
+    this.redoStack = [];
     this.updateStates();
   }
 

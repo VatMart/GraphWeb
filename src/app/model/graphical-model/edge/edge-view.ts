@@ -38,7 +38,7 @@ export class EdgeView extends Graphics implements GraphElement {
   }
 
   constructor(edge: Edge, startNode: NodeView, endNode: NodeView,
-              nodeStyle: EdgeStyle) {
+              edgeStyle: EdgeStyle) {
     super();
     this._edge = edge;
     this._startNode = startNode;
@@ -53,7 +53,7 @@ export class EdgeView extends Graphics implements GraphElement {
     const points = this.resolveConnectors();
     this._startCoordinates = points[0];
     this._endCoordinates = points[1];
-    this._edgeStyle = nodeStyle;
+    this._edgeStyle = edgeStyle;
   }
 
   /**
@@ -203,6 +203,30 @@ export class EdgeView extends Graphics implements GraphElement {
     return [{x: v1X, y: v1Y}, {x: v2X, y: v2Y}];
   }
 
+  toJSON() {
+    return {
+      edge: this._edge.toJSON(),
+      startNode: this._startNode.toJSON(),
+      endNode: this._endNode.toJSON(),
+      startCoordinates: this._startCoordinates,
+      endCoordinates: this._endCoordinates,
+      weightVisible: this._weightVisible,
+      edgeStyle: this._edgeStyle
+    };
+  }
+
+  static fromJSON(json: any, edges: Map<string, Edge>, nodeViewMap: Map<number, NodeView>): EdgeView {
+    const edge = edges.get(json.edge.edgeIndex.value)!;
+    const startNode = nodeViewMap.get(edge.firstNode.index)!;
+    const endNode = nodeViewMap.get(edge.secondNode.index)!;
+    const edgeView = new EdgeView(edge, startNode, endNode, json.edgeStyle);
+    edgeView._startCoordinates = json.startCoordinates;
+    edgeView._endCoordinates = json.endCoordinates;
+    edgeView._weightVisible = json.weightVisible;
+    edgeView.move();
+    return edgeView;
+  }
+
   get edge(): Edge {
     return this._edge;
   }
@@ -211,8 +235,16 @@ export class EdgeView extends Graphics implements GraphElement {
     return this._startNode;
   }
 
+  set startNode(value: NodeView) {
+    this._startNode = value;
+  }
+
   get endNode(): NodeView {
     return this._endNode;
+  }
+
+  set endNode(value: NodeView) {
+    this._endNode = value;
   }
 
   get weightView(): Weight {

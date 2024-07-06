@@ -48,7 +48,7 @@ import {MessageModule} from "primeng/message";
   styleUrls: ['./output-view.component.css']
 })
 export class OutputViewComponent implements OnInit, OnDestroy {
-  private subscriptions: Subscription = new Subscription();
+  private subscriptions!: Subscription;
 
   isMobileDevice: boolean;
 
@@ -80,6 +80,7 @@ export class OutputViewComponent implements OnInit, OnDestroy {
       {label: 'Adjacency', value: TypeMatrix.ADJACENCY},
       {label: 'Incidence', value: TypeMatrix.INCIDENCE}
     ];
+    this.subscriptions = new Subscription();
     // On matrix type change
     this.subscriptions.add(
       this.matrixType.valueChanges.subscribe(value => {
@@ -91,24 +92,18 @@ export class OutputViewComponent implements OnInit, OnDestroy {
     // On matrix change
     this.subscriptions.add(
       this.stateService.currentOutputMatrix$.subscribe(matrix => {
-        if (matrix !== null) {
-          this.onMatrixChange(matrix);
-        }
+        this.onMatrixChange(matrix);
       })
     );
     // On graph sets change
     this.subscriptions.add(
       this.stateService.currentVerticesGraphSet$.subscribe(set => {
-        if (set !== null) {
-          this.onVerticesSetChange(set);
-        }
+        this.onVerticesSetChange(set);
       })
     );
     this.subscriptions.add(
       this.stateService.currentEdgesGraphSet$.subscribe(set => {
-        if (set !== null) {
-          this.onEdgesSetChange(set);
-        }
+        this.onEdgesSetChange(set);
       })
     );
     this.stateService.changedOutputViewVisibility(true);
@@ -193,11 +188,11 @@ export class OutputViewComponent implements OnInit, OnDestroy {
   }
 
   showSuccessCopy() {
-    this.messageService.add({ severity: 'contrast', summary: 'Copied', detail: 'Matrix copied to clipboard!' });
+    this.messageService.add({severity: 'contrast', summary: 'Copied', detail: 'Matrix copied to clipboard!'});
   }
 
   showErrorCopy(message: string) {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
+    this.messageService.add({severity: 'error', summary: 'Error', detail: message});
   }
 
   onSetsRefresh() {

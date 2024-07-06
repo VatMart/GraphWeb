@@ -45,6 +45,23 @@ export class Graph {
     return this.nodes.size === 0;
   }
 
+  toJSON() {
+    return {
+      nodes: Array.from(this.nodes.entries()).map(([key, value]) => [key, value.toJSON()]), // Assuming Node has a toJSON method
+      edges: Array.from(this.edges.entries()).map(([key, value]) => [key, value.toJSON()]), // Assuming Edge has a toJSON method
+      orientation: this._orientation
+    };
+  }
+
+  static fromJSON(json: any): Graph {
+    const graph = new Graph(json.orientation);
+    const nodes = new Map<number, Node>(json.nodes.map(([key, value]: [number, any]) => [key, Node.fromJSON(value)])); // Assuming Node has a fromJSON method
+    const edges = new Map<string, Edge>(json.edges.map(([key, value]: [string, any]) => [key, Edge.fromJSON(value, nodes)])); // Assuming Edge has a fromJSON method
+    graph.nodes = nodes;
+    graph.edges = edges;
+    return graph;
+  }
+
   getNodes(): Map<number, Node> {
     return this.nodes;
   }
