@@ -2,6 +2,8 @@
   <body>
   <!--  TODO REMAKE HEADER-->
   <div [ngClass]="isMobileDevice ? 'main-body-mobile-container' : 'main-body-desktop-container'">
+    <!-- Global notifications -->
+    <p-toast position="top-center"/>
     <app-tool-bar id="toolbar"/>
     <div [ngClass]="isMobileDevice ? 'main-content-mobile-container' : 'main-content-desktop-container'">
       <app-tab-nav id="navbar"/>

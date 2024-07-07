@@ -18,12 +18,15 @@ import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix
 import {ConfService} from "./service/config/conf.service";
 import {PixiManagerService} from "./service/manager/pixi-manager.service";
 import {ImportService} from "./service/import.service";
+import {ToastModule} from "primeng/toast";
+import {MessageService} from "primeng/api";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass, FloatToolBarComponent, NgIf,
-    FloatHelperComponent, FloatEdgeWeightInputComponent],
+    FloatHelperComponent, FloatEdgeWeightInputComponent, ToastModule],
+  providers: [MessageService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -44,18 +47,17 @@ export class AppComponent implements OnInit, OnDestroy {
               private pixiManager: PixiManagerService,
               private environmentService: EnvironmentService,
               private stateService: StateService,
+              private messageService: MessageService,
               private cdr: ChangeDetectorRef) {
     this.isMobileDevice = this.environmentService.isMobile();
   }
 
   ngOnInit(): void {
     this.subscriptions = new Subscription();
-    // Subscribe to call pixi start event
+    // On notify error event
     this.subscriptions.add(
-      this.stateService.pixiStartCall$.subscribe(async (value) => {
-        if (value) {
-          await this.pixiManager.startPixi();
-        }
+      this.stateService.notifyError$.subscribe((value) => {
+        this.notifyError(value);
       })
     );
 
@@ -123,5 +125,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+  }
+
+  private notifyError(value: string) {
+    this.messageService.add({severity: 'error', summary: 'Error', detail: value, life: 5000});
   }
 }

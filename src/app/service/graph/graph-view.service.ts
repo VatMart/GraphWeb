@@ -229,8 +229,13 @@ export class GraphViewService extends GraphModelService {
     });
     // Import edges
     newEdgeViews.forEach((edgeView) => {
+      let hasReverseEdge = false; // Flag is needed to generate proper edge view if two nodes have two edges between them
+      if (graph.edgeViews.has(edgeView[1].edge.edgeIndex.reverse())
+        && graph.graph.orientation === GraphOrientation.ORIENTED) { // has reverse edge and graph is oriented
+        hasReverseEdge = true;
+      }
       // Create new edge view from imported edge view
-      let newEdgeView: EdgeView = this.edgeFabric.createFromImportedEdgeView(edgeView[1]);
+      let newEdgeView: EdgeView = this.edgeFabric.createFromImportedEdgeView(graph.graph.orientation, edgeView[1], hasReverseEdge);
       // Add edge view to graph view
       this.addEdgeToGraphView(this.currentGraphView, newEdgeView);
     });

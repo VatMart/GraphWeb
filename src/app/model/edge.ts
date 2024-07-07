@@ -123,6 +123,13 @@ export class EdgeIndex {
   }
 
   /**
+   * Return reverse edge index
+   */
+  reverse(): string {
+    return new EdgeIndex(this.to, this.from).value;
+  }
+
+  /**
    * Get Edge index from nodes.
    *
    * Note: Beware that this function is not check if graph has edge with this two nodes

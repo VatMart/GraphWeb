@@ -134,8 +134,10 @@ export class CustomizationResolver {
           nodeView.nodeStyle.radius.baseValue : nodeView.radius);
       });
       const param = ConfService.currentNodeStyle.radius.getRadius(); // To not save reference of config value in the action
+      const param2 = Math.max(160, param * 6); // To not save reference of config value in the action
       actions.push(() => {
         ConfService.CURRENT_GRAPH_STYLE.nodeStyle.radius.setRadius(param);
+        ConfService.MAX_DISTANCE_FORCE = param2;
         nodesRadius.forEach((radius, nodeView) => {
           this.propertiesService.changeNodeRadius(nodeView, radius);
         });

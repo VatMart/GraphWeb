@@ -49,15 +49,22 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
 
   /**
    * Create default edge view from start and end node views.
-   * @param graphView - graph to which edge belongs
+   * @param graphOrientation - graph orientation
    * @param startNodeView - start node view
    * @param endNodeView - end node view
+   * @param hasReversEdge - if graph has reverse edge to this (for example: graph has 1-2 edge index, reverse edge is 2-1)
    */
-  public createDefaultEdgeView(graphView: GraphView, startNodeView: NodeView, endNodeView: NodeView): EdgeView {
-    const edgeOrientation = graphView.graph.orientation === GraphOrientation.NON_ORIENTED ?
+  public createDefaultEdgeView(graphOrientation: GraphOrientation, startNodeView: NodeView, endNodeView: NodeView,
+                               hasReversEdge: boolean = false): EdgeView {
+    const edgeOrientation = graphOrientation === GraphOrientation.NON_ORIENTED ?
       EdgeOrientation.NON_ORIENTED : EdgeOrientation.ORIENTED
     let newEdge: Edge = new Edge(startNodeView.node, endNodeView.node, edgeOrientation);
-    const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView);
+    let edgeOffset: number | undefined;
+    if (hasReversEdge && graphOrientation === GraphOrientation.ORIENTED) {
+      edgeOffset = Math.min(20,
+        Math.max(12, ConfService.currentEdgeStyle.strokeWidth + ConfService.currentEdgeStyle.weight.text.size/2));
+    }
+    const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView, edgeOffset);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
     result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
@@ -66,12 +73,20 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
 
   /**
    * Create default edge view from edge and start and end node views.
+   * @param graphOrientation - graph orientation
    * @param edge - edge to create view
    * @param startNodeView - start node view
    * @param endNodeView - end node view
+   * @param hasReversEdge - if graph has reverse edge to this (for example: graph has 1-2 edge index, reverse edge is 2-1)
    */
-  public createDefaultEdgeViewFromEdge(edge: Edge, startNodeView: NodeView, endNodeView: NodeView): EdgeView {
-    const result: EdgeView = EdgeView.createFrom(edge, startNodeView, endNodeView);
+  public createDefaultEdgeViewFromEdge(graphOrientation: GraphOrientation, edge: Edge, startNodeView: NodeView,
+                                       endNodeView: NodeView, hasReversEdge: boolean = false): EdgeView {
+    let edgeOffset: number | undefined;
+    if (hasReversEdge && graphOrientation === GraphOrientation.ORIENTED) {
+      edgeOffset = Math.min(20,
+        Math.max(12, ConfService.currentEdgeStyle.strokeWidth + ConfService.currentEdgeStyle.weight.text.size/2));
+    }
+    const result: EdgeView = EdgeView.createFrom(edge, startNodeView, endNodeView, edgeOffset);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
     result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
@@ -81,8 +96,14 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
   /**
    * Create edge view from imported edge view.
    */
-  public createFromImportedEdgeView(edgeView: EdgeView): EdgeView {
-    const result: EdgeView = EdgeView.createFrom(edgeView.edge, edgeView.startNode, edgeView.endNode);
+  public createFromImportedEdgeView(graphOrientation: GraphOrientation, edgeView: EdgeView,
+                                    hasReversEdge: boolean = false): EdgeView {
+    let edgeOffset: number | undefined;
+    if (hasReversEdge && graphOrientation === GraphOrientation.ORIENTED) {
+      edgeOffset = Math.min(20,
+        Math.max(12, ConfService.currentEdgeStyle.strokeWidth + ConfService.currentEdgeStyle.weight.text.size/2));
+    }
+    const result: EdgeView = EdgeView.createFrom(edgeView.edge, edgeView.startNode, edgeView.endNode, edgeOffset);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
     result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);

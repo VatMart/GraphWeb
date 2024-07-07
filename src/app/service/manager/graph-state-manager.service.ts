@@ -14,6 +14,7 @@ import {ConfService} from "../config/conf.service";
 import {CustomizationResolver} from "../../logic/customization-resolver";
 import {GraphViewPropertiesService} from "../graph/graph-view-properties.service";
 import {ChangeGraphViewPropertiesCommand} from "../../logic/command/change-graph-view-properties-command";
+import {GraphOrientation} from "../../model/orientation";
 
 /**
  * Service for managing the state of the graph.
@@ -38,11 +39,28 @@ export class GraphStateManagerService implements ServiceManager {
   initSubscriptions(): void {
     this.subscriptions = new Subscription();
     // Subscribe to state changes
-    // Change edge weights visibility
+    // Handle edge added event
     this.subscriptions.add(
       this.stateService.edgeAdded$.subscribe(edge => {
         if (edge.weightVisible !== ConfService.SHOW_WEIGHT) {
           edge.changeWeightVisible(ConfService.SHOW_WEIGHT);
+        }
+        if (this.graphService.edgeViews.has(edge.edge.edgeIndex.reverse()) &&
+          this.graphService.currentGraph.orientation === GraphOrientation.ORIENTED) {
+          const reverseEdge = this.graphService.edgeViews.get(edge.edge.edgeIndex.reverse())!;
+          reverseEdge.offset = edge.offset!;
+          reverseEdge.move();
+        }
+      })
+    );
+    // Handle edge removed event
+    this.subscriptions.add(
+      this.stateService.edgeDeleted$.subscribe(edge => {
+        if (this.graphService.edgeViews.has(edge.edge.edgeIndex.reverse()) &&
+          this.graphService.currentGraph.orientation === GraphOrientation.ORIENTED) {
+          const reverseEdge = this.graphService.edgeViews.get(edge.edge.edgeIndex.reverse())!;
+          reverseEdge.offset = undefined;
+          reverseEdge.move();
         }
       })
     );

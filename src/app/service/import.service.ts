@@ -78,6 +78,7 @@ export class ImportService {
     // Set default graph style
     if (graphProperties.graphStyle !== undefined) {
       ConfService.CURRENT_GRAPH_STYLE = graphProperties.graphStyle;
+      ConfService.MAX_DISTANCE_FORCE = Math.max(160, graphProperties.graphStyle.nodeStyle.radius.getRadius() * 6);
     }
     // Node properties
     if (graphProperties.nodeProperties !== undefined) {

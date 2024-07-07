@@ -16,6 +16,7 @@ import {NodeViewFabricService} from "../../service/fabric/node-view-fabric.servi
 import {EdgeViewFabricService} from "../../service/fabric/edge-view-fabric.service";
 import {ConfService} from "../../service/config/conf.service";
 import {NodeStyle} from "../../model/graphical-model/graph/graph-view-properties";
+import {GraphOrientation} from "../../model/orientation";
 
 /**
  * Handles all events related to the edge views.
@@ -110,29 +111,33 @@ export class EdgeEventHandler {
     if (EventUtils.isNodeView(event.target)) {
       let nodeView: NodeView = event.target as NodeView;
       if (!EdgeEventHandler.startNode) {
-        console.log("Start node selected"); // TODO remove
         EdgeEventHandler.startNode = nodeView;
         this.switchStartNodeStyle(nodeView, true);
       } else if (!EdgeEventHandler.endNode) {
-        console.log("End node selected"); // TODO remove
         EdgeEventHandler.endNode = nodeView;
-        const newEdgeIndex = EdgeIndex.fromNodes(EdgeEventHandler.startNode.node, EdgeEventHandler.endNode.node);
-        // TODO check graph orientation, if non oriented, check if edge exists in reverse order
+        const newEdgeIndex = EdgeIndex.fromNodes(EdgeEventHandler.startNode.node,
+          EdgeEventHandler.endNode.node);
         if (this.graphViewService.edgeViews.has(newEdgeIndex.value)) {
-          console.log(`Edge: '${newEdgeIndex.value}' already exists between nodes`); // TODO remove
+          this.stateService.notifyError(`Edge: '${newEdgeIndex.value}' already exists between nodes`);
+          return;
+        }
+        const hasReverseEdge = this.graphViewService.edgeViews.has(newEdgeIndex.reverse());
+        if (this.graphViewService.currentGraphView.graph.orientation !== GraphOrientation.ORIENTED && hasReverseEdge) {
+          this.stateService
+            .notifyError(`Graph is not directed and it can't contain more than one edge between two specific nodes.`);
           return;
         }
         // Add edge to graph
-        const edgeView = this.edgeFabric.createDefaultEdgeView(this.graphViewService.currentGraphView,
-          EdgeEventHandler.startNode, EdgeEventHandler.endNode);
+        const edgeView = this.edgeFabric.createDefaultEdgeView(this.graphViewService.currentGraph.orientation,
+          EdgeEventHandler.startNode, EdgeEventHandler.endNode, hasReverseEdge);
         let command = new AddEdgeViewCommand(this.graphViewService, edgeView);
         this.historyService.execute(command);
+
         // Clear selected nodes
         this.clearSelectedNodes();
       }
     } else if (EventUtils.isEdgeView(event.target) || EventUtils.isEdgeViewWeight(event.target)) {
       this.clearSelectedNodes();
-      console.log("Edge remove event"); // TODO remove
       // Remove edge
       let edgeView: EdgeView = EventUtils.getGraphElement(event.target) as EdgeView;
       let command = new RemoveEdgeViewCommand(this.graphViewService, edgeView);

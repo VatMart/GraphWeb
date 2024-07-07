@@ -21,6 +21,7 @@ export class EdgeView extends Graphics implements GraphElement {
   private arrow: Arrow | undefined;
   private _weightView: Weight;
   private _weightVisible: boolean = ConfService.SHOW_WEIGHT;
+  private _offset: number | undefined;
 
   private _startNode: NodeView;
   private _endNode: NodeView;
@@ -30,15 +31,24 @@ export class EdgeView extends Graphics implements GraphElement {
 
   private _edgeStyle: EdgeStyle = JSON.parse(JSON.stringify(ConfService.currentEdgeStyle));
 
-  public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView) : EdgeView {
-    let edgeGraphical = new EdgeView(edge, startNode, endNode, ConfService.currentEdgeStyle);
+  /**
+   * Create edge view from edge and two nodes
+   * @param edge - edge model
+   * @param startNode - start node view
+   * @param endNode - end node view
+   * @param offset - if graph has reverse edge to this (for example: graph has 1-2 edge index, reverse edge is 2-1),
+   * than it should have offset to be drawn correctly
+   */
+  public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView,
+                           offset?: number) : EdgeView {
+    let edgeGraphical = new EdgeView(edge, startNode, endNode, ConfService.currentEdgeStyle, offset);
     edgeGraphical.interactive = true;
     edgeGraphical.move();
     return edgeGraphical;
   }
 
   constructor(edge: Edge, startNode: NodeView, endNode: NodeView,
-              edgeStyle: EdgeStyle) {
+              edgeStyle: EdgeStyle, offset?: number) {
     super();
     this._edge = edge;
     this._startNode = startNode;
@@ -47,6 +57,7 @@ export class EdgeView extends Graphics implements GraphElement {
       this.arrow = new Arrow();
       this.addChild(this.arrow);
     }
+    this._offset = offset;
     this._weightView = new Weight(this._edge.weight);
     this.weightView.visible = this._weightVisible;
     this.addChild(this._weightView);
@@ -61,30 +72,59 @@ export class EdgeView extends Graphics implements GraphElement {
    */
   private draw() {
     this.clear();
-    // Draw Arrow of edge first, because it reset end point coordinates
+    // Recalculate endpoint if edge will have arrow first, because it should reset end point coordinates
+    let oldEndCoordinates = this._endCoordinates;
     if (this._edge.orientation === EdgeOrientation.ORIENTED && !this.edge.isLoop()) {
-      this.drawArrow();
+      this.recalculateEndpointWithArrow();
     }
     if (!this.edge.isLoop()) { // Draw straight edge
-      this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
-        .lineTo(this._endCoordinates.x, this._endCoordinates.y)
-        .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round'});
-    } else { // Draw loop edge
-      const control1 = {x: this._startCoordinates.x - 2.5 * this.startNode.radius,
-        y: this._startCoordinates.y - 3 * this.startNode.radius};
-      const control2 = {x: this._endCoordinates.x + 2.5 * this.startNode.radius,
-        y: this._endCoordinates.y - 3 * this.startNode.radius};
-      this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
-        .bezierCurveTo(control1.x, control1.y, control2.x, control2.y, this._endCoordinates.x, this._endCoordinates.y)
-        .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round', alignment: 1});
-      const nodeCenter = this._startNode.centerCoordinates();
-      this._weightView.curveCenter = GraphicalUtils.calculateBezierCenter(nodeCenter, control1, control2, nodeCenter);
-    }
-    // Draw the hit area
-    if (!this.edge.isLoop()) { // Hit area for straight edge
+      const offset = this.drawStraightEdge();
+      oldEndCoordinates = {x: oldEndCoordinates.x + offset.x, y: oldEndCoordinates.y + offset.y};
+      // Draw the hit area with offset
       this.hitArea = this.calculateHitArea(this._startCoordinates, this._endCoordinates);
+    } else { // Draw loop edge
+      this.drawLoopEdge();
+    }
+    if (this._edge.orientation === EdgeOrientation.ORIENTED && !this.edge.isLoop()) {
+      this.drawArrow(oldEndCoordinates);
     }
     this.zIndex = 0;
+  }
+
+  private drawStraightEdge(): Point {
+    let offset = {x: 0, y: 0};
+    if (this._offset) {
+      offset = this.getPerpendicularOffset(this._startCoordinates, this._endCoordinates, this._offset);
+      this._startCoordinates.x += offset.x;
+      this._startCoordinates.y += offset.y;
+      this._endCoordinates.x += offset.x;
+      this._endCoordinates.y += offset.y;
+    }
+    this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
+      .lineTo(this._endCoordinates.x, this._endCoordinates.y)
+      .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round'});
+    return offset;
+  }
+
+  private getPerpendicularOffset(start: Point, end: Point, offset: number): Point {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const offsetX = offset * dy / length;
+    const offsetY = -offset * dx / length;
+    return { x:offsetX, y:offsetY };
+  }
+
+  private drawLoopEdge() {
+    const control1 = {x: this._startCoordinates.x - 2 * this.startNode.radius,
+      y: this._startCoordinates.y - 2 * this.startNode.radius};
+    const control2 = {x: this._endCoordinates.x + 2 * this.startNode.radius,
+      y: this._endCoordinates.y - 2 * this.startNode.radius};
+    this.moveTo(this._startCoordinates.x, this._startCoordinates.y)
+      .bezierCurveTo(control1.x, control1.y, control2.x, control2.y, this._endCoordinates.x, this._endCoordinates.y)
+      .stroke({width: this._edgeStyle.strokeWidth, color: this._edgeStyle.strokeColor, cap: 'round', alignment: 1});
+    const nodeCenter = this._startNode.centerCoordinates();
+    this._weightView.curveCenter = GraphicalUtils.calculateBezierCenter(nodeCenter, control1, control2, nodeCenter);
   }
 
   /**
@@ -115,9 +155,15 @@ export class EdgeView extends Graphics implements GraphElement {
     return new Polygon(polygonPoints);
   }
 
-  private drawArrow() {
+  private recalculateEndpointWithArrow() {
     if (this.arrow) {
-      this._endCoordinates = this.arrow.draw(this._startCoordinates, this._endCoordinates);
+      this._endCoordinates = this.arrow.calculateNewEndPoint(this._startCoordinates, this._endCoordinates);
+    }
+  }
+
+  private drawArrow(oldEndCoordinates: Point) {
+    if (this.arrow) {
+      this._endCoordinates = this.arrow.draw(this._startCoordinates, oldEndCoordinates);
     }
   }
 
@@ -197,9 +243,9 @@ export class EdgeView extends Graphics implements GraphElement {
   private resolveLoopConnectors(): [Point, Point] {
     const nodeCenter = this._startNode.centerCoordinates();
     const v1X = nodeCenter.x - this._startNode.radius + 2;
-    const v1Y = nodeCenter.y - this._startNode.radius + 10;
+    const v1Y = nodeCenter.y - this._startNode.radius + this._startNode.radius/2;
     const v2X = nodeCenter.x + this._startNode.radius - 2;
-    const v2Y = nodeCenter.y - this._startNode.radius + 10;
+    const v2Y = nodeCenter.y - this._startNode.radius + this._startNode.radius/2;
     return [{x: v1X, y: v1Y}, {x: v2X, y: v2Y}];
   }
 
@@ -245,6 +291,14 @@ export class EdgeView extends Graphics implements GraphElement {
 
   set endNode(value: NodeView) {
     this._endNode = value;
+  }
+
+  get offset(): number | undefined {
+    return this._offset;
+  }
+
+  set offset(value: number | undefined) {
+    this._offset = value;
   }
 
   get weightView(): Weight {
