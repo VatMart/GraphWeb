@@ -17,6 +17,7 @@ import {
 import {SetValidationResult} from "../graph/graph-set.service";
 import {CustomizationFormValues} from "../../component/tab-nav/customization-view/customization-view.component";
 import {AppData} from "../file.service";
+import {ConfService} from "../config/conf.service";
 
 /**
  * Service for managing the state of the application.
@@ -44,7 +45,7 @@ export class StateService {
   private redoInvokedSource = new Subject<boolean>();
   public redoInvoked$ = this.redoInvokedSource.asObservable();
 
-  private showGridSource = new Subject<boolean>();
+  private showGridSource = new BehaviorSubject<boolean>(ConfService.SHOW_GRID);
   public showGrid$ = this.showGridSource.asObservable();
 
   // Current mode (default, add vertex, add edges etc.)
