@@ -48,6 +48,19 @@ export class Arrow extends Graphics {
     return GraphicalUtils.midpoint(base, endPoint);
   }
 
+  /**
+   * Calculate new end point for edge for rendering arrow.
+   * Shifts the end point from the arrow head and gives space for the arrow.
+   */
+  public calculateNewEndPoint(startPoint: Point, endPoint: Point): Point {
+    const distance = GraphicalUtils.distanceBetween(endPoint, startPoint);
+    let ko = this._arrowStyle.size / distance;
+    const base: Point = {
+      x: endPoint.x + (startPoint.x - endPoint.x) * ko,
+      y: endPoint.y + (startPoint.y - endPoint.y) * ko};
+    return GraphicalUtils.midpoint(base, endPoint);
+  }
+
   get arrowStyle(): ArrowStyle {
     return this._arrowStyle;
   }

@@ -27,8 +27,14 @@ import {ConfService} from "../config/conf.service";
 })
 export class StateService {
 
+  // --------------------------------------------------
+  // Global events
+  // --------------------------------------------------
   private resetUiStateSource = new Subject<boolean>();
   public resetUiState$ = this.resetUiStateSource.asObservable();
+
+  private notifyErrorSource = new Subject<string>();
+  public notifyError$ = this.notifyErrorSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Tool bar
@@ -133,9 +139,6 @@ export class StateService {
   // --------------------------------------------------
   // UI component states. Canvas
   // --------------------------------------------------
-  private pixiStartCallSource = new Subject<boolean>();
-  public pixiStartCall$ = this.pixiStartCallSource.asObservable();
-
   private pixiStartedSource = new Subject<boolean>();
   public pixiStarted$ = this.pixiStartedSource.asObservable();
 
@@ -241,6 +244,13 @@ export class StateService {
   public graphViewGenerated$ = this.graphViewGeneratedSource.asObservable();
 
   constructor() { }
+
+  /**
+   * Notify about error.
+   */
+  notifyError(message: string) {
+    this.notifyErrorSource.next(message);
+  }
 
   /**
    * Reset the UI state.
@@ -453,13 +463,6 @@ export class StateService {
    */
   changeOutputMatrix(matrix: GraphMatrix) {
     this.outputMatrixSource.next(matrix);
-  }
-
-  /**
-   * Notify that the PIXI renderer needs to be started.
-   */
-  pixiStartCall() {
-    this.pixiStartCallSource.next(true);
   }
 
   /**

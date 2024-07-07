@@ -55,7 +55,7 @@ export class ConfService {
   public static REPULSIVE_CONSTANT: number = 15000;
   public static SPRING_FORCE_CONSTANT: number = 1;
   public static LINK_FORCE_CONSTANT: number = 0.04;
-  public static MAX_DISTANCE_FORCE: number = 180; // Max distance for applying force
+  public static MAX_DISTANCE_FORCE: number = 160; // Max distance for applying force
 
   // Canvas properties
   public static SHOW_GRID: boolean = true;

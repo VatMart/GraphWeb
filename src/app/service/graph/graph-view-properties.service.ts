@@ -151,7 +151,7 @@ export class GraphViewPropertiesService {
    */
   public changeCurrentNodesRadius(number: number) {
     ConfService.currentNodeStyle.radius.setRadius(number); // Save as default radius
-    ConfService.MAX_DISTANCE_FORCE = Math.max(180, number * 6);
+    ConfService.MAX_DISTANCE_FORCE = Math.max(160, number * 6);
     // Change radius of all nodes
     this.graphService.nodeViews.forEach(nodeView => {
       this.changeNodeRadius(nodeView, number);

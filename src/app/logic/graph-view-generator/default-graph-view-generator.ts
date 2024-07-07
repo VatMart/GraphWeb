@@ -7,6 +7,8 @@ import {EdgeViewFabricService} from "../../service/fabric/edge-view-fabric.servi
 import {PixiService} from "../../service/pixi.service";
 import {Point} from "../../utils/graphical-utils";
 import {ConfService} from "../../service/config/conf.service";
+import {EdgeIndex} from "../../model/edge";
+import {GraphOrientation} from "../../model/orientation";
 
 /**
  * Default graph view generator.
@@ -27,9 +29,17 @@ export class DefaultGraphViewGenerator extends GraphViewGenerator {
       .map(nodePosition => [nodePosition.node.index,
         this.nodeFabric.createDefaultNodeViewFromNode(nodePosition.node, nodePosition.position)]));
     // 3. Create edge views
-    const edgeViews = [...graph.getEdges().values()]
-      .map(edge => this.edgeFabric.createDefaultEdgeViewFromEdge(edge, nodeViews.get(edge.firstNode.index)!,
-        nodeViews.get(edge.secondNode.index)!));
+    const edgeViews: EdgeView[] = [];
+    graph.getEdges().forEach((value, key) =>  {
+      let hasReverseEdge = false; // Flag is needed to generate proper edge view if two nodes have two edges between them
+      if (graph.getEdges().has(EdgeIndex.fromString(key).reverse())
+        && graph.orientation === GraphOrientation.ORIENTED) { // has reverse edge and graph is oriented
+        hasReverseEdge = true;
+      }
+      const edgeView = this.edgeFabric.createDefaultEdgeViewFromEdge(graph.orientation, value, nodeViews.get(value.firstNode.index)!,
+        nodeViews.get(value.secondNode.index)!, hasReverseEdge);
+      edgeViews.push(edgeView);
+    });
 
     return {nodes: [...nodeViews.values()], edges: edgeViews};
   }
