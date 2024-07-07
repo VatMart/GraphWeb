@@ -88,6 +88,13 @@ export class PixiManagerService implements ServiceManager {
     this.stateService.pixiStopped();
   }
 
+  /**
+   * Check if PIXI is started.
+   */
+  public isPixiStarted(): boolean {
+    return this.pixiService.renderer !== undefined;
+  }
+
   // Set up the default PIXI canvas
   protected async setUpDefaultPixiCanvas() {
     const htmlContainer = document.getElementById('pixiCanvas');

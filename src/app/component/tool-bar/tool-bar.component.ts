@@ -17,7 +17,12 @@ import {DropdownModule} from "primeng/dropdown";
 import {ConfService} from "../../service/config/conf.service";
 import {BadgeModule} from "primeng/badge";
 import {FileService} from "../../service/file.service";
+import {LocalStorageService} from "../../service/local-storage.service";
 
+/**
+ * Toolbar component.
+ * Placed on the top of the application.
+ */
 @Component({
   selector: 'app-tool-bar',
   standalone: true,
@@ -79,6 +84,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
               private historyService: HistoryService,
               private graphViewService: GraphViewService,
               private fileService: FileService,
+              private localStorageService: LocalStorageService,
               private primengConfig: PrimeNGConfig,
               private cdr: ChangeDetectorRef) {
     this.isMobileDevice = this.environmentService.isMobile();
@@ -256,8 +262,9 @@ export class ToolBarComponent implements OnInit, OnDestroy {
    * On save graph button click.
    */
   async saveGraphClick() {
-    console.log("Save graph button clicked");
+    console.log("Save graph button clicked"); // TODO remove
     const appData = this.fileService.serializeCurrentGraphAndSettings();
+    this.localStorageService.saveAppData(appData); // Also save to local storage
     await this.saveFile(appData, 'graph.json');
   }
 
@@ -324,7 +331,8 @@ export class ToolBarComponent implements OnInit, OnDestroy {
       //console.log("Graph loaded successfully:", appData); // TODO: Remove
       this.stateService.loadApp(appData);
     } catch (error) {
-      console.error("Error importing graph:", error);
+      console.error("Error importing graph:", error); // TODO Replace with notification
+      return;
     }
   }
 

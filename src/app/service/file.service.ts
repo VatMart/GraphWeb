@@ -29,6 +29,7 @@ export class FileService {
    * Deserialize the graph and settings from the JSON string.
    */
   public deserializeGraphAndSettings(jsonContent: string): AppData {
+    // TODO: Add validation of JSON content
     const json = JSON.parse(jsonContent);
     const graphView = GraphView.fromJSON(json.graph);
     const graphProperties = json.graphProperties;

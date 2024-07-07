@@ -17,6 +17,10 @@ export class GraphView {
     this._edgeViews = edgeViews ? edgeViews : new Map<string, EdgeView>();
   }
 
+  public isEmpty(): boolean {
+    return this._nodeViews.size === 0 && this._edgeViews.size === 0;
+  }
+
   toJSON() {
     return {
       graph: this._graph.toJSON(),

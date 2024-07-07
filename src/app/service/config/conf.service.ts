@@ -58,7 +58,7 @@ export class ConfService {
   public static MAX_DISTANCE_FORCE: number = 180; // Max distance for applying force
 
   // Canvas properties
-  public static SHOW_GRID: boolean = false;
+  public static SHOW_GRID: boolean = true;
   public static BOUNDS_X_MIN: number = -1000;
   public static BOUNDS_X_MAX: number = 3000;
   public static BOUNDS_Y_MIN: number = -1000;

@@ -57,22 +57,46 @@ export class ImportService {
 
   private importPropertiesAndDefaultStyles(graphProperties: GraphViewProperties) {
     // Set default graph orientation
-    ConfService.DEFAULT_GRAPH_ORIENTATION = graphProperties.graphOrientation;
+    if (graphProperties.graphOrientation !== undefined) {
+      ConfService.DEFAULT_GRAPH_ORIENTATION = graphProperties.graphOrientation;
+    }
     // Set default force properties
-    ConfService.DEFAULT_FORCE_MODE_ON = graphProperties.enableForceMode;
-    ForceMode.activatedByUserMemory = graphProperties.enableForceMode;
-    ConfService.DEFAULT_CENTER_FORCE_ON = graphProperties.enableCenterForce;
-    ConfService.DEFAULT_LINK_FORCE_ON = graphProperties.enableLinkForce;
+    if (graphProperties.enableForceMode !== undefined) {
+      ConfService.DEFAULT_FORCE_MODE_ON = graphProperties.enableForceMode;
+      ForceMode.activatedByUserMemory = graphProperties.enableForceMode;
+    }
+    if (graphProperties.enableCenterForce !== undefined) {
+      ConfService.DEFAULT_CENTER_FORCE_ON = graphProperties.enableCenterForce;
+    }
+    if (graphProperties.enableLinkForce !== undefined) {
+      ConfService.DEFAULT_LINK_FORCE_ON = graphProperties.enableLinkForce;
+    }
     // Show grid
-    ConfService.SHOW_GRID = graphProperties.showGrid;
+    if (graphProperties.showGrid !== undefined) {
+      ConfService.SHOW_GRID = graphProperties.showGrid;
+    }
     // Set default graph style
-    ConfService.CURRENT_GRAPH_STYLE = graphProperties.graphStyle;
+    if (graphProperties.graphStyle !== undefined) {
+      ConfService.CURRENT_GRAPH_STYLE = graphProperties.graphStyle;
+    }
     // Node properties
-    ConfService.DYNAMIC_NODE_SIZE = graphProperties.nodeProperties.dynamicNodeSize;
-    ConfService.SHOW_NODE_LABEL = graphProperties.nodeProperties.showLabel;
+    if (graphProperties.nodeProperties !== undefined) {
+      if (graphProperties.nodeProperties.dynamicNodeSize !== undefined) {
+        ConfService.DYNAMIC_NODE_SIZE = graphProperties.nodeProperties.dynamicNodeSize;
+      }
+      if (graphProperties.nodeProperties.showLabel !== undefined) {
+        ConfService.SHOW_NODE_LABEL = graphProperties.nodeProperties.showLabel;
+      }
+    }
     // Edge properties
-    ConfService.SHOW_WEIGHT = graphProperties.edgeProperties.showWeight;
-    ConfService.DYNAMIC_EDGE_WEIGHT_VALUE = graphProperties.edgeProperties.dynamicEdgeWeightValue;
+    if (graphProperties.edgeProperties !== undefined) {
+      if (graphProperties.edgeProperties.showWeight !== undefined) {
+        ConfService.SHOW_WEIGHT = graphProperties.edgeProperties.showWeight;
+      }
+      if (graphProperties.edgeProperties.dynamicEdgeWeightValue !== undefined) {
+        ConfService.DYNAMIC_EDGE_WEIGHT_VALUE = graphProperties.edgeProperties.dynamicEdgeWeightValue;
+      }
+    }
   }
 
   private importGraph(graph: GraphView) {
