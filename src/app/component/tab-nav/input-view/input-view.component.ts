@@ -62,9 +62,9 @@ export class InputViewComponent implements OnInit, OnDestroy {
   readonly adjacencyMatrixPlaceholder = 'Allowed formats:\n0 1 0      0, 1, 0,      0; 1; 0;      ' +
     '0, 1, 0;\n1 0 1      1, 0, 1,      1; 0; 1;      1, 0, 1;\n0 1 0 or 0, 1, 0  or 0; 1; 0  or  0, 1, 0;\n\n' +
     'If your graph is weighted, use \nweights instead of 1s.';
-  readonly incidenceMatrixPlaceholder = 'Allowed formats:\n 1 0       1, 0,        1; 0;' +
-    '       1, 0;\n-1 1      -1, 1,      -1; 1;      -1, 1;\n 0 -1 or 0, -1 or  0; -1 or  0, -1;\n\n' +
-    'If your graph is weighted, use \nweights instead of 1s.';
+  readonly incidenceMatrixPlaceholder = 'Allowed formats:\n 1 0;       1, 0;' +
+    '\n-1 1;       -1, 1;\n 0 -1; or  0, -1;\n\n' +
+    'Symbol \';\' in the end of row is important!\nIf your graph is weighted, use \nweights instead of 1s.';
   matrixInput: string = '';
   matrixPlaceholder!: string;
   matrixInProcess: boolean = false;

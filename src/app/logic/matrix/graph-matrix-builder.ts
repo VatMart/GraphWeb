@@ -208,47 +208,35 @@ export class IncidenceMatrixBuilder extends GraphMatrixBuilder {
 
     // Normalize the input: replace all possible separators with a single one
     const normalizedInput = input
-      .replace(/[,;\n]/g, ' ')    // Replace commas, semicolons, and newlines with spaces
+      .replace(/[,\n]/g, ' ')    // Replace commas, semicolons, and newlines with spaces
       .replace(/\s+/g, ' ');      // Replace multiple spaces with a single space
 
-    // Split the normalized string into an array of values
-    const values = normalizedInput.trim().split(' ');
+    // Split the normalized string into rows
+    const rows = normalizedInput.split(';')
+      .map(row => row.trim()).filter(row => row.length > 0);
 
     // Determine the number of rows and columns
-    const totalValues = values.length;
-    let numberOfRows = 0;
-    let numberOfColumns = 0;
+    const matrix: number[][] = [];
 
-    // Try to determine the number of rows and columns
-    for (let i = 1; i <= totalValues; i++) {
-      if (totalValues % i === 0) {
-        const possibleColumns = totalValues / i;
-        if (i >= possibleColumns) {
-          numberOfRows = i;
-          numberOfColumns = possibleColumns;
-          break;
-        }
+    for (const row of rows) {
+      const values = row.split(/\s+/).map(Number);
+      if (values.some(isNaN)) {
+        throw new ValidationError(`Invalid number in the input string: '${row}' contains non-numeric values.`);
       }
+      matrix.push(values);
     }
+
+    const numberOfRows = matrix.length;
+    const numberOfColumns = matrix[0].length;
 
     if (numberOfRows === 0 || numberOfColumns === 0) {
       throw new ValidationError("Invalid input string: Unable to determine the dimensions of the incidence matrix.");
     }
 
-    // Convert the array of values into a 2D matrix
-    const matrix: number[][] = [];
-    for (let i = 0; i < numberOfRows; i++) {
-      const row: number[] = [];
-      for (let j = 0; j < numberOfColumns; j++) {
-        const value = Number(values[i * numberOfColumns + j]);
-        if (isNaN(value)) {
-          throw new ValidationError(`Invalid number in the input string: '${values[i * numberOfColumns + j]}' is not a valid number.`);
-        }
-        row.push(value);
-      }
-      matrix.push(row);
+    if (!matrix.every(row => row.length === numberOfColumns)) {
+      throw new ValidationError("Invalid input string: The matrix must have consistent column lengths.");
     }
-    //console.log("Built incidence matrix from string: ", new GraphMatrix(TypeMatrix.INCIDENCE, matrix).toString()); // TODO remove
+    console.log("Built incidence matrix from string: ", new GraphMatrix(TypeMatrix.INCIDENCE, matrix).toString()); // TODO remove
     return new GraphMatrix(TypeMatrix.INCIDENCE, matrix);
   }
 

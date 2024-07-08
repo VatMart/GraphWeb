@@ -19,7 +19,7 @@ export class GraphModelBuilder {
    * @param matrix Valid graph matrix
    */
   public buildGraphFromMatrix(matrix: GraphMatrix): Graph {
-    let result : Graph;
+    let result: Graph;
     if (matrix.type === 'Adjacency') {
       result = this.buildGraphFromAdjacencyMatrix(matrix);
     } else {
@@ -87,9 +87,10 @@ export class GraphModelBuilder {
     }
 
     // Create edges
+    const loopEdges: Node[] = [];
     for (let j = 0; j < cols; j++) {
-      let firstNodeIndex: {index: number, first: boolean} | null = null;
-      let secondNodeIndex: {index: number, first: boolean} | null = null;
+      let firstNodeIndex: { index: number, first: boolean } | null = null;
+      let secondNodeIndex: { index: number, first: boolean } | null = null;
       let edgeWeight = 0;
       let orientation = EdgeOrientation.NON_ORIENTED; // Default orientation
 
@@ -107,7 +108,15 @@ export class GraphModelBuilder {
         }
       }
 
-      if (firstNodeIndex !== null && secondNodeIndex !== null) {
+      if (firstNodeIndex !== null && secondNodeIndex === null && edgeWeight === 2) {
+        // Handle loop edge case
+        const loopNode = graph.getNodes().get(firstNodeIndex.index);
+        if (!loopNode) {
+          throw new Error("Can't generate graph from matrix. Node not found"); // Todo handle exception
+        }
+        loopEdges.push(loopNode); // Save loop edge to add it later
+      } else if (firstNodeIndex !== null && secondNodeIndex !== null) {
+        // Handle regular edge case
         let startNode;
         let endNode;
         if (orientation === EdgeOrientation.ORIENTED) {
@@ -131,6 +140,12 @@ export class GraphModelBuilder {
     const edges = graph.getEdges().values();
     const edgesOrientations = [...edges].map(edge => edge.orientation);
     graph.orientation = this.determineGraphOrientation(edgesOrientations);
+    // Add loop edges with correct orientation
+    loopEdges.forEach(node => {
+      const edgeOrientation = graph.orientation === GraphOrientation.ORIENTED ? EdgeOrientation.ORIENTED : EdgeOrientation.NON_ORIENTED;
+      const edge = new Edge(node, node, edgeOrientation, 1); // Default weight
+      this.graphService.addEdgeToGraph(graph, edge);
+    });
     return graph;
   }
 
@@ -152,8 +167,8 @@ export class GraphModelBuilder {
       const orientation = EdgeOrientation.ORIENTED; // Default orientation TODO get from property service
       const firstNodeNum = Number(vertices[0]);
       const secondNodeNum = Number(vertices[1]);
-      let firstNode : Node;
-      let secondNode : Node;
+      let firstNode: Node;
+      let secondNode: Node;
       if (isNaN(firstNodeNum)) { // If not a number, then it's a label
         firstNode = [...graph.getNodes().values()].find(node => node.label === vertices[0])!;
       } else { // If a number, then it's a node index
