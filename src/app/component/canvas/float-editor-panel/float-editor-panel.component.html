@@ -1,0 +1,77 @@
+<div class="editor-panel">
+  <div class="editor-header">
+  </div>
+  <div class="editor-content">
+    <!-- Rendering ui for single element selection -->
+    <div *ngIf="isSingularSelection">
+      <!-- Single node selected -->
+      <div *ngIf="isNodeSelection" style="display: flex;flex-direction: row;">
+        <div *ngFor="let item of nodeItems; let i = index">
+          <div [pTooltip]="item.tooltip"
+               tooltipPosition="top"
+               showDelay="200"
+               class="editor-item"
+               (click)="item.command(i, $event, colorOverlayPanel)">
+            <!--            <label class="item-label">{{ item.label }}</label>-->
+            <i pRipple appSvgIcon [appSvgIcon]="item.icon" class="gw-button" [class]="item.icon"
+               *ngIf="item.customIcon"></i>
+            <i pRipple class="gw-button" [class]="item.icon" *ngIf="!item.customIcon" style="font-size: 1.5rem"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Single edge selected -->
+      <div *ngIf="isEdgeSelection" style="display: flex;flex-direction: row;">
+        <div *ngFor="let item of edgeItems; let i = index">
+          <div [pTooltip]="item.tooltip"
+               tooltipPosition="top"
+               showDelay="200"
+               class="editor-item"
+               (click)="item.command(i, $event, colorOverlayPanel)">
+            <!--            <label class="item-label">{{ item.label }}</label>-->
+            <i pRipple appSvgIcon [appSvgIcon]="item.icon" class="gw-button" [class]="item.icon"
+               *ngIf="item.customIcon"></i>
+            <i pRipple class="gw-button" [class]="item.icon" *ngIf="!item.customIcon" style="font-size: 1.5rem"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Rendering ui for multiple element selection -->
+    <div *ngIf="isMultipleSelection">
+      <!-- Currently, only colors changing allowed for multiple selection -->
+      <div style="display: flex;flex-direction: row;">
+        <div pTooltip="Change colors of selected elements" tooltipPosition="top" showDelay="200"
+             class="editor-item" (click)="colorOverlayPanel.toggle($event)">
+          <i pRipple class="pi pi-palette gw-button" style="font-size: 1.5rem"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Utility section of editor panel -->
+  <div class="editor-utility-content">
+    <i pRipple pTooltip="Delete selected elements" tooltipPosition="top" showDelay="200"
+       class="pi pi-trash gw-button red" style="color: red; font-size: 1.5rem"
+       (click)="onDeleteSelectedClick()"></i>
+  </div>
+
+  <!-- Overlay panel for editing selected elements -->
+  <p-overlayPanel #colorOverlayPanel>
+    <div class="overlay-container" *ngIf="isNodeSelection">
+      <label class="subheader-label">Edge colors:</label>
+      <div class="color-pick-group">
+        <div class="color-pick-item" *ngFor="let item of edgeColorItems;">
+          <label class="customization-label">{{item.label}}</label>
+          <input class="color-picker" type="color" [value]="item.color"/>
+        </div>
+      </div>
+    </div>
+    <div class="overlay-container" *ngIf="isEdgeSelection">
+      <label class="subheader-label">Node colors:</label>
+      <div class="color-pick-group">
+        <div class="color-pick-item" *ngFor="let item of nodeColorItems;">
+          <label class="customization-label">{{item.label}}</label>
+          <input class="color-picker" type="color" [value]="item.color"/>
+        </div>
+      </div>
+    </div>
+  </p-overlayPanel>
+</div>

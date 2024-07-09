@@ -20,12 +20,13 @@ import {PixiManagerService} from "./service/manager/pixi-manager.service";
 import {ImportService} from "./service/import.service";
 import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
+import {FloatEditorPanelComponent} from "./component/canvas/float-editor-panel/float-editor-panel.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass, FloatToolBarComponent, NgIf,
-    FloatHelperComponent, FloatEdgeWeightInputComponent, ToastModule],
+    FloatHelperComponent, FloatEdgeWeightInputComponent, ToastModule, FloatEditorPanelComponent],
   providers: [MessageService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

@@ -1,0 +1,125 @@
+.editor-panel {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%); /* Center the element */
+  margin-bottom: 2rem;
+  padding: 0.5rem;
+  width: auto;
+  min-width: 25px;
+  max-width: 70vw;
+  background-color: var(--main-bg-color);
+  border-radius: 10px;
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  border: 1px solid var(--main-border-color);
+}
+
+.editor-content {
+  display: flex;
+  flex-direction: row;
+  padding-right: 0.25rem;
+  text-align: center;
+  align-items: center;
+}
+
+.editor-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-inline: 0.25rem;
+}
+
+.item-label {
+  font-size: 12px;
+}
+
+.editor-utility-content {
+  display: flex;
+  flex-direction: row;
+  border-left: 1px solid var(--main-border-color);
+  padding-left: 0.25rem;
+  text-align: center;
+  align-items: center;
+}
+
+.gw-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  padding: 0.25rem;
+  margin-inline: 0.25rem;
+  cursor: pointer;
+  background-color: var(--main-bg-color);
+  color: var(--main-button-color);
+}
+
+.gw-button:hover {
+  background-color: var(--main-hover-color);
+  color: var(--main-blue-color);
+}
+
+/* Overlay panel content */
+.subheader-label {
+  color: black;
+  font-weight: bold;
+  padding-left: 4px;
+  padding-bottom: 6px;
+}
+
+.color-pick-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: center;
+  margin-bottom: 4px;
+}
+
+.customization-label {
+  color: black;
+  min-width: 60px;
+  padding-inline: 4px;
+}
+
+.color-pick-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-block: 4px;
+}
+
+.color-picker {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid var(--main-blue-light-color);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  padding: 1px;
+}
+
+.color-picker:hover {
+  border: 2px solid var(--main-blue-color);
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+}
+
+.color-picker::-moz-color-swatch {
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+}
