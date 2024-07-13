@@ -129,6 +129,36 @@ export class GraphViewService extends GraphModelService {
   }
 
   /**
+   * Removes the given graph elements from the graph view.
+   */
+  public removeGraphElements(graphView: GraphView, graphElements: GraphElement[]) {
+    // First remove edges, then nodes
+    graphElements.filter((element: GraphElement) => element instanceof EdgeView)
+      .forEach((element: GraphElement) => {
+        this.removeEdgeFromGraphView(graphView, element as EdgeView); // Call base remove method
+      });
+    graphElements.filter((element: GraphElement) => element instanceof NodeView)
+      .forEach((element: GraphElement) => {
+        this.removeNodeFromGraphView(graphView, element as NodeView); // Call base remove method
+      });
+  }
+
+  /**
+   * Adds the given graph elements to the graph view.
+   */
+  public addGraphElements(graphView: GraphView, graphElements: GraphElement[]) {
+    // First add nodes, then edges
+    graphElements.filter((element: GraphElement) => element instanceof NodeView)
+      .forEach((element: GraphElement) => {
+        this.addNodeToGraphView(graphView, element as NodeView); // Call base add method
+      });
+    graphElements.filter((element: GraphElement) => element instanceof EdgeView)
+      .forEach((element: GraphElement) => {
+        this.addEdgeToGraphView(graphView, element as EdgeView); // Call base add method
+      });
+  }
+
+  /**
    * Populates the graph view of the given graph with node views and edge views.
    */
   public populateGraphView(graphView: GraphView, nodeViews: NodeView[], edgeViews: EdgeView[], callModel: boolean = true) {
@@ -153,16 +183,6 @@ export class GraphViewService extends GraphModelService {
   }
 
   /**
-   * Changes the weight of the given edge view.
-   */
-  public changeEdgeViewWeight(edgeView: EdgeView, weight: number) {
-    edgeView.changeEdgeWeight(weight);
-    this.edgeFabric.updateEdgeViewWeightTexture(edgeView); // Update texture, to resize text box
-    console.log('Edge weight changed: edge: ' + edgeView.getIndex() + '; weight: ' + weight); // TODO remove
-    this.stateService.edgeWeightChanged(edgeView);
-  }
-
-  /**
    * Changes the graph orientation.
    */
   public changeGraphOrientation(graphView: GraphView, orientation: GraphOrientation) {
@@ -180,11 +200,6 @@ export class GraphViewService extends GraphModelService {
     this.stateService.graphOrientationChanged(orientation);
   }
 
-  public changeEdgeViewOrientation(edgeView: EdgeView, orientation: EdgeOrientation) {
-    // TODO implement
-    // TODO implement restriction to non-oriented graph. If graph is non-oriented, do not allow changing edge orientation
-  }
-
   /**
    * Returns the edge views adjacent to the given node view.
    */
@@ -197,6 +212,22 @@ export class GraphViewService extends GraphModelService {
       }
     })
     return edges;
+  }
+
+  /**
+   * Updates the radius of the nodes connected by the given edge.
+   * Should be called when node radius is changed. Or on each remove/add edge when dynamic node size is enabled.
+   */
+  public updateRadiusNodes(node: NodeView) {
+    if (node.nodeStyle.radius instanceof DynamicRadius) {
+      node.nodeStyle.radius.adjEdges = node.node.getAdjacentEdges().length;
+    }
+    this.nodeFabric.updateTexture(node);
+    // Adjust position of edges
+    let nodeAdjacentEdges = this.getAdjacentEdgeViews(this.currentGraphView, node);
+    nodeAdjacentEdges.forEach((edgeView: EdgeView) => {
+      edgeView.move();
+    });
   }
 
   // ------------------ Graph view creation ------------------
@@ -289,6 +320,7 @@ export class GraphViewService extends GraphModelService {
         .edgeStyle);
       this.stateService.changeFloatHelperItem(EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM); // Change float helper item
     }
+    this.stateService.elementSelected(element); // Notify state service
   }
 
   /**
@@ -310,6 +342,7 @@ export class GraphViewService extends GraphModelService {
       // TODO Create helperService to manage helper items
       this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM); // Change float helper item
     }
+    this.stateService.elementUnselected(element); // Notify state service
   }
 
   /**
@@ -326,6 +359,7 @@ export class GraphViewService extends GraphModelService {
     });
     this._selectedElements = [];
     this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM); // Change float helper item
+    this.stateService.selectionCleared(); // Notify state service
   }
 
   /**
@@ -335,26 +369,32 @@ export class GraphViewService extends GraphModelService {
     return this._selectedElements.length === 0;
   }
 
+  /**
+   * Returns the selected elements.
+   * Returns the selected node views and edge views as GraphElements.
+   */
+  public getSelectedElements(): GraphElement[] {
+    const selectedElements: GraphElement[] = [];
+    this._selectedElements.forEach((element: GraphElement) => {
+      if (element instanceof NodeView) {
+        const node = this.currentGraphView.nodeViews.get(element.node.index);
+        if (node) {
+          selectedElements.push(node);
+        }
+      } else if (element instanceof EdgeView) {
+        const edge = this.currentGraphView.edgeViews.get(element.edge.edgeIndex.value);
+        if (edge) {
+          selectedElements.push(edge);
+        }
+      }
+    });
+    return selectedElements;
+  }
+
   private removeAdjacentEdges(graphView: GraphView, nodeView: NodeView) {
     let adjacentEdges: EdgeView[] = this.getAdjacentEdgeViews(graphView, nodeView);
     adjacentEdges.forEach((edgeView: EdgeView) => {
       this.removeEdgeFromGraphView(graphView, edgeView);
-    });
-  }
-
-  /**
-   * Updates the radius of the nodes connected by the given edge.
-   * Should be called when node radius is changed. Or on each remove/add edge when dynamic node size is enabled.
-   */
-  public updateRadiusNodes(node: NodeView) {
-    if (node.nodeStyle.radius instanceof DynamicRadius) {
-      node.nodeStyle.radius.adjEdges = node.node.getAdjacentEdges().length;
-    }
-    this.nodeFabric.updateTexture(node);
-    // Adjust position of edges
-    let nodeAdjacentEdges = this.getAdjacentEdgeViews(this.currentGraphView, node);
-    nodeAdjacentEdges.forEach((edgeView: EdgeView) => {
-      edgeView.move();
     });
   }
 

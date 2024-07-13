@@ -21,6 +21,7 @@ import {ImportService} from "./service/import.service";
 import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {FloatEditorPanelComponent} from "./component/canvas/float-editor-panel/float-editor-panel.component";
+import {GraphViewService} from "./service/graph/graph-view.service";
 
 @Component({
   selector: 'app-root',
@@ -39,11 +40,13 @@ export class AppComponent implements OnInit, OnDestroy {
   isMobileDevice: boolean;
   showFloatToolBar: boolean = false;
   showFloatHelper: boolean = false;
+  showFloatEditorPanel: boolean = false;
 
   constructor(private modeManagerService: ModeManagerService,
               private graphStateManager: GraphStateManagerService,
               private matrixManager: GraphMatrixViewStateManagerService,
               private graphSetManager: GraphSetViewManagerService,
+              private graphService: GraphViewService,
               private importService: ImportService,
               private pixiManager: PixiManagerService,
               private environmentService: EnvironmentService,
@@ -120,6 +123,27 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.stateService.showEditEdgeWeight$.subscribe((value) => {
         this.floatingEdgeWeightInput.showInput(value);
+      })
+    );
+
+    // Subscribe to changes of float editor panel visibility
+    this.subscriptions.add(
+      this.stateService.elementSelected$.subscribe((value) => {
+        this.showFloatEditorPanel = true;
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.elementUnselected$.subscribe((value) => {
+        if (this.graphService.isSelectionEmpty()) {
+          this.showFloatEditorPanel = false;
+        }
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.selectionCleared$.subscribe((value) => {
+        if (value) {
+          this.showFloatEditorPanel = false;
+        }
       })
     );
   }

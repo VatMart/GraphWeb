@@ -64,7 +64,7 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
       edgeOffset = Math.min(20,
         Math.max(12, ConfService.currentEdgeStyle.strokeWidth + ConfService.currentEdgeStyle.weight.text.size/2));
     }
-    const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView, edgeOffset);
+    const result: EdgeView = EdgeView.createFrom(newEdge, startNodeView, endNodeView, undefined,  edgeOffset);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
     result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
@@ -86,7 +86,7 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
       edgeOffset = Math.min(20,
         Math.max(12, ConfService.currentEdgeStyle.strokeWidth + ConfService.currentEdgeStyle.weight.text.size/2));
     }
-    const result: EdgeView = EdgeView.createFrom(edge, startNodeView, endNodeView, edgeOffset);
+    const result: EdgeView = EdgeView.createFrom(edge, startNodeView, endNodeView, undefined, edgeOffset);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
     result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
@@ -103,7 +103,8 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
       edgeOffset = Math.min(20,
         Math.max(12, ConfService.currentEdgeStyle.strokeWidth + ConfService.currentEdgeStyle.weight.text.size/2));
     }
-    const result: EdgeView = EdgeView.createFrom(edgeView.edge, edgeView.startNode, edgeView.endNode, edgeOffset);
+    const result: EdgeView = EdgeView.createFrom(edgeView.edge, edgeView.startNode, edgeView.endNode,
+      edgeView.edgeStyle, edgeOffset);
     const weightTexture = this.getOrCreateWeightTexture(result.weightView.text, result.weightView.weightStyle);
     result.weightView.texture = weightTexture;
     result.weightView.hitArea = this.calculateWeightHitArea(result.weightView);
@@ -135,6 +136,9 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     edge.move(); // Move edge to new position by redraw
   }
 
+  /**
+   * Change edge style to the previous style saved in cache.
+   */
   changeToPreviousStyle(edge: EdgeView): void {
     const previousStyle = this.styleCache.get(edge.getIndex());
     if (previousStyle) {
@@ -144,6 +148,13 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     } else {
       console.error("Previous style not found in cache for edge: " + edge.getIndex());
     }
+  }
+
+  /**
+   * Get previous style of edge.
+   */
+  getPreviousStyle(edge: EdgeView): EdgeStyle | undefined {
+    return this.styleCache.get(edge.getIndex());
   }
 
   /**

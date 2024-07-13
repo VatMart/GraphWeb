@@ -1,0 +1,33 @@
+<div class="dialog-content">
+  <div *ngIf="type === 'nodeLabelEdit'">
+    <div class="flex flex-column gap-2 mb-3">
+      <label for="nodeLabel">Node label</label>
+      <input pInputText
+             id="nodeLabel"
+             aria-describedby="nodeLabel-help"
+             [(ngModel)]="nodeLabel"/>
+      <small id="nodeLabel-help">
+        Enter text for the label. If it will be empty,<br>
+        node index will be used. <br>
+        Max length: 20 characters.
+      </small>
+    </div>
+  </div>
+  <div *ngIf="type === 'edgeWeightEdit'">
+    <div class="flex flex-column gap-2 mb-3">
+      <label for="edgeLabel">Edge weight</label>
+      <input pInputText
+             id="edgeLabel"
+             aria-describedby="edgeLabel-help"
+             [(ngModel)]="edgeWeight"/>
+      <small id="edgeLabel-help">
+        Value should be a number between 0 and 1000<br> (decimals allowed).
+      </small>
+    </div>
+  </div>
+  <div class="flex justify-content-end gap-2">
+    <p-button label="Cancel" severity="secondary" (click)="ref.close()"/>
+    <p-button label="Apply" (click)="onApply()"/>
+  </div>
+</div>
+

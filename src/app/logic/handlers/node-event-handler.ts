@@ -118,6 +118,7 @@ export class NodeEventHandler {
         const dy = Math.abs((newPosition.y - nodeMove.offset.y) - nodeMove.oldPosition.y);
         if (dx > this.dragThreshold || dy > this.dragThreshold) {
           this.isDragging = true; // Start dragging if moved beyond threshold
+          this.stateService.nodeStartDragging(true);
         }
       }
       // Perform vertex dragging
@@ -162,6 +163,7 @@ export class NodeEventHandler {
         const dy = Math.abs((newPosition.y - nodeMove.offset.y) - nodeMove.oldPosition.y);
         if (dx > this.dragThreshold || dy > this.dragThreshold) {
           this.isDragging = true; // Start dragging if moved beyond threshold
+          this.stateService.nodeStartDragging(true);
         }
       }
       // Perform vertex dragging
@@ -212,6 +214,7 @@ export class NodeEventHandler {
       NodeEventHandler.dragTarget = null;
       this.isDragging = false;
     }
+    this.stateService.nodeEndDragging(true);
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointermove', HandlerNames.NODE_DRAG_MOVE);
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerup', HandlerNames.NODE_DRAG_END);
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerupoutside', HandlerNames.NODE_DRAG_END);

@@ -5,15 +5,32 @@
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%); /* Center the element */
+  animation: slideIn 200ms ease-in; /* Animation for sliding in */
   margin-bottom: 2rem;
   padding: 0.5rem;
   width: auto;
-  min-width: 25px;
   max-width: 70vw;
   background-color: var(--main-bg-color);
   border-radius: 10px;
   box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
   border: 1px solid var(--main-border-color);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%) translateX(-50%);
+  }
+  to {
+    transform: translateY(0) translateX(-50%);
+  }
+}
+
+.float-panel {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.float-panel.reduced-opacity {
+  opacity: 0.5; /* Adjust the opacity value as needed */
 }
 
 .editor-content {

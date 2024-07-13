@@ -15,6 +15,7 @@ import {CustomizationResolver} from "../../logic/customization-resolver";
 import {GraphViewPropertiesService} from "../graph/graph-view-properties.service";
 import {ChangeGraphViewPropertiesCommand} from "../../logic/command/change-graph-view-properties-command";
 import {GraphOrientation} from "../../model/orientation";
+import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
 
 /**
  * Service for managing the state of the graph.
@@ -28,6 +29,7 @@ export class GraphStateManagerService implements ServiceManager {
   constructor(private stateService: StateService,
               private historyService: HistoryService,
               private graphService: GraphViewService,
+              private edgeFabric: EdgeViewFabricService,
               private graphPropertiesService: GraphViewPropertiesService,
               private graphGeneratorService: GraphModelGeneratorService) {
   }
@@ -80,7 +82,7 @@ export class GraphStateManagerService implements ServiceManager {
     // Change edge weight
     this.subscriptions.add(
       this.stateService.edgeWeightToChange$.subscribe(weightToChange => {
-        const command = new ChangeEdgeWeightCommand(this.graphService,
+        const command = new ChangeEdgeWeightCommand(this.graphPropertiesService,
           weightToChange.weight.parent as EdgeView, weightToChange.changeValue);
         this.historyService.execute(command);
       })
@@ -111,11 +113,9 @@ export class GraphStateManagerService implements ServiceManager {
     this.subscriptions.add(
       this.stateService.applyCustomization$.subscribe((value) => {
         const resolver = new CustomizationResolver(this.graphService,
-          this.graphPropertiesService);
-        const actions = resolver.resolve(value);
-        const rollbackActions = resolver.resolveRollback(value);
-        // console.log("Actions: " + actions); // Debug info
-        // console.log("Rollback actions: " + rollbackActions); // Debug info
+          this.graphPropertiesService, this.edgeFabric);
+        const actions = resolver.resolveGlobal(value);
+        const rollbackActions = resolver.resolveGlobalRollback(value);
         const command = new ChangeGraphViewPropertiesCommand(actions, rollbackActions);
         this.historyService.execute(command);
       })

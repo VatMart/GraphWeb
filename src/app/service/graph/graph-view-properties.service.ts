@@ -7,6 +7,8 @@ import {DefaultRadius, DynamicRadius} from "../../model/graphical-model/node/rad
 import {NodeViewFabricService} from "../fabric/node-view-fabric.service";
 import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
+import {style} from "@angular/animations";
+import {EdgeStyle} from "../../model/graphical-model/graph/graph-view-properties";
 
 /**
  * Service for managing the properties of the graph view.
@@ -23,6 +25,32 @@ export class GraphViewPropertiesService {
               private edgeFabric: EdgeViewFabricService) {
   }
 
+  /**
+   * Changes the label of the node.
+   */
+  public changeNodeLabel(nodeView: NodeView, newLabel: string) {
+    if (nodeView.node.label === newLabel) {
+      return;
+    }
+    if (newLabel.length === 0) { // If label is empty, set index as label
+      nodeView.node.label = '';
+      nodeView.text.text = nodeView.node.index.toString();
+      return;
+    }
+    nodeView.node.label = newLabel;
+    nodeView.text.text = newLabel;
+  }
+
+  /**
+   * Changes the weight of the given edge view.
+   */
+  public changeEdgeViewWeight(edgeView: EdgeView, weight: number) {
+    edgeView.changeEdgeWeight(weight);
+    this.edgeFabric.updateEdgeViewWeightTexture(edgeView); // Update texture, to resize text box
+    this.stateService.edgeWeightChanged(edgeView);
+  }
+
+  // ------------------- Styles related methods -------------------
   /**
    * Changes the visibility of the edge weights. Changes the visibility of all edge weights and default value
    * for new edges.

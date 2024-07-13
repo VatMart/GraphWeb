@@ -21,7 +21,15 @@ export class FileService {
    */
   public serializeCurrentGraphAndSettings(): string {
     const graphProperties = ConfService.CURRENT_GRAPH_PROPERTIES;
+    // Unselect all elements before saving (it is necessary to save the styles of the elements correctly)
+    const selectedElements = this.graphService.getSelectedElements();
+    this.graphService.clearSelection();
+    // Serialize graph
     const graphView = this.graphService.currentGraphView.toJSON();
+    // Restore selected elements
+    selectedElements.forEach(element => {
+      this.graphService.selectElement(element);
+    });
     return JSON.stringify({graph: graphView, graphProperties: graphProperties});
   }
 
