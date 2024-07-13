@@ -7,17 +7,17 @@ import {AddRemoveEdgeMode} from "../../logic/mode/add-remove-edge-mode";
 import {PixiService} from "../pixi.service";
 import {GraphViewService} from "../graph/graph-view.service";
 import {EventBusService} from "../event/event-bus.service";
-import {NodeViewFabricService} from "../fabric/node-view-fabric.service";
 import {HistoryService} from "../history.service";
-import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {
   ADD_REMOVE_EDGE_MODE_HELPER_ITEM,
-  ADD_REMOVE_VERTEX_MODE_HELPER_ITEM, DEFAULT_HELPER_ITEM
+  ADD_REMOVE_VERTEX_MODE_HELPER_ITEM,
+  DEFAULT_HELPER_ITEM
 } from "../../component/canvas/float-helper/float-helper.component";
 import {Subscription} from "rxjs";
 import {ServiceManager} from "../../logic/service-manager";
 import {ChangeForceModeCommand, NodePosition} from "../../logic/command/change-force-mode-command";
+import {SelectionMode} from "../../logic/mode/selection-mode";
 
 /**
  * Service for managing the modes of the application.
@@ -26,7 +26,6 @@ import {ChangeForceModeCommand, NodePosition} from "../../logic/command/change-f
   providedIn: 'root'
 })
 export class ModeManagerService implements ServiceManager {
-  // TODO call unsubscribe on destroy app
   private subscriptions!: Subscription;
 
   private defaultMode?: DefaultMode;
@@ -53,8 +52,8 @@ export class ModeManagerService implements ServiceManager {
     this.modeStateActions = {
       'default': this.defaultMode,
       'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.stateService),
-      'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.stateService)
-      // TODO Add selection mode for mobile devices (for multiple selection)
+      'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.stateService),
+      'SelectionMode': new SelectionMode(this.pixiService, this.eventBus)
     };
     this.initSubscriptions();
   }
@@ -85,6 +84,13 @@ export class ModeManagerService implements ServiceManager {
     this.subscriptions.add(
       this.stateService.currentAddEdgesState.subscribe(state => {
         const newState: ModeState = state ? 'AddRemoveEdge' : 'default';
+        this.stateService.changeMode(newState);
+      })
+    );
+    // Subscribe to selection mode state
+    this.subscriptions.add(
+      this.stateService.selectionModeState$.subscribe(state => {
+        const newState: ModeState = state ? 'SelectionMode' : 'default';
         this.stateService.changeMode(newState);
       })
     );
@@ -283,4 +289,4 @@ export interface ModeBehavior {
   onRedoInvoked(): void;
 }
 
-export type ModeState = 'AddRemoveVertex' | 'AddRemoveEdge' | 'default';
+export type ModeState = 'AddRemoveVertex' | 'AddRemoveEdge' | 'default' | 'SelectionMode';

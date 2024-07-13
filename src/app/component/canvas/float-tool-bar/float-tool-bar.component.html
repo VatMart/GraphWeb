@@ -4,7 +4,8 @@
          class="toolbar-item"
          [class.active]="item.isActive"
          [class.disabled]="item.disabled"
-         (click)="!item.disabled && item.command(i)">
+         (click)="!item.disabled && item.command(i)"
+         *ngIf="!item.hidden">
       <ng-container *ngIf="item.customIcon; else defaultIcon">
         <span class="custom-icon-container">
           <span [id]="'icon-' + i" [class]="item.icon" appSvgIcon [appSvgIcon]="item.icon"></span>

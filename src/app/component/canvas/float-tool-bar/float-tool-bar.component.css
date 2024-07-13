@@ -43,6 +43,12 @@
   margin-inline: 2px;
 }
 
+.selection-mode-icon {
+  position: relative;
+  top: 2px;
+  left: 2px;
+}
+
 .force-icon {
   position: relative;
   top: 2px;
