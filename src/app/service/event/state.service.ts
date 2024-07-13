@@ -174,6 +174,9 @@ export class StateService {
   private needCenterCanvasViewSource = new Subject<boolean>();
   public needCenterCanvasView$ = this.needCenterCanvasViewSource.asObservable();
 
+  private selectionModeStateSource = new Subject<boolean>();
+  public selectionModeState$ = this.selectionModeStateSource.asObservable();
+
   private forceModeDisabledSource = new Subject<boolean>();
   public forceModeDisabled$ = this.forceModeDisabledSource.asObservable();
 
@@ -552,6 +555,13 @@ export class StateService {
    */
   needCenterCanvasView() {
     this.needCenterCanvasViewSource.next(true);
+  }
+
+  /**
+   * Change the selection mode state.
+   */
+  changeSelectionModeState(state: boolean) {
+    this.selectionModeStateSource.next(state);
   }
 
   /**

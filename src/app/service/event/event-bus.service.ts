@@ -234,6 +234,7 @@ export const HandlerNames = {
   ELEMENT_SELECT: 'elementSelect', // Handler for the element select event
   RECTANGLE_SELECTION_MOVE: 'rectangleSelectionMove', // Handler for the rectangle selection start event
   RECTANGLE_SELECTION_END: 'rectangleSelectionEnd', // Handler for the rectangle selection end event
+  MULTI_SELECTION: 'multiSelection', // Handler for the multi selection event (Only for mobiles)
 
   // Canvas handlers
   CANVAS_CURSOR_MOVE: 'canvasCursorMove', // Handler for the canvas cursor move

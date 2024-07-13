@@ -54,6 +54,7 @@ export class CanvasEventHandler {
   private onSelectionElementBound: (event: FederatedPointerEvent) => void;
   private onRectangleSelectionMoveBound: (event: FederatedPointerEvent) => void;
   private onRectangleSelectionEndBound: (event: FederatedPointerEvent) => void;
+  private onMultiSelectionBound: (event: FederatedPointerEvent) => void;
 
   // CursorCoordinates
   xCursor: number = 0;
@@ -92,6 +93,7 @@ export class CanvasEventHandler {
     this.onSelectionElementBound = this.onSelectElement.bind(this);
     this.onRectangleSelectionMoveBound = this.onRectangleSelectionMove.bind(this);
     this.onRectangleSelectionEndBound = this.onRectangleSelectionEnd.bind(this);
+    this.onMultiSelectionBound = this.onMultiSelection.bind(this);
 
     // Registering event handlers
     this.eventBus.registerHandler(HandlerNames.CANVAS_CURSOR_MOVE, this.boundHandleCursorMoving);
@@ -106,6 +108,7 @@ export class CanvasEventHandler {
     this.eventBus.registerHandler(HandlerNames.ELEMENT_SELECT, this.onSelectionElementBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_MOVE, this.onRectangleSelectionMoveBound);
     this.eventBus.registerHandler(HandlerNames.RECTANGLE_SELECTION_END, this.onRectangleSelectionEndBound);
+    this.eventBus.registerHandler(HandlerNames.MULTI_SELECTION, this.onMultiSelectionBound);
     // Initialize hammer manager (touchscreen events handler)
     this.initializeHammerManager();
     // Initialize rectangle selection
@@ -369,6 +372,18 @@ export class CanvasEventHandler {
       } else {
         this.graphViewService.selectElement(selectedElement);
       }
+    }
+  }
+
+  private onMultiSelection(event: FederatedPointerEvent): void {
+    let selectedElement = EventUtils.getGraphElement(event.target);
+    if (selectedElement === null) {
+      return;
+    }
+    if (this.graphViewService.isElementSelected(selectedElement)) {
+      this.graphViewService.unselectElement(selectedElement);
+    } else {
+      this.graphViewService.selectElement(selectedElement);
     }
   }
 
