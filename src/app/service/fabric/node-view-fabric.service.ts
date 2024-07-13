@@ -75,12 +75,13 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
   }
 
   /**
-   * Initialize imported node view.
+   * Create imported node view. All properties are copied from imported node view.
    * @param nodeView - node view to initialize
    */
   public createFromImportedNodeView(nodeView: NodeView) {
     const texture: Texture = <Texture>this.getOrCreateTexture(nodeView.nodeStyle);
-    const result = NodeView.createFromTexture(nodeView.node, nodeView.coordinates, nodeView.radius, texture);
+    const result = NodeView.createFromTexture(nodeView.node, nodeView.coordinates, nodeView.radius,
+      texture, nodeView.nodeStyle);
     return result;
   }
 

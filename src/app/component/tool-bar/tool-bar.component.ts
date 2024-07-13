@@ -206,7 +206,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   }
 
   onClearGraph() {
-    this.historyService.execute(new ClearGraphViewCommand(this.graphViewService)); // TODO move to GraphStateManagerService
+    this.historyService.execute(new ClearGraphViewCommand(this.graphViewService));
     this.stateService.graphCleared();
   }
 

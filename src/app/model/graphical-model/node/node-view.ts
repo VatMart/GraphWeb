@@ -23,18 +23,22 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
   // Properties for label
   private _labelText: string;
 
-  public static createFromTexture(node: Node, coordinates: Point, radius: number, texture: Texture): NodeView {
-    let nodeGraphical = new NodeView(node, coordinates, radius, texture);
+  public static createFromTexture(node: Node, coordinates: Point, radius: number, texture: Texture,
+                                  style?: NodeStyle): NodeView {
+    let nodeGraphical = new NodeView(node, coordinates, radius, texture, style);
     nodeGraphical.interactive = true;
     nodeGraphical.addChild(nodeGraphical.text); // Add text to node
     nodeGraphical.draw();
     return nodeGraphical;
   }
 
-  private constructor(node: Node, coordinates: Point, radius: number, texture?: Texture) {
+  private constructor(node: Node, coordinates: Point, radius: number, texture?: Texture, style?: NodeStyle) {
     super(texture);
     this.hitArea = new PIXI.Circle(this.width / 2, this.height / 2, radius);
     this._node = node;
+    if (style) {
+      this._nodeStyle = style;
+    }
     this._coordinates = coordinates;
     this._labelText = node.label ? node.label : node.index.toString();
     this._text = new Text();
@@ -99,10 +103,7 @@ export class NodeView extends Sprite implements GraphElement { // TODO extends S
     const node = nodes.get(json.node.index)!;
     const coordinates: Point = json.coordinates;
     const radius = json.radius;
-    const nodeView = new NodeView(node, coordinates, radius);
-    const radiusImpl = nodeView.nodeStyle.radius;
-    nodeView.nodeStyle = json.nodeStyle;
-    nodeView.nodeStyle.radius = radiusImpl;
+    const nodeView = new NodeView(node, coordinates, radius, undefined, json.nodeStyle);
     nodeView.text.visible = ConfService.SHOW_NODE_LABEL;
     return nodeView;
   }

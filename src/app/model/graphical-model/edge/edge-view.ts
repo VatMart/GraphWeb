@@ -36,35 +36,38 @@ export class EdgeView extends Graphics implements GraphElement {
    * @param edge - edge model
    * @param startNode - start node view
    * @param endNode - end node view
+   * @param edgeStyle - style of edge
    * @param offset - if graph has reverse edge to this (for example: graph has 1-2 edge index, reverse edge is 2-1),
    * than it should have offset to be drawn correctly
    */
-  public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView,
+  public static createFrom(edge: Edge, startNode: NodeView, endNode: NodeView, edgeStyle?: EdgeStyle,
                            offset?: number) : EdgeView {
-    let edgeGraphical = new EdgeView(edge, startNode, endNode, ConfService.currentEdgeStyle, offset);
+    let edgeGraphical = new EdgeView(edge, startNode, endNode, edgeStyle, offset);
     edgeGraphical.interactive = true;
     edgeGraphical.move();
     return edgeGraphical;
   }
 
   constructor(edge: Edge, startNode: NodeView, endNode: NodeView,
-              edgeStyle: EdgeStyle, offset?: number) {
+              edgeStyle?: EdgeStyle, offset?: number) {
     super();
     this._edge = edge;
     this._startNode = startNode;
     this._endNode = endNode;
     if (edge.orientation === EdgeOrientation.ORIENTED && !this.edge.isLoop()) {
-      this.arrow = new Arrow();
+      this.arrow = new Arrow(edgeStyle?.arrow);
       this.addChild(this.arrow);
     }
     this._offset = offset;
-    this._weightView = new Weight(this._edge.weight);
+    this._weightView = new Weight(this._edge.weight, edgeStyle?.weight);
     this.weightView.visible = this._weightVisible;
     this.addChild(this._weightView);
     const points = this.resolveConnectors();
     this._startCoordinates = points[0];
     this._endCoordinates = points[1];
-    this._edgeStyle = edgeStyle;
+    if (edgeStyle) {
+      this._edgeStyle = edgeStyle;
+    }
   }
 
   /**

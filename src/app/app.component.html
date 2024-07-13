@@ -10,7 +10,7 @@
       <div class="pixi-container">
         <app-float-tool-bar *ngIf="showFloatToolBar"/>
         <app-float-helper *ngIf="showFloatHelper"/>
-        <app-float-editor-panel/>
+        <app-float-editor-panel *ngIf="showFloatEditorPanel" [@slideIn]="'in'"/>
         <app-float-edge-weight-input #floatingEdgeWeightInput/>
         <app-canvas id="pixi-canvas"/>
       </div>

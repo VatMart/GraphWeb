@@ -1,4 +1,4 @@
-<div class="editor-panel">
+<div class="editor-panel float-panel" [ngClass]="{'reduced-opacity': isDragging}">
   <div class="editor-header">
   </div>
   <div class="editor-content">
@@ -48,7 +48,7 @@
   </div>
   <!-- Utility section of editor panel -->
   <div class="editor-utility-content">
-    <i pRipple pTooltip="Delete selected elements" tooltipPosition="top" showDelay="200"
+    <i pRipple pTooltip="Delete selected elements (shortcut: 'delete' key)" tooltipPosition="top" showDelay="200"
        class="pi pi-trash gw-button red" style="color: red; font-size: 1.5rem"
        (click)="onDeleteSelectedClick()"></i>
   </div>
@@ -56,20 +56,24 @@
   <!-- Overlay panel for editing selected elements -->
   <p-overlayPanel #colorOverlayPanel>
     <div class="overlay-container" *ngIf="isNodeSelection">
-      <label class="subheader-label">Edge colors:</label>
+      <label class="subheader-label">Node colors:</label>
       <div class="color-pick-group">
-        <div class="color-pick-item" *ngFor="let item of edgeColorItems;">
+        <div class="color-pick-item" *ngFor="let item of nodeColorItems; let i = index">
           <label class="customization-label">{{item.label}}</label>
-          <input class="color-picker" type="color" [value]="item.color"/>
+          <input class="color-picker" type="color"
+                 [value]="item.color"
+                 (change)="item.command($event, item)"/>
         </div>
       </div>
     </div>
     <div class="overlay-container" *ngIf="isEdgeSelection">
-      <label class="subheader-label">Node colors:</label>
+      <label class="subheader-label">Edge colors:</label>
       <div class="color-pick-group">
-        <div class="color-pick-item" *ngFor="let item of nodeColorItems;">
+        <div class="color-pick-item" *ngFor="let item of edgeColorItems;">
           <label class="customization-label">{{item.label}}</label>
-          <input class="color-picker" type="color" [value]="item.color"/>
+          <input class="color-picker" type="color"
+                 [value]="item.color"
+                 (change)="item.command($event, item)"/>
         </div>
       </div>
     </div>

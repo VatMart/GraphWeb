@@ -18,6 +18,7 @@ import {SetValidationResult} from "../graph/graph-set.service";
 import {CustomizationFormValues} from "../../component/tab-nav/customization-view/customization-view.component";
 import {AppData} from "../file.service";
 import {ConfService} from "../config/conf.service";
+import {GraphElement} from "../../model/graphical-model/graph-element";
 
 /**
  * Service for managing the state of the application.
@@ -198,6 +199,18 @@ export class StateService {
   public currentFloatHelperItem$ = this.currentFloatHelperItemSource.asObservable();
 
   // --------------------------------------------------
+  // UI component states. Canvas Float editor panel
+  // --------------------------------------------------
+  private elementSelectedSource = new Subject<GraphElement>();
+  public elementSelected$ = this.elementSelectedSource.asObservable();
+
+  private elementUnselectedSource = new Subject<GraphElement>();
+  public elementUnselected$ = this.elementUnselectedSource.asObservable();
+
+  private selectionClearedSource = new Subject<boolean>();
+  public selectionCleared$ = this.selectionClearedSource.asObservable();
+
+  // --------------------------------------------------
   // Graph elements and graph states
   // --------------------------------------------------
   // Node related events
@@ -206,6 +219,12 @@ export class StateService {
 
   private nodeDeletedSource = new Subject<NodeView>();
   public nodeDeleted$ = this.nodeDeletedSource.asObservable();
+
+  private nodeStartDraggingSource = new Subject<boolean>();
+  public nodeStartDragging$ = this.nodeStartDraggingSource.asObservable();
+
+  private nodeEndDraggingSource = new Subject<boolean>();
+  public nodeEndDragging$ = this.nodeEndDraggingSource.asObservable();
 
   // Edge related events
   private edgeAddedSource = new Subject<EdgeView>();
@@ -586,6 +605,27 @@ export class StateService {
   }
 
   /**
+   * Graph element selected.
+   */
+  elementSelected(element: GraphElement) {
+    this.elementSelectedSource.next(element);
+  }
+
+  /**
+   * Graph element unselected.
+   */
+  elementUnselected(element: GraphElement) {
+    this.elementUnselectedSource.next(element);
+  }
+
+  /**
+   * Cleared the selection.
+   */
+  selectionCleared() {
+    this.selectionClearedSource.next(true);
+  }
+
+  /**
    * Change the add vertex mode state.
    */
   changeAddVertexModeState(state: boolean) {
@@ -620,6 +660,20 @@ export class StateService {
   deletedNode(nodeView: NodeView) {
     this.nodeDeletedSource.next(nodeView);
     this.graphChangedSource.next(true);
+  }
+
+  /**
+   * Notify that a node is dragging.
+   */
+  nodeStartDragging(value: boolean) {
+    this.nodeStartDraggingSource.next(value);
+  }
+
+  /**
+   * Notify that a node has been dragged.
+   */
+  nodeEndDragging(value: boolean) {
+    this.nodeEndDraggingSource.next(value);
   }
 
   /**

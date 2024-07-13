@@ -110,7 +110,6 @@ export class FloatEdgeWeightInputComponent {
 
   /**
    * Validate potential weight value.
-   * TODO move to separate service/class
    */
   private validateInput(value: string): WeightValidationResult {
     // Check if the value is a valid number
@@ -169,7 +168,6 @@ export class FloatEdgeWeightInputComponent {
     const maxSize = 56;
     const zoomScale = this.pixiService.getZoomScale() + 0.1;
     const fontSize = Math.max(minSize, Math.min(maxSize, Math.round(minSize * zoomScale)));
-    // console.log("calculateFontSize: " + fontSize); // TODO remove
     return fontSize;
   }
 }

@@ -77,6 +77,7 @@ export class ConfService {
   public static MIN_NODE_STROKE_WIDTH = 0;
   public static MAX_NODE_STROKE_WIDTH = 10;
   // Node label
+  public static MAX_NODE_LABEL_LENGTH = 20; // 20 symbols
   public static MIN_NODE_LABEL_FONT_SIZE = 12;
   public static MAX_NODE_LABEL_FONT_SIZE = 36;
 

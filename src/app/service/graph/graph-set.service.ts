@@ -55,7 +55,9 @@ export class GraphSetService {
     const normalizedInput = input
       .replace(/[,;\n]/g, ' ')    // Replace commas, semicolons, and newlines with spaces
       .replace(/\s+/g, ' ');      // Replace multiple spaces with a single space
-    const values = normalizedInput.trim().split(' ');
+
+    // Split the input by spaces, considering quoted labels
+    const values = normalizedInput.match(/(?:[^\s']+|'[^']*')+/g) || [];
     const vertices = new Set<number | string>();
     for (let i = 0; i < values.length; i++) {
       const vertex = values[i];
@@ -82,9 +84,10 @@ export class GraphSetService {
     }
     // Normalize the input: replace all possible separators with a single one
     const normalizedInput = edgeInput
-      .replace(/[,;\n]/g, ' ')    // Replace commas, semicolons, and newlines with spaces
+      .replace(/\n/g, '')
+      .replace(/[,;]/g, ';')    // Replace commas, semicolons, and newlines with spaces
       .replace(/\s+/g, ' ');      // Replace multiple spaces with a single space
-    const values = normalizedInput.trim().split(' ');
+    const values = normalizedInput.trim().split(';');
     const edges = new Set<string>();
     for (let i = 0; i < values.length; i++) {
       const edge = values[i];
@@ -92,6 +95,7 @@ export class GraphSetService {
         continue;
       }
       const verticesIds = edge.split('-'); // Split edge into two vertices
+      console.log("Vertices: " + verticesIds[1]); // TODO remove
       if (verticesIds.length !== 2 || verticesIds[0].trim().length === 0 || verticesIds[1].trim().length === 0){
         return {isValid: false, message: "Invalid edge format: '" + edge + "'. Expected format: 'vertexId1-vertexId2'"};
       }
