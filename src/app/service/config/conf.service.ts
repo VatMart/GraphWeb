@@ -66,6 +66,7 @@ export class ConfService {
   public static BOUNDS_GAP: number = 200;
 
   // Graph properties
+  public static MAX_NUMBER_OF_NODES: number = 350; // Max number of nodes in the graph
   public static DEFAULT_GRAPH_ORIENTATION = GraphOrientation.ORIENTED;
 
   // Node properties

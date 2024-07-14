@@ -1,9 +1,35 @@
+@keyframes slideIn {
+  from {
+    transform: translateX(calc(-100%));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100%));
+  }
+}
+
+@keyframes slideIn160 {
+  from {
+    transform: translateX(calc(-100% + 160px));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 /* Desktop vertical nav bar */
 .vertical-nav {
   display: flex;
   flex-direction: row;
   height: 100% !important;
-  background-color: var(--main-bg-color);
   border-right: 1px solid var(--main-border-color);
   box-shadow: var(--main-border-color) 1.95px 1.95px 2.6px;
   margin-right: 4px;
@@ -11,9 +37,11 @@
 
 .vertical-nav-container {
   display: flex;
+  background-color: var(--main-bg-color);
   flex-direction: column;
   min-width: min-content;
   font-size: 16px;
+  z-index: 2;
 }
 
 .vertical-nav-header {
@@ -64,6 +92,10 @@
 
 .nav-item a {
   font-family: 'Nunito Sans', sans-serif;
+}
+
+.a-expanded{
+  animation: slideIn160 0.3s forwards;
 }
 
 .collapse-icon {
@@ -127,6 +159,12 @@
   border-left-width: 1px;
   border-left-style: solid;
   border-left-color: var(--main-border-color);
+  animation: slideIn 0.3s forwards;
+  z-index: 0;
+}
+
+.left-side-content-container.slide-out {
+  animation: slideOut 0.15s forwards;
 }
 
 .left-side-content {
