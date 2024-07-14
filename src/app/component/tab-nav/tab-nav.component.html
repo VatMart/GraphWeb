@@ -19,26 +19,28 @@
                [appSvgIcon]="item.icon"
                [ngClass]="item.icon"
                *ngIf="item.icon && item['customIcon'] && item['customIcon'] === true"></i>
-            <a *ngIf="verticalNavExpanded" [ngClass]="item.icon + '-custom-text'">{{ item.label }}</a>
+            <a *ngIf="verticalNavExpanded"
+               [ngClass]="[(item.icon + '-custom-text'), (!verticalNavExpanded ? '' : 'a-expanded')]">
+              {{ item.label }}
+            </a>
           </div>
         </div>
       </div>
     </div>
 
-    <div #leftSideContentContainer>
-      <div class="left-side-content-container" *ngIf="activeIndex !== null">
-        <div id="desktopSidebarHeader" class="left-side-content-header" #desktopSidebarHeader>
-          <h2>{{ items ? items[activeIndex]['header'] : "No header" }}</h2>
-          <i pRipple class="pi pi-times-circle close-button move-right" style="font-size: 1.5rem"
-             (click)="onCloseLeftSideContainer()">
-          </i>
-        </div>
-        <div class="content-separator"></div>
-        <div class="left-side-content" #desktopSidebarContent>
-          <app-output-view *ngIf="activeIndex === 0"/>
-          <app-input-view *ngIf="activeIndex === 1"/>
-          <app-customization-view *ngIf="activeIndex === 3"/>
-        </div>
+    <div class="left-side-content-container" *ngIf="activeIndex !== null" @slideInOut>
+      <div id="desktopSidebarHeader" class="left-side-content-header" #desktopSidebarHeader>
+        <h2>{{ items ? items[activeIndex]['header'] : "No header" }}</h2>
+        <i pRipple class="pi pi-times-circle close-button move-right" style="font-size: 1.5rem"
+           (click)="onCloseLeftSideContainer()">
+        </i>
+      </div>
+      <div class="content-separator"></div>
+      <div class="left-side-content" #desktopSidebarContent>
+        <app-generate-view *ngIf="activeIndex === 0"/>
+        <app-input-view *ngIf="activeIndex === 1"/>
+        <app-customization-view *ngIf="activeIndex === 3"/>
+        <app-output-view *ngIf="activeIndex === 4"/>
       </div>
     </div>
   </div>
@@ -52,16 +54,16 @@
       <ng-template pTemplate="item" let-item let-i="index">
         <a pRipple class="p-menuitem-link" (click)="onMobileTabMenuActiveItemChange(i)">
           <ng-container *ngIf="svgIconService.getIcon(item.icon); else defaultIcon">
-              <i class="custom-icon-container">
-                <span appSvgIcon [appSvgIcon]="item.icon" [ngClass]="item.icon"></span>
-              </i>
+            <i class="custom-icon-container">
+              <span appSvgIcon [appSvgIcon]="item.icon" [ngClass]="item.icon"></span>
+            </i>
           </ng-container>
           <!-- Find icon in primeng icons -->
           <ng-template #defaultIcon>
             <span class="p-menuitem-icon black-icon" [class]="item.icon"></span>
           </ng-template>
           <a [ngClass]="item.icon + '-custom-text'">
-                {{ item.label }}
+            {{ item.label }}
           </a>
         </a>
       </ng-template>
@@ -83,6 +85,7 @@
           <app-output-view *ngIf="activeItem?.id === 'output'"/>
           <app-input-view *ngIf="activeItem?.id === 'input'"/>
           <app-customization-view *ngIf="activeItem?.id === 'customization'"/>
+          <app-generate-view *ngIf="activeItem?.id === 'generation'"/>
         </div>
       </div>
     </ng-template>

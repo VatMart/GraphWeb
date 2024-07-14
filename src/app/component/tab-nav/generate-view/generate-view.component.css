@@ -1,0 +1,90 @@
+* {
+  font-size: 16px;
+}
+
+.generate-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.generate-content {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.common-label {
+  display: block;
+  color: black;
+  padding-right: 4px;
+}
+
+.subheader-label {
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+  padding-bottom: 6px;
+}
+
+.row-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-block: 6px;
+}
+
+.custom-slider {
+  flex: 1;
+  margin-left: 8px;
+}
+
+.custom-input-number {
+  margin-left: 8px;
+  max-width: 50px;
+}
+
+.overlay-container {
+  display: flex;
+  flex-direction: column;
+  padding-block: 4px;
+}
+
+.info-button {
+  margin-left: 4px;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.info-button:hover {
+  color: var(--main-blue-color);
+  background-color: var(--main-hover-color);
+}
+
+.info-button:active {
+  color: var(--main-blue-light-color);
+  background-color: var(--main-hover-color);
+}
+
+.separator {
+  display: block;
+  width: auto;
+  height: 1px;
+  background-color: var(--main-border-color);
+  margin: 0 8px 8px 8px;
+}
+
+.button-panel {
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hint-image {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+}

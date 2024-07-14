@@ -53,7 +53,7 @@ export class ModeManagerService implements ServiceManager {
       'default': this.defaultMode,
       'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.stateService),
       'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.stateService),
-      'SelectionMode': new SelectionMode(this.pixiService, this.eventBus)
+      'SelectionMode': new SelectionMode(this.pixiService, this.eventBus, this.stateService)
     };
     this.initSubscriptions();
   }

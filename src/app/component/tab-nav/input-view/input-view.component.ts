@@ -75,10 +75,10 @@ export class InputViewComponent implements OnInit, OnDestroy {
   // Graph sets
   verticesSetInput: string = '';
   edgesSetInput: string = '';
-  readonly verticesSetPlaceholder = 'Allowed formats:\n1 pancake 3 Abc 5\nor ' +
-    '1; pancake; 3; Abc; 5\nYou can use labels (without spaces) instead of numbers.';
-  readonly edgesSetPlaceholder = 'Allowed formats:\n1-5, 1-pancake, pancake-Abc\nor ' +
-    '1-5; 1-pancake; pancake-Abc.';
+  readonly verticesSetPlaceholder = 'Allowed formats:\n1 \'blueberry pancake\' 3 \'Abc\' 5\nor ' +
+    '1; \'blueberry pancake\'; 3; \'Abc\'; 5\nYou can use labels instead of numbers. But labels should be in quotes.';
+  readonly edgesSetPlaceholder = 'Allowed formats:\n1-5, 1-\'blueberry pancake\', \'blueberry pancake\'-\'Abc\'\nor ' +
+    '1-5; 1-\'blueberry pancake\'; \'blueberry pancake\'-\'Abc\'.';
   graphSetInProcess: boolean = false;
   currentVertValidationType!: ValidationItem;
   currentEdgeValidationType!: ValidationItem;

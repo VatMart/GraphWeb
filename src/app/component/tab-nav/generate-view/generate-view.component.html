@@ -1,0 +1,246 @@
+<div class="generate-container">
+  <form [formGroup]="defaultForm">
+    <div class="generate-content">
+      <label class="subheader-label">Graph</label>
+      <div class="row-item">
+        <label class="common-label">Orientation:</label>
+        <p-dropdown
+          [options]="orientations"
+          formControlName="graphOrientation"
+          optionValue="value"
+          optionLabel="label"/>
+      </div>
+      <div class="row-item">
+        <label class="common-label">Graph type:</label>
+        <p-dropdown
+          [options]="graphTypes"
+          formControlName="graphType"
+          optionValue="value"
+          optionLabel="label"/>
+      </div>
+      <div class="row-item" *ngIf="isTreeGraphType()">
+        <label class="common-label">N-arity:</label>
+        <p-slider
+          class="custom-slider"
+          formControlName="nArity"
+          [animate]="true"
+          step="1"
+          [min]="0"
+          [max]="5"
+          (onChange)="onNArityChange($event)"/>
+        <input
+          type="text"
+          pInputText
+          formControlName="nArityText"
+          class="custom-input-number"
+          size="2"
+          [readonly]="true"/>
+        <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
+           (click)="nArityInfo.toggle($event)">
+        </i>
+      </div>
+      <!-- ############################## -->
+      <label class="subheader-label">Vertices</label>
+      <div class="row-item">
+        <p-checkbox
+          formControlName="fixedNumberOfNodes"
+          [binary]="true"
+          label="Fixed number of vertices"
+          inputId="binary"/>
+      </div>
+      <!-- Slider elements for fixed total number of node -->
+      <div class="row-item" *ngIf="isFixedNumberOfNodes()">
+        <p-slider
+          class="custom-slider"
+          formControlName="fixedNodesNumber"
+          [animate]="true"
+          step="1"
+          min="1"
+          [max]="ConfService.MAX_NUMBER_OF_NODES"
+          (onChange)="onFixedNodeNumbersChange($event)"/>
+        <p-inputNumber
+          class="custom-input-number"
+          formControlName="fixedNodesNumber"
+          size="4"
+          [maxlength]="3"
+          allowEmpty="false"
+          [readonly]="true"
+          min="1"
+          [max]="ConfService.MAX_NUMBER_OF_NODES"/>
+        <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
+           (click)="totalNodesNumberInfo.toggle($event)">
+        </i>
+      </div>
+      <!-- Slider elements for dynamic total number of node -->
+      <div *ngIf="!isFixedNumberOfNodes()">
+        <div class="row-item" formArrayName="dynamicNodesNumber">
+          <p-inputNumber
+            class="custom-input-number"
+            [formControlName]="0"
+            size="4"
+            [maxlength]="3"
+            allowEmpty="false"
+            [readonly]="true"
+            min="1"
+            [max]="ConfService.MAX_NUMBER_OF_NODES"/>
+          <p-slider
+            class="custom-slider"
+            [formControl]="dynamicNodesNumberControl"
+            [range]="true"
+            [animate]="true"
+            step="1"
+            min="1"
+            [max]="ConfService.MAX_NUMBER_OF_NODES"
+            (onChange)="onDynamicNodeNumbersChange($event)"/>
+          <p-inputNumber
+            class="custom-input-number"
+            [formControlName]="1"
+            size="4"
+            [maxlength]="3"
+            allowEmpty="false"
+            [readonly]="true"
+            min="1"
+            [max]="ConfService.MAX_NUMBER_OF_NODES"/>
+          <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
+             (click)="totalNodesNumberInfo.toggle($event)">
+          </i>
+        </div>
+      </div>
+      <!-- ############################## -->
+      <label class="subheader-label" *ngIf="isDefaultGraphType()">Edges</label>
+      <div class="row-item" *ngIf="isDefaultGraphType()">
+        <p-checkbox
+          formControlName="allowLoops"
+          [binary]="true"
+          label="Allow loops"
+          inputId="binary"/>
+      </div>
+      <div class="row-item" *ngIf="isDefaultGraphType()">
+        <p-checkbox
+          formControlName="allowTwoDirectionEdges"
+          [binary]="true"
+          label="Allow two-direction edges"
+          inputId="binary"/>
+        <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
+           (click)="allowTwoDirectionEdgesInfo.toggle($event)">
+        </i>
+      </div>
+      <div class="row-item" *ngIf="isDefaultGraphType()">
+        <label class="common-label">Probability:</label>
+        <p-slider
+          class="custom-slider"
+          formControlName="edgesProbability"
+          [animate]="true"
+          [step]="0.05"
+          [min]="0"
+          [max]="0.8"
+          (onChange)="onEdgesProbabilityChange($event)"/>
+        <p-inputNumber
+          class="custom-input-number"
+          formControlName="edgesProbability"
+          mode="decimal"
+          size="4"
+          [maxlength]="3"
+          allowEmpty="false"
+          [readonly]="true"
+          [min]="0"
+          [max]="0.8"/>
+        <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
+           (click)="edgesProbabilityInfo.toggle($event)">
+        </i>
+      </div>
+      <!-- ############################## -->
+      <label class="subheader-label">Edge weight</label>
+      <div class="row-item">
+        <p-checkbox
+          formControlName="edgeWeightSpecify"
+          [binary]="true"
+          label="Specify edge weight generation"
+          inputId="binary"/>
+      </div>
+      <div *ngIf="isEdgeWeightSpecify()">
+        <div class="row-item" formArrayName="edgeWeightRange">
+          <p-inputNumber
+            class="custom-input-number"
+            [formControlName]="0"
+            size="4"
+            [maxlength]="3"
+            allowEmpty="false"
+            [readonly]="true"
+            [min]="0"
+            [max]="100"/>
+          <p-slider
+            class="custom-slider"
+            [formControl]="edgeWeightRangeControl"
+            [range]="true"
+            [animate]="true"
+            step="1"
+            [min]="0"
+            [max]="100"
+            (onChange)="onEdgeWeightRangeChange($event)"/>
+          <p-inputNumber
+            class="custom-input-number"
+            [formControlName]="1"
+            size="4"
+            [maxlength]="3"
+            allowEmpty="false"
+            [readonly]="true"
+            [min]="0"
+            [max]="100"/>
+        </div>
+      </div>
+    </div>
+    <div class="separator"></div>
+    <div id="generateButtonPanel" class="button-panel">
+      <div class="apply-changes-container move-right">
+        <p-button icon="pi pi-check"
+                  severity="contrast"
+                  label="Generate"
+                  [raised]="true"
+                  (click)="onGenerate()">
+        </p-button>
+      </div>
+    </div>
+  </form>
+</div>
+<!-- Hints overlays -->
+<p-overlayPanel #nArityInfo>
+  <div class="overlay-container">
+    <label><b>N-ary Tree.</b></label>
+    <label>
+      An N-ary tree is a tree data structure in<br> which each node has at most N children.
+    </label>
+  </div>
+</p-overlayPanel>
+
+<p-overlayPanel #totalNodesNumberInfo>
+  <div class="overlay-container">
+    <label><b>Max value of vertices.</b></label>
+    <label>
+      Right now, number of nodes limited with '{{ ConfService.MAX_NUMBER_OF_NODES }}'.<br>
+      Such limitation is made because of inability<br> to change canvas borders. <br>
+      We are working on it.
+    </label>
+  </div>
+</p-overlayPanel>
+
+<p-overlayPanel #allowTwoDirectionEdgesInfo>
+  <div class="overlay-container">
+    <label><b>Two-directional edges.</b></label>
+    <label>
+      Allow two-directional edges means that<br>
+      edge from node A to node B and edge from<br>
+      node B to node A are possible.
+    </label>
+    <img src="assets/hints/allowTwoDirectionEdges.png" alt="allowTwoDirectionEdgesImg" class="hint-image">
+  </div>
+</p-overlayPanel>
+
+<p-overlayPanel #edgesProbabilityInfo>
+  <div class="overlay-container">
+    <label><b>Edges creation probability.</b></label>
+    <label>
+      TODO ADD DESCRIPTION
+    </label>
+  </div>
+</p-overlayPanel>

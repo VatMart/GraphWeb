@@ -3,6 +3,8 @@ import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {PixiService} from "../../service/pixi.service";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
+import {StateService} from "../../service/event/state.service";
+import {DEFAULT_HELPER_ITEM, SELECT_MODE_HELPER_ITEM} from "../../component/canvas/float-helper/float-helper.component";
 
 /**
  * Selection mode class.
@@ -11,19 +13,22 @@ import {EventBusService, HandlerNames} from "../../service/event/event-bus.servi
  */
 export class SelectionMode implements ModeBehavior {
   constructor(private pixiService: PixiService,
-              private eventBus: EventBusService) {
+              private eventBus: EventBusService,
+              private stateService: StateService) {
   }
 
   modeOn(): void {
     console.log("SelectionMode ON"); // TODO remove
     this.eventBus.registerPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.MULTI_SELECTION);
+    this.stateService.changeFloatHelperItem(SELECT_MODE_HELPER_ITEM);
   }
 
   modeOff(): void {
     console.log("SelectionMode OFF"); // TODO remove
     this.eventBus.unregisterPixiEvent(this.pixiService.stage, 'pointerdown',
       HandlerNames.MULTI_SELECTION);
+    this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM);
   }
 
   onAddedEdge(edgeView: EdgeView): void {
