@@ -16,7 +16,9 @@ export class Graph {
 
   private _orientation: GraphOrientation;
 
-  constructor(orientation?: GraphOrientation) {
+  private _type: GraphType;
+
+  constructor(orientation?: GraphOrientation, type?: GraphType) {
     this.nodes = new Map<number, Node>();
     this.edges = new Map<string, Edge>();
     if (orientation) {
@@ -24,6 +26,7 @@ export class Graph {
     } else {
       this._orientation = ConfService.DEFAULT_GRAPH_ORIENTATION; // default orientation
     }
+    this._type = type ? type : GraphType.DEFAULT;
   }
 
   toString(): string {
@@ -77,4 +80,17 @@ export class Graph {
   set orientation(value: GraphOrientation) {
     this._orientation = value;
   }
+
+  get type(): GraphType {
+    return this._type;
+  }
+
+  set type(value: GraphType) {
+    this._type = value;
+  }
+}
+
+export enum GraphType {
+  DEFAULT = 'Default',
+  TREE = 'Tree',
 }

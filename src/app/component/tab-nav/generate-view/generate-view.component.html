@@ -1,5 +1,5 @@
 <div class="generate-container">
-  <form [formGroup]="defaultForm">
+  <form [formGroup]="form">
     <div class="generate-content">
       <label class="subheader-label">Graph</label>
       <div class="row-item">
@@ -17,6 +17,9 @@
           formControlName="graphType"
           optionValue="value"
           optionLabel="label"/>
+        <i *ngIf="isDefaultGraphType()" pRipple class="pi pi-exclamation-circle info-button" style="font-size: 1rem; color: red;"
+           (click)="defaultGraphWarning.toggle($event)">
+        </i>
       </div>
       <div class="row-item" *ngIf="isTreeGraphType()">
         <label class="common-label">N-arity:</label>
@@ -115,7 +118,7 @@
           label="Allow loops"
           inputId="binary"/>
       </div>
-      <div class="row-item" *ngIf="isDefaultGraphType()">
+      <div class="row-item" *ngIf="isDefaultGraphType() && isDirectedGraph()">
         <p-checkbox
           formControlName="allowTwoDirectionEdges"
           [binary]="true"
@@ -204,6 +207,17 @@
   </form>
 </div>
 <!-- Hints overlays -->
+<p-overlayPanel #defaultGraphWarning>
+  <div class="overlay-container">
+    <label><b>Huge number of edges.</b></label>
+    <label>
+      If you generate a graph with a large number of edges,<br>
+      consider to disable link force in setting menu to<br>
+      improve graph readability.
+    </label>
+  </div>
+</p-overlayPanel>
+
 <p-overlayPanel #nArityInfo>
   <div class="overlay-container">
     <label><b>N-ary Tree.</b></label>

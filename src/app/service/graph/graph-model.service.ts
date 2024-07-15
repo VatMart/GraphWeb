@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Graph} from "../../model/graph";
 import {Node} from "../../model/node";
-import {Edge} from "../../model/edge";
+import {Edge, EdgeIndex} from "../../model/edge";
 
 /**
  * Service for handling the model of the graph.
@@ -110,6 +110,14 @@ export class GraphModelService {
       }
     });
     return edges;
+  }
+
+  /**
+   * Checks if an edge exists between two nodes in the graph.
+   */
+  public isEdgeExists(graph: Graph, firstNodeIndex: number, secondNodeIndex: number): boolean {
+    const edgeIndex = new EdgeIndex(firstNodeIndex, secondNodeIndex);
+    return graph.getEdges().has(edgeIndex.value);
   }
 
   private removeAdjacentEdgeOfNodes(edge: Edge) {

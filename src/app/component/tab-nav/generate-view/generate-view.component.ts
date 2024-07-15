@@ -14,6 +14,9 @@ import {TagModule} from "primeng/tag";
 import {TooltipModule} from "primeng/tooltip";
 import {GraphOrientation} from "../../../model/orientation";
 import {InputTextModule} from "primeng/inputtext";
+import {StateService} from "../../../service/event/state.service";
+import {MessageModule} from "primeng/message";
+import {GraphType} from "../../../model/graph";
 
 @Component({
   selector: 'app-generate-view',
@@ -31,7 +34,8 @@ import {InputTextModule} from "primeng/inputtext";
     TabViewModule,
     TagModule,
     TooltipModule,
-    InputTextModule
+    InputTextModule,
+    MessageModule
   ],
   templateUrl: './generate-view.component.html',
   styleUrl: './generate-view.component.css'
@@ -40,15 +44,16 @@ export class GenerateViewComponent implements OnInit, OnDestroy {
   private subscriptions!: Subscription;
   protected readonly ConfService = ConfService;
 
-  defaultForm!: FormGroup;
+  form!: FormGroup;
   orientations: SelectOrientationItem[] | undefined;
   graphTypes: SelectGraphTypeItem[] | undefined;
 
-  constructor(private fb: FormBuilder,) {
+  constructor(private fb: FormBuilder,
+              private stateService: StateService) {
   }
 
   ngOnInit(): void {
-    this.defaultForm = this.fb.group({
+    this.form = this.fb.group({
       graphOrientation: [this.ConfService.DEFAULT_GRAPH_ORIENTATION],
       graphType: [GraphType.DEFAULT],
       nArity: [2],
@@ -68,7 +73,7 @@ export class GenerateViewComponent implements OnInit, OnDestroy {
     this.orientations = [
       {label: 'Directed', value: GraphOrientation.ORIENTED},
       {label: 'Undirected', value: GraphOrientation.NON_ORIENTED},
-      {label: 'Mixed', value: GraphOrientation.MIXED}
+      // Currently generation of Mixed graph not supported
     ];
     this.graphTypes = [
       {label: 'Default', value: GraphType.DEFAULT},
@@ -83,37 +88,38 @@ export class GenerateViewComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  resetToDefault() {
-
+  onGenerate() {
+    const formValues = this.form.getRawValue() as GenerateGraphOptions;
+    this.stateService.callGenerateGraphWithOptions(formValues);
   }
 
-  onGenerate() {
-
+  isDirectedGraph(): boolean {
+    return this.form.get('graphOrientation')?.value === GraphOrientation.ORIENTED;
   }
 
   isDefaultGraphType(): boolean {
-    return this.defaultForm.get('graphType')?.value === GraphType.DEFAULT;
+    return this.form.get('graphType')?.value === GraphType.DEFAULT;
   }
 
   isTreeGraphType(): boolean {
-    return this.defaultForm.get('graphType')?.value === GraphType.TREE;
+    return this.form.get('graphType')?.value === GraphType.TREE;
   }
 
   onNArityChange(event: any) {
     if (event.value === 0) {
-      this.defaultForm.patchValue({nArityText: 'N/A'}, {emitEvent: false});
+      this.form.patchValue({nArityText: 'N/A'}, {emitEvent: false});
     } else {
-      this.defaultForm.patchValue({nArityText: event.value.toString()}, {emitEvent: false});
+      this.form.patchValue({nArityText: event.value.toString()}, {emitEvent: false});
     }
   }
 
   onFixedNodeNumbersChange(event: SliderChangeEvent) {
     const newValue = event.value;
-    this.defaultForm.patchValue({fixedNodesNumber: newValue}, {emitEvent: false});
+    this.form.patchValue({fixedNodesNumber: newValue}, {emitEvent: false});
   }
 
   isFixedNumberOfNodes(): boolean {
-    return this.defaultForm.get('fixedNumberOfNodes')?.value;
+    return this.form.get('fixedNumberOfNodes')?.value;
   }
 
   onDynamicNodeNumbersChange(event: any) {
@@ -122,11 +128,11 @@ export class GenerateViewComponent implements OnInit, OnDestroy {
 
   onEdgesProbabilityChange(event: SliderChangeEvent) {
     const newValue = event.value;
-    this.defaultForm.patchValue({edgesProbability: newValue}, {emitEvent: false});
+    this.form.patchValue({edgesProbability: newValue}, {emitEvent: false});
   }
 
   isEdgeWeightSpecify() {
-    return this.defaultForm.get('edgeWeightSpecify')?.value;
+    return this.form.get('edgeWeightSpecify')?.value;
   }
 
   onEdgeWeightRangeChange(event: any) {
@@ -137,7 +143,7 @@ export class GenerateViewComponent implements OnInit, OnDestroy {
   // Getters for form controls
   // ------------------------
   get dynamicNodesNumberControls(): FormArray {
-    return this.defaultForm.get('dynamicNodesNumber') as FormArray;
+    return this.form.get('dynamicNodesNumber') as FormArray;
   }
 
   get dynamicNodesNumberControl(): FormControl {
@@ -147,7 +153,7 @@ export class GenerateViewComponent implements OnInit, OnDestroy {
   }
 
   get edgeWeightRangeControls(): FormArray {
-    return this.defaultForm.get('edgeWeightRange') as FormArray;
+    return this.form.get('edgeWeightRange') as FormArray;
   }
 
   get edgeWeightRangeControl(): FormControl {
@@ -166,7 +172,16 @@ interface SelectGraphTypeItem {
   value: GraphType;
 }
 
-enum GraphType {
-  DEFAULT = 'Default',
-  TREE = 'Tree',
+export interface GenerateGraphOptions {
+  graphOrientation: GraphOrientation;
+  graphType: GraphType;
+  nArity: number;
+  fixedNumberOfNodes: boolean;
+  fixedNodesNumber: number;
+  dynamicNodesNumber: number[];
+  allowLoops: boolean;
+  allowTwoDirectionEdges: boolean;
+  edgesProbability: number;
+  edgeWeightSpecify: boolean;
+  edgeWeightRange: number[];
 }

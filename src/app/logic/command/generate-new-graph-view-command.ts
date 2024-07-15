@@ -6,9 +6,9 @@ import {Graph} from "../../model/graph";
 import {GraphOrientation} from "../../model/orientation";
 
 /**
- * Command to generate new graph.
+ * Command to generate new graph view.
  */
-export class GenerateNewGraphCommand implements Command {
+export class GenerateNewGraphViewCommand implements Command {
   // Save graph elements before executing command
   private nodes: NodeView[];
   private edges: EdgeView[];
@@ -36,7 +36,6 @@ export class GenerateNewGraphCommand implements Command {
   }
 
   redo(): void {
-    console.log("OnRedo: " +this.newGraph);
     this.newGraph = this.newGraphCopy.clone();
     this.execute();
   }

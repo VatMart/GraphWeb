@@ -44,7 +44,6 @@ export class DynamicRadius implements Radius {
   private _adjEdges: number;
 
   constructor(baseValue: number, adjEdges: number) {
-    console.log("DynamicRadius constructor");
     this._baseValue = baseValue;
     this._adjEdges = adjEdges;
   }

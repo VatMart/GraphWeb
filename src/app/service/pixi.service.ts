@@ -58,7 +58,7 @@ export class PixiService {
     const renderer: Renderer = await autoDetectRenderer({
       width: width,
       height: height,
-      preference: 'webgpu',
+      preference: 'webgl',
       background: '#ececec',
       antialias: true,
       autoDensity: true,

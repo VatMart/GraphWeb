@@ -19,6 +19,7 @@ import {CustomizationFormValues} from "../../component/tab-nav/customization-vie
 import {AppData} from "../file.service";
 import {ConfService} from "../config/conf.service";
 import {GraphElement} from "../../model/graphical-model/graph-element";
+import {GenerateGraphOptions} from "../../component/tab-nav/generate-view/generate-view.component";
 
 /**
  * Service for managing the state of the application.
@@ -136,6 +137,12 @@ export class StateService {
   // --------------------------------------------------
   private applyCustomizationSource = new Subject<Partial<CustomizationFormValues>>();
   public applyCustomization$ = this.applyCustomizationSource.asObservable();
+
+  // --------------------------------------------------
+  // UI component states. Nav bar components. Generate graph view
+  // --------------------------------------------------
+  private callGenerateGraphWithOptionsSource = new Subject<GenerateGraphOptions>();
+  public callGenerateGraphWithOptions$ = this.callGenerateGraphWithOptionsSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Canvas
@@ -478,6 +485,13 @@ export class StateService {
    */
   applyCustomization(values: Partial<CustomizationFormValues>) {
     this.applyCustomizationSource.next(values);
+  }
+
+  /**
+   * Call generate graph with options.
+   */
+  callGenerateGraphWithOptions(options: GenerateGraphOptions) {
+    this.callGenerateGraphWithOptionsSource.next(options);
   }
 
   /**

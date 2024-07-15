@@ -9,7 +9,7 @@ import {ChangeEdgeWeightCommand} from "../../logic/command/change-edge-weight-co
 import {ServiceManager} from "../../logic/service-manager";
 import {GraphModelGeneratorService} from "../graph/graph-model-generator.service";
 import {Graph} from "../../model/graph";
-import {GenerateNewGraphCommand} from "../../logic/command/generate-new-graph-command";
+import {GenerateNewGraphViewCommand} from "../../logic/command/generate-new-graph-view-command";
 import {ConfService} from "../config/conf.service";
 import {CustomizationResolver} from "../../logic/customization-resolver";
 import {GraphViewPropertiesService} from "../graph/graph-view-properties.service";
@@ -93,7 +93,7 @@ export class GraphStateManagerService implements ServiceManager {
         // Generate graph from matrix
         const graph: Graph = this.graphGeneratorService.generateFromMatrix(value);
         // Command saves current graph before generating new one
-        const command = new GenerateNewGraphCommand(this.graphService, graph);
+        const command = new GenerateNewGraphViewCommand(this.graphService, graph);
         // Execute command
         this.historyService.execute(command);
       })
@@ -104,7 +104,18 @@ export class GraphStateManagerService implements ServiceManager {
         // Generate graph from sets
         const graph: Graph = this.graphGeneratorService.generateFromSets(graphSets);
         // Command saves current graph before generating new one
-        const command = new GenerateNewGraphCommand(this.graphService, graph);
+        const command = new GenerateNewGraphViewCommand(this.graphService, graph);
+        // Execute command
+        this.historyService.execute(command);
+      })
+    );
+    // Generate graph from options on UI request
+    this.subscriptions.add(
+      this.stateService.callGenerateGraphWithOptions$.subscribe((options) => {
+        // Generate graph from options
+        const graph: Graph = this.graphGeneratorService.generateGraphWithOptions(options);
+        // Command saves current graph before generating new one
+        const command = new GenerateNewGraphViewCommand(this.graphService, graph);
         // Execute command
         this.historyService.execute(command);
       })
@@ -112,8 +123,8 @@ export class GraphStateManagerService implements ServiceManager {
     // On customization form apply
     this.subscriptions.add(
       this.stateService.applyCustomization$.subscribe((value) => {
-        const resolver = new CustomizationResolver(this.graphService,
-          this.graphPropertiesService, this.edgeFabric);
+        const resolver = new CustomizationResolver(this.graphService, this.graphPropertiesService,
+          this.edgeFabric);
         const actions = resolver.resolveGlobal(value);
         const rollbackActions = resolver.resolveGlobalRollback(value);
         const command = new ChangeGraphViewPropertiesCommand(actions, rollbackActions);

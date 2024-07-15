@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Graph} from "../../model/graph";
+import {Graph, GraphType} from "../../model/graph";
 import {PixiService} from "../pixi.service";
 import {GraphModelService} from "./graph-model.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
@@ -18,6 +18,8 @@ import {DefaultGraphViewGenerator} from "../../logic/graph-view-generator/defaul
 import {ConfService} from "../config/conf.service";
 import {GraphView} from "../../model/graphical-model/graph/graph-view";
 import {DynamicRadius} from "../../model/graphical-model/node/radius";
+import {GraphViewGenerator} from "../../logic/graph-view-generator/graph-view-generator";
+import {TreeGraphViewGenerator} from "../../logic/graph-view-generator/tree-graph-view-generator";
 
 /**
  * Service for handling the graphical representation of the graph.
@@ -50,7 +52,7 @@ export class GraphViewService extends GraphModelService {
     this.nodeViews.set(nodeView.node.index, nodeView);
     this.pixiService.mainContainer.addChild(nodeView); // TODO Add container, not the node itself
     this.stateService.addedNode(nodeView); // Notify state service
-    console.log("Added node to graph: " + nodeView.node.index); // TODO remove
+    //console.log("Added node to graph: " + nodeView.node.index); // TODO remove
   }
 
   /**
@@ -86,7 +88,7 @@ export class GraphViewService extends GraphModelService {
       this.updateRadiusNodes(edgeView.endNode);
     }
     this.stateService.addedEdge(edgeView); // Notify state service
-    console.log("Added edge to graph: " + edgeView.edge.edgeIndex.value); // TODO remove
+    //console.log("Added edge to graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
 
   /**
@@ -282,8 +284,7 @@ export class GraphViewService extends GraphModelService {
     // Replace current graph with new one
     this.currentGraph = newGraph;
     // Create new graph view elements by default generator
-    const generator = new DefaultGraphViewGenerator(this.pixiService, this.nodeFabric,
-      this.edgeFabric);
+    const generator = this.createGraphViewGenerator(newGraph.type);
     const result = generator.generateGraphViewElements(newGraph);
     const nodeViews = result.nodes;
     const edgeViews = result.edges;
@@ -293,6 +294,14 @@ export class GraphViewService extends GraphModelService {
     console.log("Graph orientation: " + newGraph.orientation);
     this.changeGraphOrientation(graphView, newGraph.orientation); // Change orientation (to update state on UI)
     this.stateService.graphViewGenerated(); // Notify state service about graph view generation
+  }
+
+  private createGraphViewGenerator(graphType: GraphType): GraphViewGenerator {
+    switch (graphType.toString()) {
+      case 'Default': return new DefaultGraphViewGenerator(this.pixiService, this.nodeFabric, this.edgeFabric);
+      case 'Tree': return new TreeGraphViewGenerator(this.pixiService, this.nodeFabric, this.edgeFabric);
+    }
+    throw new Error('Graph type not supported');
   }
 
   // ------------------ Selection methods ------------------
