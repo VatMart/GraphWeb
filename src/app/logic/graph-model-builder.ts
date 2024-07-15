@@ -5,6 +5,8 @@ import {Edge} from "../model/edge";
 import {EdgeOrientation, GraphOrientation} from "../model/orientation";
 import {GraphSet, GraphSets} from "../model/graph-set";
 import {Node} from "../model/node";
+import {GenerateGraphOptions} from "../component/tab-nav/generate-view/generate-view.component";
+import {ConfService} from "../service/config/conf.service";
 
 /**
  * Graph builder. Builds graph from different types of input.
@@ -37,6 +39,32 @@ export class GraphModelBuilder {
     this.processVerticesSet(graphSets.verticesSet, graph);
     this.processEdgesSet(graphSets.edgesSet, graph);
     return graph;
+  }
+
+  /**
+   * Generate default graph from options.
+   * @param options options for generating graph
+   */
+  buildDefaultGraphFromOptions(options: GenerateGraphOptions): Graph {
+    // Calculate number of nodes
+    const numberOfNodes: number = this.calculateNodesNumber (options);
+    const edgesNumber: number = this.calculateEdgesNumber(numberOfNodes, options);
+    const edgesWeights: number[] = options.edgeWeightSpecify ? this.calculateEdgeWeights(edgesNumber, options) :
+      Array(edgesNumber).fill(1);
+    // Generate graph
+    const graph = this.createDefaultGraph(numberOfNodes, edgesNumber, edgesWeights, options);
+    // console.log('Number of nodes: ' + numberOfNodes + '; Number of edges: ' + edgesNumber); // TODO remove
+    // console.log('Edges weights: ' + edgesWeights); // TODO remove
+    return graph;
+  }
+
+  /**
+   * Generate tree graph from options.
+   * @param options options for generating graph
+   */
+  buildTreeGraphFromOptions(options: GenerateGraphOptions): Graph {
+    // TODO
+    return new Graph();
   }
 
   private buildGraphFromAdjacencyMatrix(matrix: GraphMatrix): Graph {
@@ -192,6 +220,101 @@ export class GraphModelBuilder {
     } else {
       return GraphOrientation.MIXED;
     }
+  }
+
+  private calculateNodesNumber(options: GenerateGraphOptions): number {
+    if (options.fixedNumberOfNodes) {
+      return options.fixedNodesNumber;
+    } else { // Range of nodes
+      // Generate random number of nodes based on range
+      const minNodes = Math.min(options.dynamicNodesNumber[0], options.dynamicNodesNumber[1]);
+      const maxNodes = Math.max(options.dynamicNodesNumber[0], options.dynamicNodesNumber[1]);
+      return Math.floor(Math.random() * (maxNodes - minNodes + 1)) + minNodes;
+    }
+  }
+
+  private calculateEdgesNumber(numberOfNodes: number, options: GenerateGraphOptions): number {
+    const maxEdges = options.graphOrientation === GraphOrientation.NON_ORIENTED
+      ? (numberOfNodes * (numberOfNodes - 1)) / 2
+      : numberOfNodes * (numberOfNodes - 1);
+    // To avoid exponential growth of edges number, used reverse quadratic function with exponential decrease
+    // Function params works good only for 1-350 nodes. Need to adjust for more nodes
+    const a = 2;  // Starting value of exponential function
+    const b = 6;  // Ending value of exponential function
+    const c = ConfService.MAX_NUMBER_OF_NODES; // The range limit
+    const k = 2; // Reverse aggressiveness factor
+    // Normalize x to the range [0, 1]
+    const normalizedX = (numberOfNodes - 1) / (c - 1);
+    // Calculate exponential function
+    const quadraticFunction = a + (b - a) * (1 - Math.pow(1 - normalizedX, k));
+    //console.log('Quadratic function: ' + quadraticFunction); // TODO remove
+    const expFun = maxEdges * options.edgesProbability * Math.exp(-quadraticFunction);
+    //console.log('Exponential function: ' + expFun); // TODO remove
+    return Math.floor(expFun);
+  }
+
+  private calculateEdgeWeights(edgesNumber: number, options: GenerateGraphOptions): number[] {
+    const result: number[] = [];
+    const minWeight = Math.min(options.edgeWeightRange[0], options.edgeWeightRange[1]);
+    const maxWeight = Math.max(options.edgeWeightRange[0], options.edgeWeightRange[1]);
+    for (let i = 0; i < edgesNumber; i++) {
+      result.push(Math.floor(Math.random() * Math.abs(maxWeight - minWeight + 1)) + minWeight);
+    }
+    return result;
+  }
+
+  private createDefaultGraph(numberOfNodes: number, edgesNumber: number, edgesWeights: number[],
+                             options: GenerateGraphOptions): Graph {
+    const graph = new Graph(options.graphOrientation);
+    // Create nodes
+    for (let i = 0; i < numberOfNodes; i++) {
+      this.graphService.addNodeToGraph(graph);
+    }
+    // Generate all possible valid pairs of nodes (for creating edges) once
+    // Such approach was used to avoid creating the same pair of nodes twice
+    const validPairs = this.generateAllValidNodePairs(graph, options);
+    // Shuffle the list of valid pairs to randomize selection
+    for (let i = validPairs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [validPairs[i], validPairs[j]] = [validPairs[j], validPairs[i]];
+    }
+
+    // Create edges
+    for (let i = 0; i < edgesNumber; i++) {
+      const nodePair: NodePair = validPairs.pop()!;
+      const startNode = graph.getNodes().get(nodePair.firstNode)!;
+      const endNode = graph.getNodes().get(nodePair.secondNode)!;
+      const orientation = options.graphOrientation === GraphOrientation.NON_ORIENTED ?
+        EdgeOrientation.NON_ORIENTED : EdgeOrientation.ORIENTED;
+      const edge = new Edge(startNode, endNode, orientation, edgesWeights[i]);
+      this.graphService.addEdgeToGraph(graph, edge);
+    }
+
+    return graph;
+  }
+
+  private generateAllValidNodePairs(graph: Graph, options: GenerateGraphOptions): NodePair[] {
+    const nodesIndexes = [...graph.getNodes().keys()];
+    const validPairs: NodePair[] = [];
+
+    // Generate all possible valid pairs
+    for (let i = 0; i < nodesIndexes.length; i++) {
+      for (let j = 0; j < nodesIndexes.length; j++) {
+        if (!options.allowLoops && i === j) {
+          continue;
+        }
+        const pair: NodePair = { firstNode: nodesIndexes[i], secondNode: nodesIndexes[j] };
+        // Check if the pair already exists or reverse pair exists (if graph is oriented and two direction edges are not allowed)
+        const edgeExists = (this.graphService.isEdgeExists(graph, pair.firstNode, pair.secondNode))
+          || (!options.allowTwoDirectionEdges && options.graphOrientation === GraphOrientation.ORIENTED &&
+            this.graphService.isEdgeExists(graph, pair.secondNode, pair.firstNode));
+        if (!edgeExists) {
+          validPairs.push(pair);
+        }
+      }
+    }
+
+    return validPairs;
   }
 }
 

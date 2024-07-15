@@ -160,7 +160,6 @@ export class CustomizationViewComponent implements OnInit, OnDestroy, AfterViewI
     if (Object.keys(changedValues).length === 0) {
       return; // No changes to apply
     }
-    console.log('Apply changes'); // TODO remove
     this.stateService.applyCustomization(changedValues);
     // Update initial values
     this.unsavedChanges = false;
@@ -325,7 +324,6 @@ export interface CustomizationFormValues {
   edgeArrowSize: number;
   showEdgeWeight: boolean;
   dynamicEdgeWeight: boolean;
-  // Template tab items
 }
 
 export interface TemplateItem {
