@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Graph} from "../../model/graph";
 import {Node} from "../../model/node";
 import {Edge, EdgeIndex} from "../../model/edge";
+import {GraphOrientation} from "../../model/orientation";
 
 /**
  * Service for handling the model of the graph.
@@ -110,6 +111,47 @@ export class GraphModelService {
       }
     });
     return edges;
+  }
+
+  /**
+   * Returns all nodes that are adjacent to the given node.
+   * If the graph is oriented, then the second node is adjacent to the first node.
+   * If the graph is not oriented, then both nodes are adjacent to each other.
+   */
+  public getAdjacentNodes(graph: Graph, node: Node, considerOrientation: boolean = true): Node[] {
+    let nodes: Node[] = [];
+    for (const edgeIndex of node.getAdjacentEdges()) {
+      const edge = graph.getEdges().get(edgeIndex);
+      if (edge) {
+        if (!considerOrientation) {
+          if (edge.firstNode.index === node.index) {
+            nodes.push(edge.secondNode);
+          }
+          continue;
+        }
+        // If the graph is oriented, then the second node is adjacent to the first node.
+        if (graph.orientation === GraphOrientation.ORIENTED && edge.firstNode.index === node.index) {
+          nodes.push(edge.secondNode);
+        } else if (graph.orientation !== GraphOrientation.ORIENTED) { // If the graph is not oriented, then both nodes are adjacent to each other.
+          nodes.push(edge.firstNode.index === node.index ? edge.secondNode : edge.firstNode);
+        }
+      }
+    }
+    return nodes;
+  }
+
+  /**
+   * Returns all nodes that are connected to the given node.
+   */
+  public getConnectedNodes(graph: Graph, node: Node): Node[] {
+    let nodes: Node[] = [];
+    node.getAdjacentEdges().forEach((edgeIndex: string) => {
+      const edge = graph.getEdges().get(edgeIndex);
+      if (edge) {
+        nodes.push(edge.firstNode.index === node.index ? edge.secondNode : edge.firstNode);
+      }
+    });
+    return nodes;
   }
 
   /**
