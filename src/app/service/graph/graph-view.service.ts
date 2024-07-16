@@ -10,10 +10,7 @@ import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
 import {Point} from "../../utils/graphical-utils";
 import {EdgeOrientation, GraphOrientation} from "../../model/orientation";
-import {
-  DEFAULT_HELPER_ITEM,
-  EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM
-} from "../../component/canvas/float-helper/float-helper.component";
+import {EDIT_EDGE_WEIGHT_MODE_HELPER_ITEM} from "../../component/canvas/float-helper/float-helper.component";
 import {DefaultGraphViewGenerator} from "../../logic/graph-view-generator/default-graph-view-generator";
 import {ConfService} from "../config/conf.service";
 import {GraphView} from "../../model/graphical-model/graph/graph-view";
@@ -37,7 +34,8 @@ export class GraphViewService extends GraphModelService {
   constructor(private pixiService: PixiService,
               private nodeFabric: NodeViewFabricService,
               private edgeFabric: EdgeViewFabricService,
-              private stateService: StateService) {
+              private stateService: StateService,
+              private graphModelService: GraphModelService) {
     super();
   }
 
@@ -46,13 +44,17 @@ export class GraphViewService extends GraphModelService {
    * All other methods for adding nodes should call this method.
    */
   public addNodeToGraphView(graphView: GraphView, nodeView: NodeView, callModel: boolean = true) {
+    if ((this._currentGraphView!.nodeViews.size ) >= ConfService.MAX_NUMBER_OF_NODES) {
+      this.stateService.notifyError(`Maximum number of vertices reached (${ConfService.MAX_NUMBER_OF_NODES}).
+        Cannot add more nodes. We are working on increasing this limit.`);
+      return;
+    }
     if (callModel) {
       super.addNodeToGraph(graphView.graph, nodeView.node);
     }
     this.nodeViews.set(nodeView.node.index, nodeView);
     this.pixiService.mainContainer.addChild(nodeView); // TODO Add container, not the node itself
     this.stateService.addedNode(nodeView); // Notify state service
-    //console.log("Added node to graph: " + nodeView.node.index); // TODO remove
   }
 
   /**
@@ -69,7 +71,6 @@ export class GraphViewService extends GraphModelService {
     this.pixiService.mainContainer.removeChild(nodeView);
     super.removeNodeFromGraph(graphView.graph, nodeView.node); // Should be called after removing from view
     this.stateService.deletedNode(nodeView); // Notify state service
-    console.log("Removed node from graph: " + nodeView.node.index); // TODO remove
   }
 
   /**
@@ -88,7 +89,6 @@ export class GraphViewService extends GraphModelService {
       this.updateRadiusNodes(edgeView.endNode);
     }
     this.stateService.addedEdge(edgeView); // Notify state service
-    //console.log("Added edge to graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
 
   /**
@@ -108,7 +108,6 @@ export class GraphViewService extends GraphModelService {
       this.updateRadiusNodes(edgeView.endNode);
     }
     this.stateService.deletedEdge(edgeView); // Notify state service
-    console.log("Removed edge from graph: " + edgeView.edge.edgeIndex.value); // TODO remove
   }
 
   /**
@@ -127,7 +126,6 @@ export class GraphViewService extends GraphModelService {
     this.nodeViews.clear();
     this.edgeViews.clear();
     super.clearAllElements(graphView.graph);
-    console.log("Cleared all elements from graph view"); // TODO remove
   }
 
   /**
@@ -291,7 +289,6 @@ export class GraphViewService extends GraphModelService {
     const graphView = new GraphView(newGraph);
     // Populate graph view with new elements
     this.populateGraphView(graphView, nodeViews, edgeViews, false); // Do not call model service methods, because it is already called
-    console.log("Graph orientation: " + newGraph.orientation);
     this.changeGraphOrientation(graphView, newGraph.orientation); // Change orientation (to update state on UI)
     this.stateService.graphViewGenerated(); // Notify state service about graph view generation
   }
@@ -299,7 +296,7 @@ export class GraphViewService extends GraphModelService {
   private createGraphViewGenerator(graphType: GraphType): GraphViewGenerator {
     switch (graphType.toString()) {
       case 'Default': return new DefaultGraphViewGenerator(this.pixiService, this.nodeFabric, this.edgeFabric);
-      case 'Tree': return new TreeGraphViewGenerator(this.pixiService, this.nodeFabric, this.edgeFabric);
+      case 'Tree': return new TreeGraphViewGenerator(this.pixiService, this.nodeFabric, this.edgeFabric, this.graphModelService);
     }
     throw new Error('Graph type not supported');
   }
@@ -348,8 +345,6 @@ export class GraphViewService extends GraphModelService {
       this.moveNodeView(element, element.coordinates);
     } else if (element instanceof EdgeView) {
       this.edgeFabric.changeToPreviousStyle(element);
-      // TODO Create helperService to manage helper items
-      this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM); // Change float helper item
     }
     this.stateService.elementUnselected(element); // Notify state service
   }
@@ -367,7 +362,6 @@ export class GraphViewService extends GraphModelService {
       }
     });
     this._selectedElements = [];
-    this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM); // Change float helper item
     this.stateService.selectionCleared(); // Notify state service
   }
 

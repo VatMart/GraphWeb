@@ -36,7 +36,7 @@
           pInputText
           formControlName="nArityText"
           class="custom-input-number"
-          size="2"
+          size="4"
           [readonly]="true"/>
         <i pRipple class="pi pi-info-circle info-button" style="font-size: 1rem"
            (click)="nArityInfo.toggle($event)">
@@ -254,7 +254,8 @@
   <div class="overlay-container">
     <label><b>Edges creation probability.</b></label>
     <label>
-      TODO ADD DESCRIPTION
+      Probability of creating an edge between two nodes.<br>
+      Actual number of edges also depends on the number<br>of nodes.
     </label>
   </div>
 </p-overlayPanel>

@@ -64,7 +64,7 @@ export class GenerateViewComponent implements OnInit, OnDestroy {
       dynamicNodesNumber: this.fb.array([5, 50].map(num => new FormControl(num))),
       // Edges
       allowLoops: [false],
-      allowTwoDirectionEdges: [false],
+      allowTwoDirectionEdges: [true],
       edgesProbability: [0.15], // chance of edge creation between each two nodes in the graph
       // Weights
       edgeWeightSpecify: [false],

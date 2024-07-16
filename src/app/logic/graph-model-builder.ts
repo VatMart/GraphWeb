@@ -1,7 +1,7 @@
 import {GraphMatrix} from "../model/graph-matrix";
-import {Graph} from "../model/graph";
+import {Graph, GraphType} from "../model/graph";
 import {GraphModelService} from "../service/graph/graph-model.service";
-import {Edge} from "../model/edge";
+import {Edge, EdgeIndex} from "../model/edge";
 import {EdgeOrientation, GraphOrientation} from "../model/orientation";
 import {GraphSet, GraphSets} from "../model/graph-set";
 import {Node} from "../model/node";
@@ -53,8 +53,6 @@ export class GraphModelBuilder {
       Array(edgesNumber).fill(1);
     // Generate graph
     const graph = this.createDefaultGraph(numberOfNodes, edgesNumber, edgesWeights, options);
-    // console.log('Number of nodes: ' + numberOfNodes + '; Number of edges: ' + edgesNumber); // TODO remove
-    // console.log('Edges weights: ' + edgesWeights); // TODO remove
     return graph;
   }
 
@@ -63,8 +61,9 @@ export class GraphModelBuilder {
    * @param options options for generating graph
    */
   buildTreeGraphFromOptions(options: GenerateGraphOptions): Graph {
-    // TODO
-    return new Graph();
+    const numberOfNodes: number = this.calculateNodesNumber(options);
+    const graph = this.createTreeGraph(numberOfNodes, options);
+    return graph;
   }
 
   private buildGraphFromAdjacencyMatrix(matrix: GraphMatrix): Graph {
@@ -295,7 +294,7 @@ export class GraphModelBuilder {
 
   private generateAllValidNodePairs(graph: Graph, options: GenerateGraphOptions): NodePair[] {
     const nodesIndexes = [...graph.getNodes().keys()];
-    const validPairs: NodePair[] = [];
+    const validPairs: Map<string, NodePair> = new Map<string, NodePair>();
 
     // Generate all possible valid pairs
     for (let i = 0; i < nodesIndexes.length; i++) {
@@ -305,16 +304,55 @@ export class GraphModelBuilder {
         }
         const pair: NodePair = { firstNode: nodesIndexes[i], secondNode: nodesIndexes[j] };
         // Check if the pair already exists or reverse pair exists (if graph is oriented and two direction edges are not allowed)
-        const edgeExists = (this.graphService.isEdgeExists(graph, pair.firstNode, pair.secondNode))
-          || (!options.allowTwoDirectionEdges && options.graphOrientation === GraphOrientation.ORIENTED &&
-            this.graphService.isEdgeExists(graph, pair.secondNode, pair.firstNode));
-        if (!edgeExists) {
-          validPairs.push(pair);
+        validPairs.set(new EdgeIndex(pair.firstNode, pair.secondNode).value, pair);
+        if (!(options.allowTwoDirectionEdges && options.graphOrientation === GraphOrientation.ORIENTED)) {
+          const index = new EdgeIndex(pair.secondNode, pair.firstNode).value;
+          const reversePair = validPairs.get(index);
+          if (reversePair !== undefined) {
+            validPairs.delete(index);
+          }
         }
       }
     }
 
-    return validPairs;
+    return [...validPairs.values()];
+  }
+
+  private createTreeGraph(numberOfNodes: number, options: GenerateGraphOptions) {
+    const graph = new Graph(options.graphOrientation, GraphType.TREE);
+    const nArity = options.nArity === 0 ? (Math.floor(Math.random() * Math.abs(5)) + 1) : options.nArity;
+    // Create nodes
+    for (let i = 0; i < numberOfNodes; i++) {
+      this.graphService.addNodeToGraph(graph);
+    }
+    const edgesWeights: number[] = options.edgeWeightSpecify ?
+      this.calculateEdgeWeights(numberOfNodes - 1, options) : // Number of edges in tree is number of nodes - 1
+      Array(numberOfNodes - 1).fill(1);
+    // Create edges
+    this.createTreeEdges(graph, nArity, edgesWeights);
+    return graph;
+  }
+
+  private createTreeEdges(graph: Graph, nArity: number, edgesWeights: number[]) {
+    const nodes = [...graph.getNodes().values()];
+    const root = nodes[0]; // Root node
+    const nodesToConnect = nodes.slice(1);
+    let nodesQueue = [root];
+    let nodesToConnectQueue = [...nodesToConnect];
+    let edgeCounter = 0;
+    while (nodesToConnectQueue.length > 0) {
+      const currentNode = nodesQueue.shift()!;
+      for (let i = 0; i < nArity; i++) {
+        if (nodesToConnectQueue.length === 0) {
+          break;
+        }
+        const nodeToConnect = nodesToConnectQueue.shift()!;
+        const edge = new Edge(currentNode, nodeToConnect, EdgeOrientation.ORIENTED, edgesWeights[edgeCounter]);
+        edgeCounter++;
+        this.graphService.addEdgeToGraph(graph, edge);
+        nodesQueue.push(nodeToConnect);
+      }
+    }
   }
 }
 
