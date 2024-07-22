@@ -6,6 +6,8 @@ import {GraphOrientation} from "../../model/orientation";
 
 /**
  * Service for handling the model of the graph.
+ * Note: Since the service used both via Angular DI and manually init (in separate thread of WebWorker),
+ * it should be purely functional and do not contain any states.
  */
 @Injectable({
   providedIn: 'root'

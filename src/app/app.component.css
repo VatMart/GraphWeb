@@ -1,13 +1,17 @@
 .main-body-desktop-container {
   display: flex;
   flex-direction: column;
-  background-color: #F5F5F5; /* TODO CHANGE to same as canvas*/
+  background-color: #F5F5F5;
   max-height: 100vh;
   overflow-y: hidden;
 }
 
 .main-body-mobile-container {
-  background-color: #F5F5F5; /* TODO CHANGE to same as canvas*/
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F5F5;
+  max-height: 100vh;
+  overflow-y: hidden;
 }
 
 .main-content-mobile-container {

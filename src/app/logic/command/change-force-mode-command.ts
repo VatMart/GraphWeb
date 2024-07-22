@@ -4,7 +4,7 @@ import {Point} from "../../utils/graphical-utils";
 import {GraphViewService} from "../../service/graph/graph-view.service";
 import {DefaultMode} from "../mode/default-mode";
 import {StateService} from "../../service/event/state.service";
-import {ForceMode} from "../mode/force-mode";
+import {ForceSubmode} from "../mode/force-submode";
 
 /**
  * Command to change the force mode state.
@@ -18,27 +18,36 @@ export class ChangeForceModeCommand implements Command {
               private forceMode: boolean) {
   }
   execute(): void {
+    console.log("ChangeForceModeCommand execute: ", this.forceMode); // TODO remove
     if (this.forceMode) {
       if (!this.stateService.isForceModeDisabled()) {
-        this.defaultMode.forceModeOn();
-        ForceMode.activatedByUserMemory = true;
+        if (this.defaultMode.getSubmodeState() === 'force') {
+          this.defaultMode.submodeOn();
+          ForceSubmode.activatedByUserMemory = true; // TODO
+        }
       }
     } else {
-      this.defaultMode.forceModeOff();
-      ForceMode.activatedByUserMemory = false;
+      if (this.defaultMode.getSubmodeState() === 'force') {
+        this.defaultMode.submodeOff();
+        ForceSubmode.activatedByUserMemory = false; // TODO
+      }
     }
   }
 
   undo(): void {
     if (this.forceMode) {
-      this.defaultMode.forceModeOff();
-      ForceMode.activatedByUserMemory = false;
+      if (this.defaultMode.getSubmodeState() === 'force') {
+        this.defaultMode.submodeOff();
+        ForceSubmode.activatedByUserMemory = false; // TODO
+      }
       this.nodePositions.forEach(nodePosition => {
         this.graphViewService.moveNodeView(nodePosition.node, nodePosition.position);
       });
     } else if (!this.stateService.isForceModeDisabled()) {
-      this.defaultMode.forceModeOn();
-      ForceMode.activatedByUserMemory = true;
+      if (this.defaultMode.getSubmodeState() === 'force') {
+        this.defaultMode.submodeOn();
+        ForceSubmode.activatedByUserMemory = true; // TODO
+      }
     }
   }
 

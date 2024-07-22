@@ -1,18 +1,17 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject, Subject} from "rxjs";
-import {ModeState} from "../manager/mode-manager.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {GraphOrientation} from "../../model/orientation";
 import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
-import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../../component/canvas/float-helper/float-helper.component";
+import {FloatHelperItem} from "../../component/canvas/float-helper/float-helper.component";
 import {Weight} from "../../model/graphical-model/edge/weight";
-import {ForceMode} from "../../logic/mode/force-mode";
 import {GraphSet, GraphSets} from "../../model/graph-set";
 import {
-  MatrixStringInput,
+  GraphSetParseResult,
+  GraphSetRequest,
   MatrixParseResult,
-  GraphSetRequest, GraphSetParseResult
+  MatrixStringInput
 } from "../../component/tab-nav/input-view/input-view.component";
 import {SetValidationResult} from "../graph/graph-set.service";
 import {CustomizationFormValues} from "../../component/tab-nav/customization-view/customization-view.component";
@@ -20,6 +19,9 @@ import {AppData} from "../file.service";
 import {ConfService} from "../config/conf.service";
 import {GraphElement} from "../../model/graphical-model/graph-element";
 import {GenerateGraphOptions} from "../../component/tab-nav/generate-view/generate-view.component";
+import {ModeState, SubmodeState} from "../../logic/mode/mode";
+import {Algorithm} from "../../model/Algorithm";
+import {AlgorithmCalculationRequest, ShortestPathRequest} from "../manager/algorithm-manager.service";
 
 /**
  * Service for managing the state of the application.
@@ -190,6 +192,9 @@ export class StateService {
   private forceModeStateSource = new Subject<boolean>();
   public forceModeState$ = this.forceModeStateSource.asObservable();
 
+  private restoreForceModeStateSource = new Subject<boolean>();
+  public restoreForceModeState$ = this.restoreForceModeStateSource.asObservable();
+
   private forceModeStateChangedSource = new Subject<boolean>();
   public forceModeStateChanged$ = this.forceModeStateChangedSource.asObservable();
 
@@ -226,6 +231,9 @@ export class StateService {
   // Node related events
   private nodeAddedSource = new Subject<NodeView>();
   public nodeAdded$ = this.nodeAddedSource.asObservable();
+
+  private beforeNodeDeletedSource = new Subject<NodeView>();
+  public beforeNodeDeleted$ = this.beforeNodeDeletedSource.asObservable();
 
   private nodeDeletedSource = new Subject<NodeView>();
   public nodeDeleted$ = this.nodeDeletedSource.asObservable();
@@ -271,6 +279,36 @@ export class StateService {
 
   private graphViewGeneratedSource = new Subject<boolean>();
   public graphViewGenerated$ = this.graphViewGeneratedSource.asObservable();
+
+  // --------------------------------------------------
+  // Algorithms related events
+  // --------------------------------------------------
+  private activateAlgorithmSource = new Subject<Algorithm>();
+  public activateAlgorithm$ = this.activateAlgorithmSource.asObservable();
+
+  private changeSubmodeSource = new Subject<SubmodeState>();
+  public changeSubmode$ = this.changeSubmodeSource.asObservable();
+
+  private algorithmModeStateChangedSource = new Subject<boolean>();
+  public algorithmModeStateChanged$ = this.algorithmModeStateChangedSource.asObservable();
+
+  private canResetAlgorithmSource = new Subject<boolean>();
+  public canResetAlgorithm$ = this.canResetAlgorithmSource.asObservable();
+
+  private callResetAlgorithmSource = new Subject<boolean>();
+  public callResetAlgorithm$ = this.callResetAlgorithmSource.asObservable();
+
+  private resetAlgorithmSource = new Subject<boolean>();
+  public resetAlgorithm$ = this.resetAlgorithmSource.asObservable();
+
+  private performAlgorithmCalculationSource = new Subject<AlgorithmCalculationRequest>();
+  public performAlgorithmCalculation$ = this.performAlgorithmCalculationSource.asObservable();
+
+  // Shortest path algs related
+  private shortestPathRequestSource = new Subject<ShortestPathRequest>();
+  public shortestPathRequest$ = this.shortestPathRequestSource.asObservable();
+
+
 
   constructor() { }
 
@@ -359,6 +397,67 @@ export class StateService {
   graphViewGenerated() {
     this.graphViewGeneratedSource.next(true);
     this.graphChangedSource.next(true);
+  }
+
+  /**
+   * Activate the algorithm.
+   */
+  activateAlgorithm(algorithm: Algorithm) {
+    this.activeAlgorithm = algorithm; // Save the active algorithm
+    this.activateAlgorithmSource.next(algorithm);
+  }
+
+  /**
+   * Change the submode state.
+   */
+  changeSubmode(state: SubmodeState) {
+    this.changeSubmodeSource.next(state);
+  }
+
+  /**
+   * Notify that the state of algorithm mode has been changed.
+   */
+  algorithmModeEnabled(value: boolean) {
+    this.algorithmModeStateChangedSource.next(value);
+    this.isAlgModeActiveBool = value; // Save the state
+    if (!value) {
+      this.activeAlgorithm = undefined; // Clear the active algorithm
+    }
+  }
+
+  /**
+   * Change state of reset algorithm button.
+   */
+  changeCanResetAlgorithm(state: boolean) {
+    this.canResetAlgorithmSource.next(state);
+  }
+
+  /**
+   * Call reset the algorithm.
+   */
+  callResetAlgorithm() {
+    this.callResetAlgorithmSource.next(true);
+  }
+
+  /**
+   * Reset the algorithm.
+   */
+  resetAlgorithm() {
+    this.resetAlgorithmSource.next(true);
+  }
+
+  /**
+   * Perform algorithm calculation.
+   */
+  performAlgorithmCalculation(request: AlgorithmCalculationRequest) {
+    this.performAlgorithmCalculationSource.next(request);
+  }
+
+  /**
+   * Request to perform the shortest path algorithm.
+   */
+  requestShortestPath(request: ShortestPathRequest) {
+    this.shortestPathRequestSource.next(request);
   }
 
   /**
@@ -594,6 +693,13 @@ export class StateService {
   }
 
   /**
+   * Restore force mode state.
+   */
+  restoreForceModeState(state: boolean) {
+    this.restoreForceModeStateSource.next(state);
+  }
+
+  /**
    * Notify that the force mode state has been changed.
    */
   forceModeStateChanged() {
@@ -679,6 +785,13 @@ export class StateService {
   }
 
   /**
+   * Notify that a node is about to be deleted.
+   */
+  beforeNodeDeleted(nodeView: NodeView) {
+    this.beforeNodeDeletedSource.next(nodeView);
+  }
+
+  /**
    * Notify that a node has been deleted.
    */
   deletedNode(nodeView: NodeView) {
@@ -737,17 +850,22 @@ export class StateService {
     this.edgeWeightChangedSource.next(edgeView);
   }
 
-  /**
-   * Get current force mode state.
-   */
-  isForceModeEnabled(): boolean {
-    return ForceMode.isActive;
-  }
-
   private isForceModeDisabledBool: boolean = false;
 
   isForceModeDisabled(): boolean {
     return this.isForceModeDisabledBool;
+  }
+
+  private isAlgModeActiveBool: boolean = false;
+
+  isAlgorithmModeActive(): boolean {
+    return this.isAlgModeActiveBool;
+  }
+
+  private activeAlgorithm: Algorithm | undefined;
+
+  getActiveAlgorithm(): Algorithm | undefined {
+    return this.activeAlgorithm;
   }
 }
 

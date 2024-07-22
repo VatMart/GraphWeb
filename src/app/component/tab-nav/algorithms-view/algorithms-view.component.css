@@ -1,0 +1,60 @@
+* {
+  font-size: 16px;
+}
+
+.algorithms-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.row-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-block: 6px;
+  flex-wrap: wrap;
+}
+
+.column-item {
+  display: flex;
+  flex-direction: column;
+  padding-block: 6px;
+}
+
+.common-label {
+  display: block;
+  color: black;
+  font-weight: bold;
+  padding-right: 4px;
+}
+
+.separator {
+  display: block;
+  width: auto;
+  height: 1px;
+  background-color: var(--main-border-color);
+  margin: 0 8px 8px 8px;
+}
+
+.button-panel {
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Style which will be applied when alg mode is enabled */
+.alg-background {
+  background-color: var(--alg-bg-color) !important;
+  color:  var(--alg-button-color) !important;
+  border-color: var(--alg-hover-color) !important;
+}
+
+.alg-label {
+  display: block;
+  color: var(--alg-button-color) !important;
+  font-weight: bold;
+  padding-right: 4px;
+}
+

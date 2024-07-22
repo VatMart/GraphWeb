@@ -18,6 +18,14 @@ import {Subscription} from "rxjs";
 import {ServiceManager} from "../../logic/service-manager";
 import {ChangeForceModeCommand, NodePosition} from "../../logic/command/change-force-mode-command";
 import {SelectionMode} from "../../logic/mode/selection-mode";
+import {Mode, ModeState, Submode, SubmodeState} from "../../logic/mode/mode";
+import {DijkstraSubmode} from "../../logic/mode/algorithm-submode/dijkstra-submode";
+import {BfsSubmode} from "../../logic/mode/algorithm-submode/bfsSubmode";
+import {DfsSubmode} from "../../logic/mode/algorithm-submode/dfsSubmode";
+import {ForceSubmode} from "../../logic/mode/force-submode";
+import {Algorithm} from "../../model/Algorithm";
+import {AlgorithmMode} from "../../logic/mode/algorithm-mode";
+import {ConfService} from "../config/conf.service";
 
 /**
  * Service for managing the modes of the application.
@@ -29,7 +37,8 @@ export class ModeManagerService implements ServiceManager {
   private subscriptions!: Subscription;
 
   private defaultMode?: DefaultMode;
-  private modeStateActions?: { [key in ModeState]: ModeBehavior };
+  private modeStateActions?: { [key in ModeState]: Mode };
+  private submodeStateActions?: { [key in SubmodeState]: Submode | undefined };
 
   private currentModeState?: ModeState;
 
@@ -45,15 +54,24 @@ export class ModeManagerService implements ServiceManager {
    * Should be called after all ui components are initialized (including Pixi canvas)
    */
   initialize(): void {
-    this.defaultMode = new DefaultMode(
-      this.pixiService, this.eventBus, this.historyService,
-      this.graphViewService, this.stateService
-    );
+    // Initialize mode state actions
+    this.submodeStateActions = {
+      'none': undefined,
+      'force': new ForceSubmode(this.pixiService, this.eventBus, this.historyService, this.graphViewService,
+        this.stateService),
+      // Algorithm submodes
+      'Dijkstra': new DijkstraSubmode(this.pixiService, this.stateService, this.eventBus),
+      'BFS': new BfsSubmode(),
+      'DFS': new DfsSubmode()
+    };
+    this.defaultMode = new DefaultMode(this.pixiService, this.eventBus, this.historyService, this.graphViewService,
+      this.stateService, this.submodeStateActions.force); // Default mode with force submode
     this.modeStateActions = {
       'default': this.defaultMode,
       'AddRemoveVertex': new AddRemoveVertexMode(this.pixiService, this.eventBus, this.stateService),
       'AddRemoveEdge': new AddRemoveEdgeMode(this.pixiService, this.eventBus, this.stateService),
-      'SelectionMode': new SelectionMode(this.pixiService, this.eventBus, this.stateService)
+      'SelectionMode': new SelectionMode(this.pixiService, this.eventBus, this.stateService),
+      'Algorithm': new AlgorithmMode(this.pixiService, this.eventBus, this.stateService),
     };
     this.initSubscriptions();
   }
@@ -71,6 +89,12 @@ export class ModeManagerService implements ServiceManager {
           this.updateModeState(mode);
           this.updateHelperItem(mode);
         }
+      })
+    );
+    // Subscribe to the submode state
+    this.subscriptions.add(
+      this.stateService.changeSubmode$.subscribe(submode => {
+        this.changeSubmodeOfMode(this.modeStateActions![this.currentModeState!], this.submodeStateActions![submode]);
       })
     );
     // Subscribe to mode states
@@ -94,6 +118,25 @@ export class ModeManagerService implements ServiceManager {
         this.stateService.changeMode(newState);
       })
     );
+    // ----------------- Algorithm related -----------------
+    // Subscribe to algorithm mode state
+    this.subscriptions.add(
+      this.stateService.activateAlgorithm$.subscribe((value) => {
+        this.stateService.changeMode('Algorithm'); // Change mode to algorithm
+        const submodeState = this.getSubmodeStateFromAlgorithm(value);
+        this.stateService.changeSubmode(submodeState); // Change submode to selected algorithm
+        ConfService.DEFAULT_ALGORITHM = value; // Set default algorithm
+      })
+    );
+    // Subscribe to reset algorithm state
+    this.subscriptions.add(
+      this.stateService.resetAlgorithm$.subscribe((value) => {
+        if (this.currentModeState === 'Algorithm') {
+          (this.modeStateActions![this.currentModeState!] as AlgorithmMode).resetAlgorithm();
+        }
+      })
+    );
+    // ----------------- Force related -----------------
     // Subscribe to force mode state
     this.subscriptions.add(
       this.stateService.forceModeState$.subscribe(mode => {
@@ -104,22 +147,39 @@ export class ModeManagerService implements ServiceManager {
         this.historyService.execute(command);
       })
     );
+    // Subscribe to restore force mode state
+    this.subscriptions.add(
+      this.stateService.restoreForceModeState$.subscribe((state) => {
+        if (this.defaultMode!.getSubmodeState() === 'force') {
+          if (state) {
+            this.defaultMode!.submodeOn();
+          } else {
+            this.defaultMode!.submodeOff();
+          }
+        }
+      })
+    );
     // Subscribe to center force mode state
     this.subscriptions.add(
       this.stateService.centerForceState$.subscribe(value => {
-        this.defaultMode!.centerForceToggle(value)
+        (this.submodeStateActions?.force as ForceSubmode).centerForceToggle(value);
       })
     );
     // Subscribe to link force mode state
     this.subscriptions.add(
       this.stateService.linkForceState$.subscribe(value => {
-        this.defaultMode!.linkForceToggle(value)
+        (this.submodeStateActions?.force as ForceSubmode).linkForceToggle(value);
       })
     );
     // Subscribe to changes in the graph
     this.subscriptions.add(
       this.stateService.nodeAdded$.subscribe(nodeView => {
         this.onAddedNode(nodeView);
+      })
+    );
+    this.subscriptions.add(
+      this.stateService.beforeNodeDeleted$.subscribe(nodeView => {
+        this.onBeforeNodeDeleted(nodeView);
       })
     );
     this.subscriptions.add(
@@ -197,6 +257,14 @@ export class ModeManagerService implements ServiceManager {
     this.currentModeState = newState;
   }
 
+  private changeSubmodeOfMode(mode: Mode, submode: Submode | undefined) {
+    mode.unregisterSubmode();
+    if (submode) {
+      mode.registerSubmode(submode);
+      mode.submodeOn(); // Turn on submode
+    }
+  }
+
   private updateHelperItem(mode: ModeState) {
     switch (mode) {
       case 'AddRemoveVertex':
@@ -210,11 +278,27 @@ export class ModeManagerService implements ServiceManager {
     }
   }
 
+  private getSubmodeStateFromAlgorithm(value: Algorithm): SubmodeState {
+    switch (value) {
+      case 'Dijkstra':
+        return 'Dijkstra';
+      case 'BFS':
+        return 'BFS';
+      case 'DFS':
+        return 'DFS';
+    }
+    throw new Error('Invalid algorithm value: ' + value); // TODO replace with custom error
+  }
+
   /**
    * On added node handling, while mode is active
    */
   public onAddedNode(nodeView: NodeView) {
     this.modeStateActions![this.currentModeState!].onAddedNode(nodeView);
+  }
+
+  public onBeforeNodeDeleted(nodeView: NodeView) {
+    this.modeStateActions![this.currentModeState!].onBeforeNodeDeleted(nodeView);
   }
 
   /**
@@ -266,27 +350,3 @@ export class ModeManagerService implements ServiceManager {
     this.modeStateActions![this.currentModeState!].onRedoInvoked();
   }
 }
-
-export interface ModeBehavior {
-  modeOn(): void;
-
-  modeOff(): void;
-
-  onAddedNode(nodeView: NodeView): void;
-
-  onRemovedNode(nodeView: NodeView): void;
-
-  onAddedEdge(edgeView: EdgeView): void;
-
-  onRemovedEdge(edgeView: EdgeView): void;
-
-  onGraphCleared(): void;
-
-  onGraphViewGenerated(): void;
-
-  onUndoInvoked(): void;
-
-  onRedoInvoked(): void;
-}
-
-export type ModeState = 'AddRemoveVertex' | 'AddRemoveEdge' | 'default' | 'SelectionMode';

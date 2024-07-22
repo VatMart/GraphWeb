@@ -1,18 +1,25 @@
-import {ModeBehavior} from "../../service/manager/mode-manager.service";
 import {PixiService} from "../../service/pixi.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {StateService} from "../../service/event/state.service";
-import {EdgeEventHandler} from "../handlers/edge-event-handler";
+import {EdgeEventHandler} from "../handler/edge-event-handler";
+import {BaseMode, Mode, ModeState, Submode} from "./mode";
 
 /**
  * Mode to add or remove edges between nodes.
  */
-export class AddRemoveEdgeMode implements ModeBehavior {
+export class AddRemoveEdgeMode extends BaseMode implements Mode {
+
+  override readonly modeState: ModeState = 'AddRemoveEdge';
+  override submode: Submode | undefined;
+
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
-              private stateService: StateService) {
+              private stateService: StateService,
+              submode?: Submode) {
+    super();
+    this.submode = submode ? submode : undefined;
   }
 
   modeOff(): void {
@@ -31,6 +38,9 @@ export class AddRemoveEdgeMode implements ModeBehavior {
   }
 
   onRemovedEdge(edgeView: EdgeView): void {
+  }
+
+  onBeforeNodeDeleted(nodeView: NodeView): void {
   }
 
   onRemovedNode(nodeView: NodeView): void {

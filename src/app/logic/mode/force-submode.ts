@@ -6,18 +6,18 @@ import {StateService} from "../../service/event/state.service";
 import {InternalGrid} from "../../model/internal-grid";
 import {ForceNodeView} from "../../model/graphical-model/force-node-view";
 import {NodeView} from "../../model/graphical-model/node/node-view";
-import {NodeEventHandler} from "../handlers/node-event-handler";
+import {NodeEventHandler} from "../handler/node-event-handler";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {Point} from "../../utils/graphical-utils";
 import {ConfService} from "../../service/config/conf.service";
+import {Submode, SubmodeState} from "./mode";
 
 /**
  * Submode of 'Default Mode' for applying forces to the graph elements.
  */
-export class ForceMode {
-  // Static property to keep track of the mode state (Don't change this property directly,
-  // use modeOn() and modeOff() methods)
-  public static isActive: boolean;
+export class ForceSubmode implements Submode {
+  public static readonly GRID_SIZE: number = ConfService.FORCE_GRID_SIZE;
+
   // Used to remember state of force mode when change default mode on other modes and back
   public static activatedByUserMemory: boolean = ConfService.DEFAULT_FORCE_MODE_ON; // This field is used as default value for force mode
 
@@ -38,28 +38,38 @@ export class ForceMode {
   private lastTime: number = 0;
   private fps: number = 0;
 
+  submodeState: SubmodeState = 'force';
+  private active: boolean = false;
+
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
               private historyService: HistoryService,
               private graphViewService: GraphViewService,
-              private stateService: StateService,
-              gridCellSize: number) {
-    this.grid = new InternalGrid<NodeView>(gridCellSize);
+              private stateService: StateService) {
+    this.grid = new InternalGrid<NodeView>(ForceSubmode.GRID_SIZE);
     this.forceNodes = new Map<NodeView, ForceNodeView>();
   }
 
   modeOn(): void {
+    console.log("ForceSubmode ON"); // TODO remove
     this.initializeForceNodes();
     this.enableForces();
-    ForceMode.isActive = true;
     ConfService.DEFAULT_FORCE_MODE_ON = true;
+    this.active = true;
+    this.stateService.forceModeStateChanged();
   }
 
   modeOff(): void {
+    console.log("ForceSubmode OFF"); // TODO remove
     this.disableForces();
     this.destroyForceNodes();
-    ForceMode.isActive = false;
     ConfService.DEFAULT_FORCE_MODE_ON = false;
+    this.active = false;
+    this.stateService.forceModeStateChanged();
+  }
+
+  isActive(): boolean {
+    return this.active;
   }
 
   onAddedNode(nodeView: NodeView): void {
@@ -69,8 +79,11 @@ export class ForceMode {
   onAddedEdge(edgeView: EdgeView): void {
   }
 
-  onRemovedNode(nodeView: NodeView): void {
+  onBeforeNodeDeleted(nodeView: NodeView): void {
     this.destroyForceNode(nodeView);
+  }
+
+  onRemovedNode(nodeView: NodeView): void {
   }
 
   onRemovedEdge(edgeView: EdgeView): void {

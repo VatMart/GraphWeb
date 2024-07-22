@@ -62,6 +62,7 @@ export class GraphViewService extends GraphModelService {
    * All other methods for removing nodes should call this method.
    */
   public removeNodeFromGraphView(graphView: GraphView, nodeView: NodeView) {
+    this.stateService.beforeNodeDeleted(nodeView); // Notify state service
     if (this._selectedElements.includes(nodeView)) { // remove from selected elements
       this.unselectElement(nodeView);
     }
@@ -126,6 +127,7 @@ export class GraphViewService extends GraphModelService {
     this.nodeViews.clear();
     this.edgeViews.clear();
     super.clearAllElements(graphView.graph);
+    this.stateService.graphCleared(); // Notify state service
   }
 
   /**

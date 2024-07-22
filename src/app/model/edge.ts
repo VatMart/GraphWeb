@@ -17,7 +17,7 @@ export class Edge {
 
   /**
    * Label of node. Replace index in representations if set
-   * TODO implement label
+   * TODO implement label rendering
    */
   private _label: string = "";
 
@@ -50,6 +50,9 @@ export class Edge {
     return edge;
   }
 
+  /**
+   * Serialize edge to JSON. This method is used to save graph to file.
+   */
   toJSON() {
     return {
       firstNode: this._firstNode.toJSON(),

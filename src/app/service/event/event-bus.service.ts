@@ -249,4 +249,7 @@ export const HandlerNames = {
   // Canvas touchscreen handlers
   CANVAS_PINCH_START: 'canvasPinchStart', // Handler for the canvas pinch start event
   CANVAS_PINCH_ZOOM: 'canvasPinchZoom', // Handler for the canvas pinch zoom event
+
+  // Algorithm handlers
+  SHORTEST_PATH_SELECTION: 'shortestPathSelection', // Handler for the shortest path selection event
 }

@@ -6,17 +6,19 @@ import {EventBusService} from "../event/event-bus.service";
 import {StateService} from "../event/state.service";
 import {VisualGrid} from "../../model/graphical-model/visual-grid";
 import {CanvasBorder} from "../../model/graphical-model/canvas-border";
-import {CanvasEventHandler} from "../../logic/handlers/canvas-event-handler";
+import {CanvasEventHandler} from "../../logic/handler/canvas-event-handler";
 import {ServiceManager} from "../../logic/service-manager";
-import {NodeEventHandler} from "../../logic/handlers/node-event-handler";
+import {NodeEventHandler} from "../../logic/handler/node-event-handler";
 import {GraphViewService} from "../graph/graph-view.service";
 import {HistoryService} from "../history.service";
-import {EdgeEventHandler} from "../../logic/handlers/edge-event-handler";
+import {EdgeEventHandler} from "../../logic/handler/edge-event-handler";
 import {NodeViewFabricService} from "../fabric/node-view-fabric.service";
 import {EdgeViewFabricService} from "../fabric/edge-view-fabric.service";
 import {GraphStateManagerService} from "./graph-state-manager.service";
 import {GraphSetViewManagerService} from "./graph-set-view-manager.service";
 import {GraphMatrixViewStateManagerService} from "./graph-matrix-view-state-manager.service";
+import {AlgorithmManagerService} from "./algorithm-manager.service";
+import {AlgorithmEventHandler} from "../../logic/handler/algorithm/algorithm-event-handler";
 
 /**
  * Service to manage the PIXI canvas
@@ -29,11 +31,13 @@ export class PixiManagerService implements ServiceManager {
   private canvasEventHandler!: CanvasEventHandler;
   private nodeEventHandler!: NodeEventHandler;
   private edgeEventHandler!: EdgeEventHandler;
+  private algorithmEventHandler!: AlgorithmEventHandler;
 
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
               private stateService: StateService,
               private modeManagerService: ModeManagerService,
+              private algorithmManagerService: AlgorithmManagerService,
               private graphManagerService: GraphStateManagerService,
               private setViewManager: GraphSetViewManagerService,
               private matrixManagerService: GraphMatrixViewStateManagerService,
@@ -55,6 +59,7 @@ export class PixiManagerService implements ServiceManager {
     this.initSubscriptions();
     // Initialize all managers
     this.modeManagerService.initialize();
+    this.algorithmManagerService.initialize();
     this.graphManagerService.initialize();
     this.setViewManager.initialize();
     this.matrixManagerService.initialize();
@@ -69,6 +74,7 @@ export class PixiManagerService implements ServiceManager {
     this.historyService.clear(); // Clear history
     this.destroySubscriptions(); // Stop default canvas event listeners
     this.modeManagerService.destroy();
+    this.algorithmManagerService.destroy();
     this.graphManagerService.destroy();
     this.setViewManager.destroy();
     this.matrixManagerService.destroy();
@@ -150,6 +156,8 @@ export class PixiManagerService implements ServiceManager {
       this.graphViewService, this.historyService, this.nodeFabric);
     this.edgeEventHandler = EdgeEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
       this.graphViewService, this.historyService, this.nodeFabric, this.edgeFabric);
+    this.algorithmEventHandler = AlgorithmEventHandler.initialize(this.pixiService, this.eventBus, this.stateService,
+      this.graphViewService, this.nodeFabric, this.edgeFabric);
     // Initialize default canvas event handlers (zoom, drag canvas etc)
     this.canvasEventHandler.initializeDefaultEventHandlers();
   }

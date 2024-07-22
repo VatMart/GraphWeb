@@ -24,6 +24,9 @@ html, body {
   --main-button-color: #3b3b3b;
   --main-hover-color: #DCDCDC;
   --main-bg-color: #f2f2f2;
+  --alg-bg-color: #3b3b3b;
+  --alg-button-color: white;
+  --alg-hover-color: #adadad;
   --font-family: "Inter var", sans-serif !important;
 }
 
@@ -180,6 +183,18 @@ body {
 
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item:first-child {
   margin-top: 1px;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item-group {
+  padding: 0.5rem 0.5rem;
+}
+
+.p-dropdown-panel .p-dropdown-items {
+  padding: 0.25rem;
+}
+
+.p-dropdown-item {
+  font-size: 14px;
 }
 
 .p-inputtext {

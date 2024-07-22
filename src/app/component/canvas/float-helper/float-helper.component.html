@@ -1,7 +1,7 @@
 <div class="float-helper" *ngIf="showHelper" @fade>
   <div class="float-helper-container">
     <div class="float-helper-content">
-      <a>{{currentHelperItem.text}}</a>
+      <a [innerHTML]="sanitizedHtmlContent"></a>
     </div>
     <div class="close-button-container move-right"
          (click)="onCloseHelper()">

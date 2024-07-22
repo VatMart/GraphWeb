@@ -15,6 +15,16 @@
   border: 1px solid var(--main-border-color);
 }
 
+.alg-background {
+  background-color: var(--alg-bg-color) !important;
+  color: var(--alg-button-color) !important;
+  border-color: var(--alg-hover-color) !important;
+}
+
+.algorithm-button {
+  color: var(--alg-button-color) !important;
+}
+
 .toolbar-item {
   border-radius: 5px;
   padding: 4px;
@@ -35,6 +45,10 @@
 .toolbar-item.disabled {
   pointer-events: none;
   opacity: 0.5;
+}
+
+.toolbar-item[hidden] {
+  display: none !important;
 }
 
 .align-centre-icon {

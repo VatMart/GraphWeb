@@ -1,0 +1,40 @@
+<div class="algorithms-container">
+  <div class="row-item">
+    <label [ngClass]="isAlgorithmModeActive ? 'alg-label' : 'common-label'">Algorithm:</label>
+    <p-dropdown
+      [options]="groupedAlgs"
+      [formControl]="selectedAlg"
+      appendTo="body"
+      placeholder="Select an algorithm"
+      [focusOnHover]="true"
+      [group]="true">
+      <ng-template let-group pTemplate="group">
+        <div class="flex align-items-center">
+          <span>{{ group.label }}</span>
+        </div>
+      </ng-template>
+    </p-dropdown>
+  </div>
+  <div class="separator"></div>
+  <div class="column-item">
+    <label [ngClass]="isAlgorithmModeActive ? 'alg-label' : 'common-label'">Definition:</label>
+    <p>{{ selectedAlgItem.definition }}</p>
+    TODO:Image illustration of the algorithm
+  </div>
+  <div class="separator"></div>
+  <div class="column-item">
+    <label [ngClass]="isAlgorithmModeActive ? 'alg-label' : 'common-label'">Description:</label>
+    <p>{{ selectedAlgItem.description }}</p>
+  </div>
+  <div class="separator"></div>
+  <div class="button-panel">
+    <div class="move-right">
+      <p-button icon="pi pi-check"
+                severity="warning"
+                label="Try Algorithm"
+                [raised]="true"
+                (click)="onActivateAlgorithm()">
+      </p-button>
+    </div>
+  </div>
+</div>
