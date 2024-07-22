@@ -91,6 +91,17 @@ export class GraphicalUtils {
     // Return rectangle that represents the bounds of all containers objects
     return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
   }
+
+  /**
+   * Converts a hex number to a hex color string.
+   * @param hex - The hex number (e.g., 0x2db72d).
+   * @returns The hex color string (e.g., "#2db72d").
+   */
+  public static hexNumberToString(hex: number): string {
+    // Convert the number to a hex string and pad with leading zeros if necessary
+    const hexString = hex.toString(16).padStart(6, '0');
+    return `#${hexString}`;
+  }
 }
 
 export type Rectangle = {

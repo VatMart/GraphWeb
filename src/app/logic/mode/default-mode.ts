@@ -1,4 +1,3 @@
-import {ModeBehavior} from "../../service/manager/mode-manager.service";
 import {PixiService} from "../../service/pixi.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {GraphViewService} from "../../service/graph/graph-view.service";
@@ -6,29 +5,31 @@ import {EventBusService, HandlerNames} from "../../service/event/event-bus.servi
 import {HistoryService} from "../../service/history.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {StateService} from "../../service/event/state.service";
-import {ForceMode} from "./force-mode";
+import {BaseMode, Mode, ModeState, Submode, SubmodeState} from "./mode";
+import {ForceSubmode} from "./force-submode";
 
 /**
  * Default mode for the application
  */
-export class DefaultMode implements ModeBehavior {
-  public static readonly GRID_SIZE: number = 150; // TODO move to separate class
-  private forceMode: ForceMode;
+export class DefaultMode extends BaseMode implements Mode {
+  override readonly modeState: ModeState = 'default';
+  override submode: Submode | undefined;
 
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
               private historyService: HistoryService,
               private graphViewService: GraphViewService,
-              private stateService: StateService) {
-    this.forceMode = new ForceMode(pixiService, eventBus, historyService, graphViewService, stateService,
-      DefaultMode.GRID_SIZE);
+              private stateService: StateService,
+              submode?: Submode) {
+    super();
+    this.submode = submode ? submode : undefined;
   }
 
   modeOn(): void {
     console.log("DefaultMode ON"); // TODO remove
-    this.stateService.changeForceModeDisabledState(false);
-    if (ForceMode.activatedByUserMemory) {
-      this.forceModeOn();
+    // Special case for force submode
+    if (this.submode?.submodeState === 'force' && ForceSubmode.activatedByUserMemory) {
+      this.submodeOn();
     }
     this.selectableModeOn();
     this.moveableNodesOn();
@@ -37,8 +38,9 @@ export class DefaultMode implements ModeBehavior {
 
   modeOff(): void {
     console.log("DefaultMode OFF"); // TODO remove
-    this.forceModeOff(); // Off force mode if it is enabled
-    this.stateService.changeForceModeDisabledState(true);
+    if (this.submode?.isActive()) {
+      this.submodeOff();
+    }
     this.selectableModeOff();
     this.moveableNodesOff();
     this.editableEdgesWeightOff()
@@ -47,81 +49,57 @@ export class DefaultMode implements ModeBehavior {
 
   onAddedNode(nodeView: NodeView): void {
     this.moveableNodeOn(nodeView);
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onAddedNode(nodeView);
+    if (this.submode) {
+      this.submode.onAddedNode(nodeView);
     }
   }
 
   onAddedEdge(edgeView: EdgeView): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onAddedEdge(edgeView);
+    if (this.submode) {
+      this.submode.onAddedEdge(edgeView);
+    }
+  }
+
+  onBeforeNodeDeleted(nodeView: NodeView): void {
+    if (this.submode) {
+      this.submode.onBeforeNodeDeleted(nodeView);
     }
   }
 
   onRemovedNode(nodeView: NodeView): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onRemovedNode(nodeView);
+    if (this.submode) {
+      this.submode.onRemovedNode(nodeView);
     }
   }
 
   onRemovedEdge(edgeView: EdgeView): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onRemovedEdge(edgeView);
+    if (this.submode) {
+      this.submode.onRemovedEdge(edgeView);
     }
   }
 
   onGraphCleared(): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onGraphCleared();
+    if (this.submode) {
+      this.submode.onGraphCleared();
     }
   }
 
   onGraphViewGenerated(): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onGraphViewGenerated();
+    if (this.submode) {
+      this.submode.onGraphViewGenerated();
     }
   }
 
   onUndoInvoked(): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onUndoInvoked();
+    if (this.submode) {
+      this.submode.onUndoInvoked();
     }
   }
 
   onRedoInvoked(): void {
-    if (this.stateService.isForceModeEnabled()) {
-      this.forceMode.onRedoInvoked();
+    if (this.submode) {
+      this.submode.onRedoInvoked();
     }
-  }
-
-  public forceModeOn(): void {
-    if (this.stateService.isForceModeEnabled()) {
-      return;
-    }
-    this.forceMode.modeOn();
-    this.stateService.forceModeStateChanged();
-  }
-
-  public forceModeOff(): void {
-    if (!this.stateService.isForceModeEnabled()) {
-      return;
-    }
-    this.forceMode.modeOff();
-    this.stateService.forceModeStateChanged();
-  }
-
-  /**
-   * Toggle center force
-   */
-  public centerForceToggle(value: boolean) {
-    this.forceMode.centerForceToggle(value);
-  }
-
-  /**
-   * Toggle link force
-   */
-  public linkForceToggle(value: boolean) {
-    this.forceMode.linkForceToggle(value);
   }
 
   /**

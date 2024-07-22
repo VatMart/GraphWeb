@@ -32,19 +32,27 @@ export class EdgeViewFabricService extends AbstractGraphElementFabric {
     _${weightStyle.text.labelFontFamily}`;
     if (!this.textureWeightCache.has(key)) {
       // Create new texture, cache it, and return
-      const graphics = new Graphics();
-      const totalWidth = text.bounds.width + 10; // padding
-      const totalHeight = text.bounds.height;
-      graphics.rect(0, 0, totalWidth, totalHeight)
-        .fill(weightStyle.color)
-        .stroke({width: weightStyle.strokeWidth, color: weightStyle.strokeColor});
-
-      const texture = RenderTexture.create({width: totalWidth, height: totalHeight, antialias: true,
-        resolution: Math.max(2, window.devicePixelRatio)});
-      this.pixiService.renderer.render({container: graphics, target: texture, clear: true});
+      const texture = this.createWeightTexture(text, weightStyle);
       this.textureWeightCache.set(key, texture);
     }
     return <Texture>this.textureWeightCache.get(key);
+  }
+
+  /**
+   * Create weight texture for edge.
+   */
+  public createWeightTexture(text: Text, weightStyle: WeightStyle): Texture {
+    const graphics = new Graphics();
+    const totalWidth = text.bounds.width + 10; // padding
+    const totalHeight = text.bounds.height;
+    graphics.rect(0, 0, totalWidth, totalHeight)
+      .fill(weightStyle.color)
+      .stroke({width: weightStyle.strokeWidth, color: weightStyle.strokeColor});
+
+    const texture = RenderTexture.create({width: totalWidth, height: totalHeight, antialias: true,
+      resolution: Math.max(2, window.devicePixelRatio)});
+    this.pixiService.renderer.render({container: graphics, target: texture, clear: true});
+    return texture;
   }
 
   /**

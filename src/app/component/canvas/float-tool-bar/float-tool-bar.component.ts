@@ -2,13 +2,16 @@ import {ChangeDetectorRef, Component, OnDestroy, OnInit, Renderer2} from '@angul
 import {RippleModule} from "primeng/ripple";
 import {SvgIconService} from "../../../service/svg-icon.service";
 import {SvgIconDirective} from "../../../directive/svg-icon.directive";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {StateService} from "../../../service/event/state.service";
 import {TooltipModule} from "primeng/tooltip";
 import {Subscription} from "rxjs";
 import {ConfService} from "../../../service/config/conf.service";
 import {EnvironmentService} from "../../../service/config/environment.service";
 
+/**
+ * Float tool bar component.
+ */
 @Component({
   selector: 'app-float-tool-bar',
   standalone: true,
@@ -17,7 +20,8 @@ import {EnvironmentService} from "../../../service/config/environment.service";
     SvgIconDirective,
     NgIf,
     NgForOf,
-    TooltipModule
+    TooltipModule,
+    NgClass
   ],
   templateUrl: './float-tool-bar.component.html',
   styleUrl: './float-tool-bar.component.css'
@@ -27,6 +31,9 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
   public isMobile: boolean = false;
 
   items!: FloatToolBarItem[];
+
+  // Algorithm mode state
+  isAlgorithmModeActive: boolean = false;
 
   constructor(protected svgIconService: SvgIconService,
               private stateService: StateService,
@@ -50,6 +57,7 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
         },
         tooltip: 'Center view',
         disabled: false,
+        hidden: false,
       },
       {
         icon: 'selection-mode-icon',
@@ -75,15 +83,26 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
         },
         tooltip: 'Toggle force mode on/off', // TODO replace to PrimeNG OverlayPanel
         disabled: false,
+        hidden: false,
       }
     ];
     this.subscriptions = new Subscription();
     // Subscribe to current mode state changes
-    this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
+    this.subscriptions.add(
+      this.stateService.currentMode$.subscribe(state => {
       if (this.items[1].isActive && state !== 'SelectionMode') {
         this.onToggleButton(false, 1);
       }
     }));
+    this.subscriptions.add(
+      this.stateService.currentMode$.subscribe(state => {
+        if (state != 'default') {
+          this.stateService.changeForceModeDisabledState(true);
+        } else {
+          this.stateService.changeForceModeDisabledState(false);
+        }
+      })
+    );
     // Subscribe to force mode disabled state changes
     this.subscriptions.add(
       this.stateService.forceModeDisabled$.subscribe((value) => {
@@ -95,6 +114,14 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
       this.stateService.forceModeStateChanged$.subscribe((value) => {
         if (value) {
           this.toggleForceMode();
+        }
+      })
+    );
+    // On enable algorithm mode
+    this.subscriptions.add(
+      this.stateService.algorithmModeStateChanged$.subscribe((value) => {
+        if (this.isAlgorithmModeActive !== value) {
+          this.toggleAlgorithmModeStyles(value);
         }
       })
     );
@@ -113,6 +140,12 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
 
   private toggleForceMode() {
     this.onToggleButton(!this.items[2].isActive!, 2);
+  }
+
+  private toggleAlgorithmModeStyles(value: boolean) {
+    this.isAlgorithmModeActive = value;
+    this.items[1].hidden = value || !this.isMobile; // Hide selection mode on algorithm mode
+    this.items[2].hidden = value; // Hide force mode on algorithm mode
   }
 
   private onToggleButton(state: boolean, index: number) : boolean {
@@ -137,6 +170,9 @@ export class FloatToolBarComponent implements OnInit, OnDestroy {
   }
 }
 
+/**
+ * Float tool bar item.
+ */
 export interface FloatToolBarItem {
   icon: string;
   customIcon: boolean;

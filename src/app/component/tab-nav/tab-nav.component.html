@@ -1,14 +1,15 @@
 <ng-container *ngIf="!isMobileDevice; else bottomNavTab">
   <div class="vertical-nav">
-    <div class="vertical-nav-container">
+    <div class="vertical-nav-container" [ngClass]="isAlgorithmModeActive ? 'alg-background' : ''">
       <div class="vertical-nav-header">
-        <a pRipple class="pi pi-angle-double-left collapse-icon" [ngClass]="!verticalNavExpanded ? 'expanded' : ''"
+        <a pRipple class="pi pi-angle-double-left collapse-icon"
+           [ngClass]="[!verticalNavExpanded ? 'expanded' : '', isAlgorithmModeActive ? 'algorithm-button' : '']"
            style="font-size: 1.5rem"
            (click)="onToggleExpandVerticalNav($event)"></a>
       </div>
       <div class="nav-items-container">
         <div pRipple class="nav-item-container" [ngClass]="activeIndex === i ? 'active' : ''"
-             *ngFor="let item of items; let i = index"
+             *ngFor="let item of items; let i = index" [hidden]="!item.visible"
              (click)="onDesktopNavItemClick(i)">
           <div class="nav-item">
             <i class="icon"
@@ -28,7 +29,9 @@
       </div>
     </div>
 
-    <div class="left-side-content-container" *ngIf="activeIndex !== null" @slideInOut>
+    <div class="left-side-content-container"
+         [ngClass]="isAlgorithmModeActive ? 'alg-background' : ''"
+         *ngIf="activeIndex !== null" @slideInOut>
       <div id="desktopSidebarHeader" class="left-side-content-header" #desktopSidebarHeader>
         <h2>{{ items ? items[activeIndex]['header'] : "No header" }}</h2>
         <i pRipple class="pi pi-times-circle close-button move-right" style="font-size: 1.5rem"
@@ -39,6 +42,7 @@
       <div class="left-side-content" #desktopSidebarContent>
         <app-generate-view *ngIf="activeIndex === 0"/>
         <app-input-view *ngIf="activeIndex === 1"/>
+        <app-algorithms-view *ngIf="activeIndex === 2"/>
         <app-customization-view *ngIf="activeIndex === 3"/>
         <app-output-view *ngIf="activeIndex === 4"/>
       </div>
@@ -50,17 +54,19 @@
 <ng-template #bottomNavTab>
   <div #tabMenuContainer></div>
   <div #mobileTabNav id="mobile-navbar" class="mobile-tab-menu">
-    <p-tabMenu [model]="items" [(activeItem)]="activeItem">
+    <p-tabMenu [model]="items" [(activeItem)]="activeItem" [ngClass]="isAlgorithmModeActive ? 'alg-background' : ''">
       <ng-template pTemplate="item" let-item let-i="index">
         <a pRipple class="p-menuitem-link" (click)="onMobileTabMenuActiveItemChange(i)">
           <ng-container *ngIf="svgIconService.getIcon(item.icon); else defaultIcon">
             <i class="custom-icon-container">
-              <span appSvgIcon [appSvgIcon]="item.icon" [ngClass]="item.icon"></span>
+              <span appSvgIcon [appSvgIcon]="item.icon"
+                    [ngClass]="[item.icon, isAlgorithmModeActive ? 'algorithm-button' : '']"></span>
             </i>
           </ng-container>
           <!-- Find icon in primeng icons -->
           <ng-template #defaultIcon>
-            <span class="p-menuitem-icon black-icon" [class]="item.icon"></span>
+            <span class="p-menuitem-icon black-icon"
+                  [ngClass]="[item.icon, isAlgorithmModeActive ? 'algorithm-button' : '']"></span>
           </ng-template>
           <a [ngClass]="item.icon + '-custom-text'">
             {{ item.label }}
@@ -72,6 +78,7 @@
   <p-sidebar #sidebarRef [visible]="bottomPanelVisible"
              (onHide)="onBottomPanelHide($event)"
              [appendTo]="tabMenuContainer"
+             [styleClass]="isAlgorithmModeActive ? 'alg-background' : ''"
              autoZIndex="false"
              [modal]="true">
     <ng-template pTemplate="headless">
@@ -79,11 +86,13 @@
         <div id="mobileSidebarHeader" class="mobile-sidebar-header" #mobileSidebarHeader>
           <h2>{{ activeItem ? activeItem['header'] : "No header" }}</h2>
           <a pRipple class="pi pi-angle-double-left collapse-icon move-right" style="font-size: 1.5rem"
+             [ngClass]="isAlgorithmModeActive ? 'algorithm-button' : ''"
              (click)="onCloseMobileSidebar($event)"></a>
         </div>
         <div class="mobile-sidebar-content" #mobileSidebarContent>
           <app-output-view *ngIf="activeItem?.id === 'output'"/>
           <app-input-view *ngIf="activeItem?.id === 'input'"/>
+          <app-algorithms-view *ngIf="activeItem?.id === 'algorithms'"/>
           <app-customization-view *ngIf="activeItem?.id === 'customization'"/>
           <app-generate-view *ngIf="activeItem?.id === 'generation'"/>
         </div>

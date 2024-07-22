@@ -48,18 +48,51 @@ export class Graph {
     return this.nodes.size === 0;
   }
 
+  /**
+   * Serialize graph to JSON. This method is used to save graph to file.
+   * Save only the most important data (indexes and labels of nodes and edges).
+   */
   toJSON() {
     return {
-      nodes: Array.from(this.nodes.entries()).map(([key, value]) => [key, value.toJSON()]), // Assuming Node has a toJSON method
-      edges: Array.from(this.edges.entries()).map(([key, value]) => [key, value.toJSON()]), // Assuming Edge has a toJSON method
-      orientation: this._orientation
+      nodes: Array.from(this.nodes.entries()).map(([key, value]) => [key, value.toJSON()]),
+      edges: Array.from(this.edges.entries()).map(([key, value]) => [key, value.toJSON()]),
+      orientation: this._orientation,
+      type: this._type
     };
   }
 
   static fromJSON(json: any): Graph {
     const graph = new Graph(json.orientation);
-    const nodes = new Map<number, Node>(json.nodes.map(([key, value]: [number, any]) => [key, Node.fromJSON(value)])); // Assuming Node has a fromJSON method
-    const edges = new Map<string, Edge>(json.edges.map(([key, value]: [string, any]) => [key, Edge.fromJSON(value, nodes)])); // Assuming Edge has a fromJSON method
+    const nodes = new Map<number, Node>(json.nodes.map(([key, value]: [number, any]) =>
+      [key, Node.fromJSON(value)]));
+    const edges = new Map<string, Edge>(json.edges.map(([key, value]: [string, any]) =>
+      [key, Edge.fromJSON(value, nodes)]));
+    graph.nodes = nodes;
+    graph.edges = edges;
+    return graph;
+  }
+
+  /**
+   * This method is used to convert graph to full JSON (keep all data).
+   */
+  toFullJSON() {
+    return {
+      nodes: Array.from(this.nodes.entries()).map(([key, value]) => [key, value.toFullJSON()]),
+      edges: Array.from(this.edges.entries()).map(([key, value]) => [key, value.toJSON()]), // Already full JSON
+      orientation: this._orientation,
+      type: this._type
+    }
+  }
+
+  /**
+   * This method is used to convert graph from full JSON (keep all data).
+   */
+  static fromFullJSON(json: any): Graph {
+    const graph = new Graph(json.orientation);
+    const nodes = new Map<number, Node>(json.nodes.map(([key, value]: [number, any]) =>
+      [key, Node.fromFullJSON(value)]));
+    const edges = new Map<string, Edge>(json.edges.map(([key, value]: [string, any]) =>
+      [key, Edge.fromJSON(value, nodes)])); // Already full JSON
     graph.nodes = nodes;
     graph.edges = edges;
     return graph;

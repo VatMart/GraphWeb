@@ -1,0 +1,52 @@
+<p-menu #speedMenu [model]="speedItems" [popup]="true"/>
+<div class="animation-panel">
+  <div class="animation-panel-content">
+    <div class="speed-slider-container" *ngIf="!isMobile">
+      <input type="range" min="0.5" max="3" step="0.5" [value]="speedValue"
+             (input)="onSpeedChange($event)"
+             [disabled]="!canChangeSpeed"
+             class="speed-slider" id="speedSlider">
+      <span class="speed-slider-label">{{ speedValue }}X</span>
+    </div>
+    <button pRipple pTooltip="Animation speed" tooltipPosition="top" showDelay="200"
+            class="alg-mode-button"
+            *ngIf="isMobile"
+            style="margin-left: 8px"
+            [disabled]="!canChangeSpeed"
+            (click)="speedMenu.toggle($event)">
+      {{ speedValue }}X
+    </button>
+    <button pRipple pTooltip="Step back animation on one step" tooltipPosition="top" showDelay="200"
+            class="alg-mode-button"
+            appSvgIcon="step-back-icon"
+            [disabled]="!canStepBack"
+            (click)="onStepBackButton()">
+    </button>
+    <button pRipple pTooltip="Play animation of the algorithm" tooltipPosition="top" showDelay="200"
+            class="alg-mode-button"
+            style="color: limegreen"
+            appSvgIcon="play-alg-icon"
+            *ngIf="!isPlaying"
+            [disabled]="!canPlay"
+            (click)="onPlayButton()">
+    </button>
+    <button pRipple pTooltip="Pause animation of the algorithm" tooltipPosition="top" showDelay="200"
+            class="alg-mode-button"
+            style="color: red"
+            appSvgIcon="pause-alg-icon"
+            *ngIf="isPlaying"
+            (click)="onPauseButton()">
+    </button>
+    <button pRipple pTooltip="Step forward animation on one step" tooltipPosition="top" showDelay="200"
+            class="alg-mode-button"
+            appSvgIcon="step-forward-icon"
+            [disabled]="!canStepForward"
+            (click)="onStepForwardButton()">
+    </button>
+    <span class="player-slider-container">
+      <input type="range" [min]="0" [max]="totalSteps" [value]="currentStep" class="player-slider" id="playerSlider"
+             [disabled]="!canGoToStep"
+             (input)="onGoToStep($event)">
+    </span>
+  </div>
+</div>

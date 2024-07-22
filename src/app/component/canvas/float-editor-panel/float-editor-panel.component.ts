@@ -59,7 +59,6 @@ import {EdgeViewFabricService} from "../../../service/fabric/edge-view-fabric.se
 })
 export class FloatEditorPanelComponent implements OnInit, OnDestroy {
   private subscriptions!: Subscription;
-  animationState: string = 'in';
   isMobile: boolean;
 
   isSingularSelection: boolean = false;
@@ -193,7 +192,6 @@ export class FloatEditorPanelComponent implements OnInit, OnDestroy {
     this.edgeColorItems = this.colorItems.filter((item) => item.graphElement === 'edge');
     this.checkSelection();
     this.initSubscriptions();
-    this.animationState = 'in';
   }
 
   ngOnDestroy(): void {
@@ -202,7 +200,6 @@ export class FloatEditorPanelComponent implements OnInit, OnDestroy {
 
   toggleOverlayPanel(op: OverlayPanel, event: MouseEvent, i: number) {
     op.toggle(event);
-    console.log('toggleOverlayPanel', i); // TODO remove
   }
 
   openEditNodeLabelDialog() {

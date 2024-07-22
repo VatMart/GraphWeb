@@ -19,8 +19,9 @@ export class Arrow extends Graphics {
    * Draw arrow. End point is the arrow head.
    * Returns the center point of arrow
    */
-  public draw(startPoint: Point, endPoint: Point): Point {
+  public draw(startPoint: Point, endPoint: Point, color?: number): Point {
     this.clear();
+    const colorToUse = color ? color : this._arrowStyle.color;
     const distance = GraphicalUtils.distanceBetween(endPoint, startPoint);
     let ko = this._arrowStyle.size / distance;
     const base: Point = {
@@ -44,7 +45,7 @@ export class Arrow extends Graphics {
       .quadraticCurveTo(curve.x, curve.y, right.x, right.y)
       .closePath()
       .fill(this._arrowStyle.color)
-      .stroke({width: this._arrowStyle.strokeWidth, color: this._arrowStyle.strokeColor}); // TODO
+      .stroke({width: this._arrowStyle.strokeWidth, color: colorToUse}); // TODO
     return GraphicalUtils.midpoint(base, endPoint);
   }
 

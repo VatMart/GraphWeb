@@ -22,12 +22,18 @@ import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {FloatEditorPanelComponent} from "./component/canvas/float-editor-panel/float-editor-panel.component";
 import {GraphViewService} from "./service/graph/graph-view.service";
+import {
+  FloatAnimationToolbarComponent
+} from "./component/canvas/float-animation-toolbar/float-animation-toolbar.component";
 
+/**
+ * Main component of the application.
+ */
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [ToolBarComponent, CanvasComponent, TabNavComponent, NgClass, FloatToolBarComponent, NgIf,
-    FloatHelperComponent, FloatEdgeWeightInputComponent, ToastModule, FloatEditorPanelComponent],
+    FloatHelperComponent, FloatEdgeWeightInputComponent, ToastModule, FloatEditorPanelComponent, FloatAnimationToolbarComponent],
   providers: [MessageService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -41,6 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   showFloatToolBar: boolean = false;
   showFloatHelper: boolean = false;
   showFloatEditorPanel: boolean = false;
+  showFloatAnimationToolbar: boolean = false;
 
   constructor(private modeManagerService: ModeManagerService,
               private graphStateManager: GraphStateManagerService,
@@ -106,6 +113,13 @@ export class AppComponent implements OnInit, OnDestroy {
         // Hide float toolbar and helper
         this.showFloatToolBar = false;
         this.showFloatHelper = false;
+      })
+    );
+
+    // Subscribe to changes of animation toolbar visibility
+    this.subscriptions.add(
+      this.stateService.showAnimationToolbar$.subscribe((value) => {
+        this.showFloatAnimationToolbar = value;
       })
     );
 

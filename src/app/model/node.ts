@@ -12,11 +12,15 @@ export class Node {
    */
   private _label: string = "";
 
-  private _edges: string[] = []; // adjacent edge indexes
+  private _edges: string[]; // adjacent edge indexes
 
-  constructor(index: number, label: string = "") {
+  constructor(index: number, label: string = "",
+              edges: string[] = []) {
     this._index = index;
     this._label = label;
+    // It's not recommended to set adjacent edges through constructor because of possible inconsistency.
+    // Use GraphModelService methods.
+    this._edges = edges;
   }
 
   /**
@@ -57,6 +61,9 @@ export class Node {
     return node;
   }
 
+  /**
+   * Serialize node to JSON. This method is used to save graph to file.
+   */
   toJSON() {
     return {
       index: this._index,
@@ -66,8 +73,22 @@ export class Node {
   }
 
   static fromJSON(json: any): Node {
-    const node = new Node(json.index, json.label);
-    return node;
+    return new Node(json.index, json.label);
+  }
+
+  /**
+   * This method is used to convert node to full JSON (keep all data).
+   */
+  toFullJSON() {
+    return {
+      index: this._index,
+      label: this._label,
+      edges: this._edges // copy adj edges
+    };
+  }
+
+  static fromFullJSON(json: any): Node {
+    return new Node(json.index, json.label, json.edges);
   }
 
   get index(): number {
@@ -79,7 +100,11 @@ export class Node {
   }
 
   get label(): string {
-    return this._label;
+    if (this._label === "") {
+      return this._index.toString();
+    } else {
+      return this._label;
+    }
   }
 
   set label(value: string) {

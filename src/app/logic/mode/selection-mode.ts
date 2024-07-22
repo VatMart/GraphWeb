@@ -1,20 +1,28 @@
-import {ModeBehavior} from "../../service/manager/mode-manager.service";
+
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {PixiService} from "../../service/pixi.service";
 import {EventBusService, HandlerNames} from "../../service/event/event-bus.service";
 import {StateService} from "../../service/event/state.service";
 import {DEFAULT_HELPER_ITEM, SELECT_MODE_HELPER_ITEM} from "../../component/canvas/float-helper/float-helper.component";
+import {BaseMode, Mode, ModeBehavior, ModeState, Submode, SubmodeState} from "./mode";
 
 /**
  * Selection mode class.
  * Used for selecting elements on the canvas.
  * Its used only for mobile version of the application.
  */
-export class SelectionMode implements ModeBehavior {
+export class SelectionMode extends BaseMode implements Mode {
+
+  override readonly modeState: ModeState = 'SelectionMode';
+  override submode: Submode | undefined;
+
   constructor(private pixiService: PixiService,
               private eventBus: EventBusService,
-              private stateService: StateService) {
+              private stateService: StateService,
+              submode?: Submode) {
+    super();
+    this.submode = submode ? submode : undefined;
   }
 
   modeOn(): void {
@@ -47,6 +55,9 @@ export class SelectionMode implements ModeBehavior {
   }
 
   onRemovedEdge(edgeView: EdgeView): void {
+  }
+
+  onBeforeNodeDeleted(nodeView: NodeView): void {
   }
 
   onRemovedNode(nodeView: NodeView): void {

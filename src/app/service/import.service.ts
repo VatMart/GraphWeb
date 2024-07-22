@@ -6,7 +6,7 @@ import {ConfService} from "./config/conf.service";
 import {StateService} from "./event/state.service";
 import {GraphView} from "../model/graphical-model/graph/graph-view";
 import {PixiManagerService} from "./manager/pixi-manager.service";
-import {ForceMode} from "../logic/mode/force-mode";
+import {ForceSubmode} from "../logic/mode/force-submode";
 
 /**
  * Service for managing the import of files.
@@ -50,6 +50,12 @@ export class ImportService {
       this.stateService.changeShowGrid(ConfService.SHOW_GRID);
       // Import graph
       this.importGraph(appData.graph);
+      // Activate force mode if it was active
+      if (ConfService.DEFAULT_FORCE_MODE_ON) {
+        this.stateService.restoreForceModeState(true);
+      } else {
+        this.stateService.restoreForceModeState(false);
+      }
       // Notify state service that PIXI is started
       this.stateService.pixiStarted();
     });
@@ -63,7 +69,7 @@ export class ImportService {
     // Set default force properties
     if (graphProperties.enableForceMode !== undefined) {
       ConfService.DEFAULT_FORCE_MODE_ON = graphProperties.enableForceMode;
-      ForceMode.activatedByUserMemory = graphProperties.enableForceMode;
+      ForceSubmode.activatedByUserMemory = graphProperties.enableForceMode;
     }
     if (graphProperties.enableCenterForce !== undefined) {
       ConfService.DEFAULT_CENTER_FORCE_ON = graphProperties.enableCenterForce;

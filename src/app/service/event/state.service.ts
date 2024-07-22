@@ -1,18 +1,17 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject, Subject} from "rxjs";
-import {ModeState} from "../manager/mode-manager.service";
 import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {GraphOrientation} from "../../model/orientation";
 import {GraphMatrix, TypeMatrix} from "../../model/graph-matrix";
-import {DEFAULT_HELPER_ITEM, FloatHelperItem} from "../../component/canvas/float-helper/float-helper.component";
+import {FloatHelperItem} from "../../component/canvas/float-helper/float-helper.component";
 import {Weight} from "../../model/graphical-model/edge/weight";
-import {ForceMode} from "../../logic/mode/force-mode";
 import {GraphSet, GraphSets} from "../../model/graph-set";
 import {
-  MatrixStringInput,
+  GraphSetParseResult,
+  GraphSetRequest,
   MatrixParseResult,
-  GraphSetRequest, GraphSetParseResult
+  MatrixStringInput
 } from "../../component/tab-nav/input-view/input-view.component";
 import {SetValidationResult} from "../graph/graph-set.service";
 import {CustomizationFormValues} from "../../component/tab-nav/customization-view/customization-view.component";
@@ -20,6 +19,13 @@ import {AppData} from "../file.service";
 import {ConfService} from "../config/conf.service";
 import {GraphElement} from "../../model/graphical-model/graph-element";
 import {GenerateGraphOptions} from "../../component/tab-nav/generate-view/generate-view.component";
+import {ModeState, SubmodeState} from "../../logic/mode/mode";
+import {Algorithm} from "../../model/Algorithm";
+import {
+  AlgorithmCalculationRequest,
+  AlgorithmCalculationResponse,
+  ShortestPathRequest
+} from "../manager/algorithm-manager.service";
 
 /**
  * Service for managing the state of the application.
@@ -190,6 +196,9 @@ export class StateService {
   private forceModeStateSource = new Subject<boolean>();
   public forceModeState$ = this.forceModeStateSource.asObservable();
 
+  private restoreForceModeStateSource = new Subject<boolean>();
+  public restoreForceModeState$ = this.restoreForceModeStateSource.asObservable();
+
   private forceModeStateChangedSource = new Subject<boolean>();
   public forceModeStateChanged$ = this.forceModeStateChangedSource.asObservable();
 
@@ -226,6 +235,9 @@ export class StateService {
   // Node related events
   private nodeAddedSource = new Subject<NodeView>();
   public nodeAdded$ = this.nodeAddedSource.asObservable();
+
+  private beforeNodeDeletedSource = new Subject<NodeView>();
+  public beforeNodeDeleted$ = this.beforeNodeDeletedSource.asObservable();
 
   private nodeDeletedSource = new Subject<NodeView>();
   public nodeDeleted$ = this.nodeDeletedSource.asObservable();
@@ -271,6 +283,82 @@ export class StateService {
 
   private graphViewGeneratedSource = new Subject<boolean>();
   public graphViewGenerated$ = this.graphViewGeneratedSource.asObservable();
+
+  // --------------------------------------------------
+  // Algorithms related events
+  // --------------------------------------------------
+  private activateAlgorithmSource = new Subject<Algorithm>();
+  public activateAlgorithm$ = this.activateAlgorithmSource.asObservable();
+
+  private changeSubmodeSource = new Subject<SubmodeState>();
+  public changeSubmode$ = this.changeSubmodeSource.asObservable();
+
+  private algorithmModeStateChangedSource = new Subject<boolean>();
+  public algorithmModeStateChanged$ = this.algorithmModeStateChangedSource.asObservable();
+
+  private canResetAlgorithmSource = new Subject<boolean>();
+  public canResetAlgorithm$ = this.canResetAlgorithmSource.asObservable();
+
+  private callResetAlgorithmSource = new Subject<boolean>();
+  public callResetAlgorithm$ = this.callResetAlgorithmSource.asObservable();
+
+  private resetAlgorithmSource = new Subject<boolean>();
+  public resetAlgorithm$ = this.resetAlgorithmSource.asObservable();
+
+  private performAlgorithmCalculationSource = new Subject<AlgorithmCalculationRequest>();
+  public performAlgorithmCalculation$ = this.performAlgorithmCalculationSource.asObservable();
+
+  private algorithmCalculatedSource = new Subject<AlgorithmCalculationResponse>();
+  public algorithmCalculated$ = this.algorithmCalculatedSource.asObservable();
+
+  private showAnimationToolbarSource = new Subject<boolean>();
+  public showAnimationToolbar$ = this.showAnimationToolbarSource.asObservable();
+
+  private resolveAlgorithmAnimationSource = new Subject<AlgorithmCalculationResponse>();
+  public resolveAlgorithmAnimation$ = this.resolveAlgorithmAnimationSource.asObservable();
+
+  private changeAlgorithmCurrentStepSource = new Subject<number>();
+  public changeAlgorithmCurrentStep$ = this.changeAlgorithmCurrentStepSource.asObservable();
+
+  private canAlgorithmStepForwardSource = new Subject<boolean>();
+  public canAlgorithmStepForward$ = this.canAlgorithmStepForwardSource.asObservable();
+
+  private algorithmAnimationStepForwardSource = new Subject<boolean>();
+  public algorithmAnimationStepForward$ = this.algorithmAnimationStepForwardSource.asObservable();
+
+  private canAlgorithmStepBackwardSource = new Subject<boolean>();
+  public canAlgorithmStepBackward$ = this.canAlgorithmStepBackwardSource.asObservable();
+
+  private algorithmAnimationStepBackwardSource = new Subject<boolean>();
+  public algorithmAnimationStepBackward$ = this.algorithmAnimationStepBackwardSource.asObservable();
+
+  private canAlgorithmGoToStepSource = new Subject<boolean>();
+  public canAlgorithmGoToStep$ = this.canAlgorithmGoToStepSource.asObservable();
+
+  private algorithmAnimationGoToStepSource = new Subject<number>();
+  public algorithmAnimationGoToStep$ = this.algorithmAnimationGoToStepSource.asObservable();
+
+  private canAlgorithmPlaySource = new Subject<boolean>();
+  public canAlgorithmPlay$ = this.canAlgorithmPlaySource.asObservable();
+
+  private algorithmAnimationPlaySource = new Subject<boolean>();
+  public algorithmAnimationPlay$ = this.algorithmAnimationPlaySource.asObservable();
+
+  private isAlgorithmPlayingSource = new Subject<boolean>()
+  public isAlgorithmPlaying$ = this.isAlgorithmPlayingSource.asObservable();
+
+  private algorithmAnimationPauseSource = new Subject<boolean>();
+  public algorithmAnimationPause$ = this.algorithmAnimationPauseSource.asObservable();
+
+  private canAlgorithmChangeSpeedSource = new Subject<boolean>();
+  public canAlgorithmChangeSpeed$ = this.canAlgorithmChangeSpeedSource.asObservable();
+
+  private algorithmAnimationChangeSpeedSource = new Subject<number>();
+  public algorithmAnimationChangeSpeed$ = this.algorithmAnimationChangeSpeedSource.asObservable();
+
+  // Shortest path algs related
+  private shortestPathRequestSource = new Subject<ShortestPathRequest>();
+  public shortestPathRequest$ = this.shortestPathRequestSource.asObservable();
 
   constructor() { }
 
@@ -359,6 +447,179 @@ export class StateService {
   graphViewGenerated() {
     this.graphViewGeneratedSource.next(true);
     this.graphChangedSource.next(true);
+  }
+
+  /**
+   * Activate the algorithm.
+   */
+  activateAlgorithm(algorithm: Algorithm) {
+    this.activeAlgorithm = algorithm; // Save the active algorithm
+    this.activateAlgorithmSource.next(algorithm);
+  }
+
+  /**
+   * Change the submode state.
+   */
+  changeSubmode(state: SubmodeState) {
+    this.changeSubmodeSource.next(state);
+  }
+
+  /**
+   * Notify that the state of algorithm mode has been changed.
+   */
+  algorithmModeEnabled(value: boolean) {
+    this.algorithmModeStateChangedSource.next(value);
+    this.isAlgModeActiveBool = value; // Save the state
+    if (!value) {
+      this.activeAlgorithm = undefined; // Clear the active algorithm
+    }
+  }
+
+  /**
+   * Change state of reset algorithm button.
+   */
+  changeCanResetAlgorithm(state: boolean) {
+    this.canResetAlgorithmSource.next(state);
+  }
+
+  /**
+   * Call reset the algorithm.
+   */
+  callResetAlgorithm() {
+    this.callResetAlgorithmSource.next(true);
+  }
+
+  /**
+   * Reset the algorithm.
+   */
+  resetAlgorithm() {
+    this.resetAlgorithmSource.next(true);
+  }
+
+  /**
+   * Perform algorithm calculation.
+   */
+  performAlgorithmCalculation(request: AlgorithmCalculationRequest) {
+    this.performAlgorithmCalculationSource.next(request);
+  }
+
+  /**
+   * Notify that the algorithm has been calculated.
+   */
+  algorithmCalculated(response: AlgorithmCalculationResponse) {
+    this.algorithmCalculatedSource.next(response);
+  }
+
+  /**
+   * Show the animation toolbar.
+   */
+  showAnimationToolbar(value: boolean) {
+    this.showAnimationToolbarSource.next(value);
+  }
+
+  /**
+   * Resolve the algorithm animation.
+   */
+  resolveAlgorithmAnimation(response: AlgorithmCalculationResponse) {
+    this.resolveAlgorithmAnimationSource.next(response);
+  }
+
+  /**
+   * Change the current step of the algorithm.
+   */
+  changeAlgorithmCurrentStep(step: number) {
+    this.changeAlgorithmCurrentStepSource.next(step);
+  }
+
+  /**
+   * Change can step forward algorithm state.
+   */
+  canAlgorithmStepForward(value: boolean) {
+    this.canAlgorithmStepForwardSource.next(value);
+  }
+
+  /**
+   * Step forward in the algorithm animation.
+   */
+  algorithmAnimationStepForward() {
+    this.algorithmAnimationStepForwardSource.next(true);
+  }
+
+  /**
+   * Change can step backward algorithm state.
+   */
+  canAlgorithmStepBackward(value: boolean) {
+    this.canAlgorithmStepBackwardSource.next(value);
+  }
+
+  /**
+   * Step backward in the algorithm animation.
+   */
+  algorithmAnimationStepBackward() {
+    this.algorithmAnimationStepBackwardSource.next(true);
+  }
+
+  /**
+   * Change can go to step algorithm state.
+   */
+  canAlgorithmGoToStep(value: boolean) {
+    this.canAlgorithmGoToStepSource.next(value);
+  }
+
+  /**
+   * Go to step in the algorithm animation.
+   */
+  algorithmAnimationGoToStep(step: number) {
+    this.algorithmAnimationGoToStepSource.next(step);
+  }
+
+  /**
+   * Change can play algorithm state.
+   */
+  canAlgorithmPlay(value: boolean) {
+    this.canAlgorithmPlaySource.next(value);
+  }
+
+  /**
+   * Play the algorithm animation.
+   */
+  algorithmAnimationPlay() {
+    this.algorithmAnimationPlaySource.next(true);
+  }
+
+  /**
+   * Is algorithm playing
+   */
+  algorithmPlaying(value: boolean) {
+    this.isAlgorithmPlayingSource.next(value);
+  }
+
+  /**
+   * Pause the algorithm animation.
+   */
+  algorithmAnimationPause() {
+    this.algorithmAnimationPauseSource.next(true);
+  }
+
+  /**
+   * Change can change speed algorithm state.
+   */
+  canAlgorithmChangeSpeed(value: boolean) {
+    this.canAlgorithmChangeSpeedSource.next(value);
+  }
+
+  /**
+   * Change the speed of the algorithm animation.
+   */
+  algorithmAnimationChangeSpeed(speed: number) {
+    this.algorithmAnimationChangeSpeedSource.next(speed);
+  }
+
+  /**
+   * Request to perform the shortest path algorithm.
+   */
+  requestShortestPath(request: ShortestPathRequest) {
+    this.shortestPathRequestSource.next(request);
   }
 
   /**
@@ -594,6 +855,13 @@ export class StateService {
   }
 
   /**
+   * Restore force mode state.
+   */
+  restoreForceModeState(state: boolean) {
+    this.restoreForceModeStateSource.next(state);
+  }
+
+  /**
    * Notify that the force mode state has been changed.
    */
   forceModeStateChanged() {
@@ -679,6 +947,13 @@ export class StateService {
   }
 
   /**
+   * Notify that a node is about to be deleted.
+   */
+  beforeNodeDeleted(nodeView: NodeView) {
+    this.beforeNodeDeletedSource.next(nodeView);
+  }
+
+  /**
    * Notify that a node has been deleted.
    */
   deletedNode(nodeView: NodeView) {
@@ -737,17 +1012,32 @@ export class StateService {
     this.edgeWeightChangedSource.next(edgeView);
   }
 
-  /**
-   * Get current force mode state.
-   */
-  isForceModeEnabled(): boolean {
-    return ForceMode.isActive;
-  }
-
   private isForceModeDisabledBool: boolean = false;
 
   isForceModeDisabled(): boolean {
     return this.isForceModeDisabledBool;
+  }
+
+  private isAlgModeActiveBool: boolean = false;
+
+  isAlgorithmModeActive(): boolean {
+    return this.isAlgModeActiveBool;
+  }
+
+  private activeAlgorithm: Algorithm | undefined;
+
+  getActiveAlgorithm(): Algorithm | undefined {
+    return this.activeAlgorithm;
+  }
+
+  private totalAlgorithmSteps: number = 0;
+
+  setTotalAlgorithmSteps(value: number) {
+    this.totalAlgorithmSteps = value;
+  }
+
+  getTotalAlgorithmSteps(): number {
+    return this.totalAlgorithmSteps;
   }
 }
 

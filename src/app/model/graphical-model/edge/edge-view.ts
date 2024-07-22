@@ -18,7 +18,7 @@ export class EdgeView extends Graphics implements GraphElement {
   private _edge: Edge;
 
   // Representation of arrow, if edge is oriented
-  private arrow: Arrow | undefined;
+  private _arrow: Arrow | undefined;
   private _weightView: Weight;
   private _weightVisible: boolean = ConfService.SHOW_WEIGHT;
   private _offset: number | undefined;
@@ -55,14 +55,14 @@ export class EdgeView extends Graphics implements GraphElement {
     this._startNode = startNode;
     this._endNode = endNode;
     if (edge.orientation === EdgeOrientation.ORIENTED && !this.edge.isLoop()) {
-      this.arrow = new Arrow(edgeStyle?.arrow);
-      this.addChild(this.arrow);
+      this._arrow = new Arrow(edgeStyle?.arrow);
+      this.addChild(this._arrow);
     }
     this._offset = offset;
     this._weightView = new Weight(this._edge.weight, edgeStyle?.weight);
     this.weightView.visible = this._weightVisible;
     this.addChild(this._weightView);
-    const points = this.resolveConnectors();
+    const points = this.resolveConnectors(this.startNode, this.endNode);
     this._startCoordinates = points[0];
     this._endCoordinates = points[1];
     if (edgeStyle) {
@@ -72,8 +72,9 @@ export class EdgeView extends Graphics implements GraphElement {
 
   /**
    * Draw edge between two nodes. Should be called after creating edge and moving adjacent nodes.
+   * Note: Do not call this method directly! Use move() method instead.
    */
-  private draw() {
+  public draw() {
     this.clear();
     // Recalculate endpoint if edge will have arrow first, because it should reset end point coordinates
     let oldEndCoordinates = this._endCoordinates;
@@ -109,16 +110,19 @@ export class EdgeView extends Graphics implements GraphElement {
     return offset;
   }
 
-  private getPerpendicularOffset(start: Point, end: Point, offset: number): Point {
+  public getPerpendicularOffset(start: Point, end: Point, offset: number): Point {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const length = Math.sqrt(dx * dx + dy * dy);
+    if (length === 0) {
+      return { x: 0, y: 0 }; // Avoid division by zero
+    }
     const offsetX = offset * dy / length;
     const offsetY = -offset * dx / length;
     return { x:offsetX, y:offsetY };
   }
 
-  private drawLoopEdge() {
+  public drawLoopEdge() {
     const control1 = {x: this._startCoordinates.x - 2 * this.startNode.radius,
       y: this._startCoordinates.y - 2 * this.startNode.radius};
     const control2 = {x: this._endCoordinates.x + 2 * this.startNode.radius,
@@ -158,30 +162,47 @@ export class EdgeView extends Graphics implements GraphElement {
     return new Polygon(polygonPoints);
   }
 
-  private recalculateEndpointWithArrow() {
-    if (this.arrow) {
-      this._endCoordinates = this.arrow.calculateNewEndPoint(this._startCoordinates, this._endCoordinates);
+  /**
+   * Recalculate the endpoint of the edge with the arrow.
+   */
+  public recalculateEndpointWithArrow() {
+    if (this._arrow) {
+      this._endCoordinates = this._arrow.calculateNewEndPoint(this._startCoordinates, this._endCoordinates);
     }
   }
 
-  private drawArrow(oldEndCoordinates: Point) {
-    if (this.arrow) {
-      this._endCoordinates = this.arrow.draw(this._startCoordinates, oldEndCoordinates);
+  /**
+   * Draw arrow at the end of the edge.
+   * Note: Do not call this method directly! Use move() method instead.
+   */
+  public drawArrow(oldEndCoordinates: Point) {
+    if (this._arrow) {
+      this._endCoordinates = this._arrow.draw(this._startCoordinates, oldEndCoordinates);
     }
   }
 
-  private moveWeight() {
+  /**
+   * Move the weight of the edge to the correct position.
+   * Note: Do not call this method directly! Use move() method instead.
+   */
+  public moveWeight() {
     if (this._weightView) {
       this._weightView.move(this._startCoordinates, this._endCoordinates, this.edge.isLoop());
     }
   }
 
+  /**
+   * Get the index of the edge.
+   */
   public getIndex(): string {
     return this._edge.edgeIndex.value;
   }
 
+  /**
+   * Move the edge to the correct position.
+   */
   public move(): void {
-    const points = this.resolveConnectors();
+    const points = this.resolveConnectors(this.startNode, this.endNode);
     this._startCoordinates = points[0];
     this._endCoordinates = points[1];
     this.draw();
@@ -195,15 +216,15 @@ export class EdgeView extends Graphics implements GraphElement {
       return;
     }
     this.edge.orientation = orientation;
-    if (orientation === EdgeOrientation.ORIENTED && this.arrow) {
-      this.arrow.renderable = true;
-    } else if (orientation === EdgeOrientation.ORIENTED && !this.arrow) {
-      this.arrow = new Arrow();
-      this.addChild(this.arrow);
-      this.arrow.renderable = true;
+    if (orientation === EdgeOrientation.ORIENTED && this._arrow) {
+      this._arrow.renderable = true;
+    } else if (orientation === EdgeOrientation.ORIENTED && !this._arrow) {
+      this._arrow = new Arrow();
+      this.addChild(this._arrow);
+      this._arrow.renderable = true;
     }
-    if (orientation === EdgeOrientation.NON_ORIENTED && this.arrow) {
-      this.arrow.renderable = false;
+    if (orientation === EdgeOrientation.NON_ORIENTED && this._arrow) {
+      this._arrow.renderable = false;
     }
     this.move();
   }
@@ -226,17 +247,17 @@ export class EdgeView extends Graphics implements GraphElement {
    * Resolve coordinates of connectors of edge
    * @return [startConnector, endConnector] - coordinates of start and end nodes connectors
    */
-  private resolveConnectors(): [Point, Point] {
+  public resolveConnectors(startNode: NodeView, endNode: NodeView): [Point, Point] {
     if (this.edge.isLoop()) {
       return this.resolveLoopConnectors();
     }
-    const centerNode1 = this._startNode.centerCoordinates();
-    const centerNode2 = this._endNode.centerCoordinates();
+    const centerNode1 = startNode.centerCoordinates();
+    const centerNode2 = endNode.centerCoordinates();
     const distance = GraphicalUtils.distanceBetween(centerNode1, centerNode2);
-    const ko1 = (this._startNode.width / 2) / distance;
+    const ko1 = (startNode.width / 2) / distance;
     const xNode1 = centerNode1.x + (centerNode2.x - centerNode1.x) * ko1;
     const yNode1 = centerNode1.y + (centerNode2.y - centerNode1.y) * ko1;
-    const ko2 = (this._endNode.width / 2) / distance;
+    const ko2 = (endNode.width / 2) / distance;
     const xNode2 = centerNode2.x + (centerNode1.x - centerNode2.x) * ko2;
     const yNode2 = centerNode2.y + (centerNode1.y - centerNode2.y) * ko2;
     return [{x: xNode1, y: yNode1}, {x: xNode2, y: yNode2}];
@@ -296,6 +317,26 @@ export class EdgeView extends Graphics implements GraphElement {
     this._endNode = value;
   }
 
+  get arrow(): Arrow | undefined {
+    return this._arrow;
+  }
+
+  get startCoordinates(): Point {
+    return this._startCoordinates;
+  }
+
+  set startCoordinates(value: Point) {
+    this._startCoordinates = value;
+  }
+
+  get endCoordinates(): Point {
+    return this._endCoordinates;
+  }
+
+  set endCoordinates(value: Point) {
+    this._endCoordinates = value;
+  }
+
   get offset(): number | undefined {
     return this._offset;
   }
@@ -319,8 +360,8 @@ export class EdgeView extends Graphics implements GraphElement {
   set edgeStyle(value: EdgeStyle) {
     this._edgeStyle = value;
     this._weightView.weightStyle = value.weight;
-    if (this.arrow !== undefined && value.arrow !== undefined) {
-      this.arrow.arrowStyle = value.arrow;
+    if (this._arrow !== undefined && value.arrow !== undefined) {
+      this._arrow.arrowStyle = value.arrow;
     }
     this.move();
   }

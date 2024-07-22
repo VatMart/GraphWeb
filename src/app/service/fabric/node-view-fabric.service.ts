@@ -33,24 +33,32 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
     const key = `${nodeStyle.radius.getRadius()}_${nodeStyle.fillNode}_${nodeStyle.strokeColor}_${nodeStyle.strokeWidth}`;
     if (!this.textureCache.has(key)) {
       // Create new texture, cache it, and return
-      const graphics = new Graphics();
-      const totalRadius = nodeStyle.radius.getRadius() + nodeStyle.strokeWidth;
-      graphics.circle(totalRadius, totalRadius, nodeStyle.radius.getRadius()).
-      fill(nodeStyle.fillNode);
-      if (strokeGradient) {
-        graphics.stroke({fill: strokeGradient, alignment: 0, width: nodeStyle.strokeWidth,
-          cap: 'round', join: 'round'});
-      } else {
-        graphics.stroke({color: nodeStyle.strokeColor, alignment: 0, width: nodeStyle.strokeWidth,
-          cap: 'round', join: 'round'});
-      }
-
-      const texture = RenderTexture.create({width: 2 * totalRadius, height: 2 * totalRadius, antialias: true,
-        resolution: Math.max(2, window.devicePixelRatio)});
-      this.pixiService.renderer.render({container: graphics, target: texture, clear: true});
+      const texture = this.createTexture(nodeStyle, strokeGradient);
       this.textureCache.set(key, texture);
     }
     return <Texture>this.textureCache.get(key);
+  }
+
+  /**
+   * Create texture for node style.
+   */
+  public createTexture(nodeStyle: NodeStyle, strokeGradient?: FillGradient): Texture {
+    const graphics = new Graphics();
+    const totalRadius = nodeStyle.radius.getRadius() + nodeStyle.strokeWidth;
+    graphics.circle(totalRadius, totalRadius, nodeStyle.radius.getRadius())
+      .fill(nodeStyle.fillNode);
+    if (strokeGradient) {
+      graphics.stroke({fill: strokeGradient, alignment: 0, width: nodeStyle.strokeWidth,
+        cap: 'round', join: 'round'});
+    } else {
+      graphics.stroke({color: nodeStyle.strokeColor, alignment: 0, width: nodeStyle.strokeWidth,
+        cap: 'round', join: 'round'});
+    }
+
+    const texture = RenderTexture.create({width: 2 * totalRadius, height: 2 * totalRadius, antialias: true,
+      resolution: Math.max(2, window.devicePixelRatio)});
+    this.pixiService.renderer.render({container: graphics, target: texture, clear: true});
+    return texture;
   }
 
   /**
@@ -107,6 +115,9 @@ export class NodeViewFabricService extends AbstractGraphElementFabric {
     nodeView.move(); // adjust position
   }
 
+  /**
+   * Change node style to previous style.
+   */
   public changeToPreviousStyle(nodeView: NodeView) {
     if (this.styleCache.has(nodeView.node.index)) {
       let textureKey = this.styleCache.get(nodeView.node.index);

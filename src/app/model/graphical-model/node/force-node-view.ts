@@ -1,5 +1,5 @@
-import {NodeView} from "./node/node-view";
-import {Point} from "../../utils/graphical-utils";
+import {NodeView} from "./node-view";
+import {Point} from "../../../utils/graphical-utils";
 
 /**
  * Force node view to simulate forces on the node.

@@ -11,6 +11,7 @@ import {NodeView} from "../../model/graphical-model/node/node-view";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {GradientColor} from "../fabric/node-view-fabric.service";
 import {BLACK_WHITE_SMALL_STYLE} from "../../model/graphical-model/graph/style-template/black-white-small-style";
+import {Algorithm} from "../../model/Algorithm";
 
 /**
  * Service for managing the configuration of the application.
@@ -32,9 +33,20 @@ export class ConfService {
    */
   public static START_NODE_STYLE: NodeStyle = {
     radius: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.radius,
-    fillNode: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.fillNode,
+    fillNode: '#FFC618',
     strokeColor: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.strokeColor,
-    strokeWidth: Math.max(ConfService.CURRENT_GRAPH_STYLE.nodeStyle.strokeWidth + 1, 4),
+    strokeWidth: Math.max(ConfService.CURRENT_GRAPH_STYLE.nodeStyle.strokeWidth + 2, 4),
+    labelStyle: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.labelStyle
+  };
+
+  /**
+   * Style for the end node when using algorithms.
+   */
+  public static END_NODE_STYLE: NodeStyle = {
+    radius: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.radius,
+    fillNode: '#ff5f5f',
+    strokeColor: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.strokeColor,
+    strokeWidth: Math.max(ConfService.CURRENT_GRAPH_STYLE.nodeStyle.strokeWidth + 2, 4),
     labelStyle: ConfService.CURRENT_GRAPH_STYLE.nodeStyle.labelStyle
   };
 
@@ -49,6 +61,7 @@ export class ConfService {
   public static ALWAYS_HIDE_HELPER_TEXT: boolean = false;
 
   // Force properties
+  public static FORCE_GRID_SIZE: number = 150; // Grid size for force mode
   public static DEFAULT_FORCE_MODE_ON: boolean = true; // Enable force mode by default on start
   public static DEFAULT_CENTER_FORCE_ON: boolean = true;
   public static DEFAULT_LINK_FORCE_ON: boolean = true;
@@ -95,6 +108,11 @@ export class ConfService {
   public static MAX_WEIGHT: number = 1000;
   public static MIN_WEIGHT: number = 1;
   public static DYNAMIC_EDGE_WEIGHT_VALUE: boolean = false; // Dynamic value changes according to edge length
+
+  // Algorithms related properties
+  public static DEFAULT_ALGORITHM: Algorithm = Algorithm.DIJKSTRA; // Default algorithm shown in select ui component
+  public static ALGORITHM_SELECTION_COLOR: number = 0xffd379; // Color of the selected element
+  public static ALGORITHM_PATH_COLOR: number = 0x69d169; // Color of the path
 
   /**
    * Getter for current graph properties.
