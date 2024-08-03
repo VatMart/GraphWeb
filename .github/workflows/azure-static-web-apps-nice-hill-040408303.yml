@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.19.0' # Set the Node.js version to 18.19.0
+          node-version: '20.11.1'
 
       # Install project dependencies
       - name: Install dependencies
@@ -44,10 +44,10 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
-          output_location: "dist/graph-web" # Built app content directory - optional
+          output_location: "dist/graph-web/browser" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
         env:
-            NODE_VERSION: '18.19.0' # Ensure the correct Node.js version is used during deployment
+            NODE_VERSION: '20.11.1'
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
