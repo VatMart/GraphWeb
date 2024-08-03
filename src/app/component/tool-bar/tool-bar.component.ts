@@ -604,6 +604,11 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   }
 
   private exportAsPng() {
+    // Allow to export only in default mode or algorithm mode
+    if (this.stateService.getCurrentMode() !== 'default' && this.stateService.getCurrentMode() !== 'Algorithm') {
+      this.stateService.changeMode('default'); // Switch to default mode if not already
+      this.stateService.clearSelectedElements(); // Clear selected elements
+    }
     this.stateService.callExportAsPngWindow();
   }
 

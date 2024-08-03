@@ -196,6 +196,13 @@ export class PixiService {
     return this.boundaryYMax - this.boundaryYMin;
   }
 
+  /**
+   * Get the content bounds of the canvas.
+   */
+  getContentBounds() {
+    return this.mainContainer.getBounds();
+  }
+
   // ------------------
   // Getters and Setters
   // ------------------

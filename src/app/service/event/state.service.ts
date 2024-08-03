@@ -281,6 +281,9 @@ export class StateService {
   private graphClearedSource = new Subject<boolean>();
   public graphCleared$ = this.graphClearedSource.asObservable();
 
+  private clearSelectedElementsCallSource = new Subject<boolean>();
+  public clearSelectedElementsCall$ = this.clearSelectedElementsCallSource.asObservable();
+
   private graphOrientationSource = new Subject<GraphOrientation>();
   public graphOrientation$ = this.graphOrientationSource.asObservable();
 
@@ -422,6 +425,7 @@ export class StateService {
    */
   changeMode(mode: ModeState) {
     this.modeStateSource.next(mode);
+    this.currentMode = mode;
   }
 
   /**
@@ -430,6 +434,13 @@ export class StateService {
   graphCleared() {
    this.graphClearedSource.next(true);
    this.graphChangedSource.next(true);
+  }
+
+  /**
+   * Clear selected elements.
+   */
+  clearSelectedElements() {
+    this.clearSelectedElementsCallSource.next(true);
   }
 
   /**
@@ -1030,6 +1041,12 @@ export class StateService {
    */
   edgeWeightChanged(edgeView: EdgeView) {
     this.edgeWeightChangedSource.next(edgeView);
+  }
+
+  private currentMode: ModeState = 'default';
+
+  getCurrentMode(): ModeState {
+    return this.currentMode;
   }
 
   private isForceModeDisabledBool: boolean = false;

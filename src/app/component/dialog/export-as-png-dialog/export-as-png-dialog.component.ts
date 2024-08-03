@@ -25,10 +25,9 @@ import {CheckboxModule} from "primeng/checkbox";
 export class ExportAsPngDialogComponent implements OnInit, OnDestroy {
   private subscriptions!: Subscription;
 
-  zoomItems: ZoomItem[] | undefined;
-  selectedZoom = new FormControl(100);
+  resolutionLevelItems: ResolutionLevelItem[] | undefined;
+  selectedResolutionLevel: FormControl<'low' | 'medium' | 'high' | null> = new FormControl('high');
   transparentBackground = new FormControl(false);
-  showGrid = new FormControl(false);
 
   constructor(public ref: DynamicDialogRef,
               public config: DynamicDialogConfig,
@@ -37,40 +36,26 @@ export class ExportAsPngDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.zoomItems = [
+    this.resolutionLevelItems = [
       {
-        label: '50%',
-        value: 50,
+        label: 'Low',
+        value: 'low',
         command: () => {
-          this.selectedZoom.setValue(50);
+          this.selectedResolutionLevel.setValue('low');
         }
       },
       {
-        label: '75%',
-        value: 75,
+        label: 'Medium',
+        value: 'medium',
         command: () => {
-          this.selectedZoom.setValue(75);
+          this.selectedResolutionLevel.setValue('medium');
         }
       },
       {
-        label: '100%',
-        value: 100,
+        label: 'High',
+        value: 'high',
         command: () => {
-          this.selectedZoom.setValue(100);
-        }
-      },
-      {
-        label: '150%',
-        value: 150,
-        command: () => {
-          this.selectedZoom.setValue(150);
-        }
-      },
-      {
-        label: '200%',
-        value: 200,
-        command: () => {
-          this.selectedZoom.setValue(200);
+          this.selectedResolutionLevel.setValue('high');
         }
       }
     ];
@@ -88,23 +73,21 @@ export class ExportAsPngDialogComponent implements OnInit, OnDestroy {
 
   onExport() {
     const request: ExportAsPngRequest = {
-      showGrid: this.showGrid.value === null ? false : this.showGrid.value,
       transparentBackground: this.transparentBackground.value === null ? false : this.transparentBackground.value,
-      zoom: this.selectedZoom.value === null ? 100 : this.selectedZoom.value
+      resolutionLevel: this.selectedResolutionLevel.value === null ? 'high' : this.selectedResolutionLevel.value
     };
     this.stateService.callExportAsPng(request);
     this.ref.close();
   }
 }
 
-interface ZoomItem {
+interface ResolutionLevelItem {
   label: string;
-  value: number;
+  value: string;
   command: () => void;
 }
 
 export interface ExportAsPngRequest {
-  showGrid: boolean;
   transparentBackground: boolean;
-  zoom: number;
+  resolutionLevel: 'low' | 'medium' | 'high';
 }

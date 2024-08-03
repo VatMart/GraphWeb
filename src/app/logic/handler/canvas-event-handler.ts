@@ -170,6 +170,7 @@ export class CanvasEventHandler {
     this.subscriptions.add(
       this.stateService.showGrid$.subscribe(value => {
         this.pixiService.canvasVisualGrid.renderable = value;
+        this.pixiService.canvasVisualGrid.visible = value;
         ConfService.SHOW_GRID = value;
         if (value) {
           this.pixiService.canvasVisualGrid.drawGrid();
@@ -221,11 +222,11 @@ export class CanvasEventHandler {
   private handleCursorMoving(event: FederatedPointerEvent): void {
     this.xCursor = event.globalX;
     this.yCursor = event.globalY;
-    const currentPoint = event.getLocalPosition(this.pixiService.mainContainer); // TODO Change back
-    this.stateService.changeCursorX(currentPoint.x)
-    this.stateService.changeCursorY(currentPoint.y)
-    // this.stateService.changeCursorX(this.xCursor)
-    // this.stateService.changeCursorY(this.yCursor)
+    // const currentPoint = event.getLocalPosition(this.pixiService.mainContainer); // TODO Change back
+    // this.stateService.changeCursorX(currentPoint.x)
+    // this.stateService.changeCursorY(currentPoint.y)
+    this.stateService.changeCursorX(this.xCursor)
+    this.stateService.changeCursorY(this.yCursor)
   }
 
   private handlerContextMenu(event: any): void {

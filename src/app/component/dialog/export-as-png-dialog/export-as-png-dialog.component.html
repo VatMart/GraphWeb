@@ -1,10 +1,10 @@
 <div class="dialog-container">
   <div class="dialog-content">
     <div class="row-item">
-      <label class="common-label">Zoom:</label>
+      <label class="common-label">Quality (Resolution size):</label>
       <p-dropdown
-        [options]="zoomItems"
-        [formControl]="selectedZoom"
+        [options]="resolutionLevelItems"
+        [formControl]="selectedResolutionLevel"
         optionValue="value"
         optionLabel="label"/>
     </div>
@@ -13,13 +13,6 @@
         [formControl]="transparentBackground"
         [binary]="true"
         label="Transparent background"
-        inputId="binary"/>
-    </div>
-    <div class="row-item">
-      <p-checkbox
-        [formControl]="showGrid"
-        [binary]="true"
-        label="Show grid"
         inputId="binary"/>
     </div>
   </div>

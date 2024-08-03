@@ -131,6 +131,14 @@ export class GraphStateManagerService implements ServiceManager {
         this.historyService.execute(command);
       })
     );
+    // On clear selected elements call
+    this.subscriptions.add(
+      this.stateService.clearSelectedElementsCall$.subscribe((value) => {
+        if (value) {
+          this.graphService.clearSelection();
+        }
+      })
+    );
   }
 
   destroySubscriptions(): void {

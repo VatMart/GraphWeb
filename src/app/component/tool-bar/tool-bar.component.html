@@ -210,8 +210,6 @@
         </a>
         <a pRipple *ngIf="item.id === 'exportItems'"
            class="p-menuitem-link"
-           [class.disabled]="isAlgorithmModeActive"
-           [attr.aria-disabled]="isAlgorithmModeActive ? 'true' : null"
            (click)="openExportItemsSubMenu($event, exportSubMenu)">
           <i class="pi pi-file-export" style="font-size: 1rem"></i>
           <span class="ml-1">{{ item.label }}</span>
