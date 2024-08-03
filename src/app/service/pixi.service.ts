@@ -88,7 +88,7 @@ export class PixiService {
     }
     let occupiedHeight = (this.environment.isMobile() ? navbar.offsetHeight : 0) + toolbar.offsetHeight+5;
     let occupiedWidth = (this.environment.isMobile() ? 0 : navbar.offsetWidth+8);
-    console.log("Occupied width: " + occupiedWidth + ", occupied height: " + occupiedHeight); // TODO remove
+    //console.log("Occupied width: " + occupiedWidth + ", occupied height: " + occupiedHeight); // TODO remove
     return {
       width: window.innerWidth - occupiedWidth,
       height: window.innerHeight - occupiedHeight

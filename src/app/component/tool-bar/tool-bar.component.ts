@@ -76,6 +76,8 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   enableLinkForce = new FormControl(ConfService.DEFAULT_LINK_FORCE_ON);
   orientations: SelectOrientationItem[] | undefined;
   selectedOrientation = new FormControl<GraphOrientation | null>(ConfService.DEFAULT_GRAPH_ORIENTATION);
+  // Export items
+  exportItems: MenuItem[] | undefined;
 
   // Save/load graph
   filename: string = 'graph.json';  // Default filename
@@ -198,6 +200,10 @@ export class ToolBarComponent implements OnInit, OnDestroy {
           {
             id: 'loadGraph',
             label: 'Open graph',
+          },
+          {
+            id: 'exportItems',
+            label: 'Export'
           }
         ]
       },
@@ -264,10 +270,122 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         ]
       }
     ];
+    this.exportItems = [
+      {
+        label: 'Export as PNG',
+        command: () => {
+          this.exportAsPng();
+        }
+      }
+    ];
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+  }
+
+  private initSubscriptions() {
+    this.subscriptions = new Subscription();
+    // Cursor coordinates
+    this.subscriptions.add(this.stateService.currentCursorX.subscribe(state => this.xCursor = state));
+    this.subscriptions.add(this.stateService.currentCursorY.subscribe(state => this.yCursor = state));
+    // Undo/Redo buttons
+    this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
+    this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
+    // Zooming button
+    this.subscriptions.add(this.stateService.zoomChanged$.subscribe(state => {
+      this.zoomPercentage = state;
+    }));
+    // Cog dropdown components
+    this.subscriptions.add(this.showGrid.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onToggleShowGrid(value);
+      }
+    }));
+    this.subscriptions.add(this.hideHelper.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onToggleAlwaysHideHelper(value);
+      }
+    }));
+    // Force options
+    this.subscriptions.add(this.enableCenterForce.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onCenterForceToggle(value);
+      }
+    }));
+    this.subscriptions.add(this.enableLinkForce.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onLinkForceToggle(value)
+      }
+    }));
+    // Graph orientation
+    this.subscriptions.add(this.selectedOrientation.valueChanges.subscribe(value => {
+      if (value !== null) {
+        this.onChoseGraphOrientation(value);
+      }
+    }));
+    this.subscriptions.add(this.stateService.graphOrientationChanged$.subscribe(state => {
+      if (state !== this.selectedOrientation.value) {
+        this.selectedOrientation.setValue(state);
+      }
+    }));
+    // Mode buttons
+    this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
+      if (this.isAddVertexButtonActive && state !== 'AddRemoveVertex') {
+        console.log("Switching add vertex button");
+        this.switchAddVertexButton(); // Turn off add vertex mode
+      }
+      if (this.isAddEdgesButtonActive && state !== 'AddRemoveEdge') {
+        console.log("Switching add edges button");
+        this.switchAddEdgesButton(); // Turn off add edges mode
+      }
+    }));
+    // On reset UI state
+    this.subscriptions.add(
+      this.stateService.resetUiState$.subscribe((value) => {
+        if (value) {
+          this.resetUiState();
+        }
+      })
+    );
+    // On enable algorithm mode
+    this.subscriptions.add(
+      this.stateService.algorithmModeStateChanged$.subscribe((value) => {
+        if (this.isAlgorithmModeActive !== value) {
+          this.toggleAlgorithmModeStyles(value);
+        }
+      })
+    );
+    // On algorithm activation
+    this.subscriptions.add(
+      this.stateService.activateAlgorithm$.subscribe((value) => {
+        if (this.activeAlgIndex) {
+          // @ts-ignore
+          this!.algorithmsItems[this.activeAlgIndex[0]].items[this.activeAlgIndex[1]].style = {'background-color': '#ffffff'};
+        }
+        const index = this.getIndexOfAlgorithm(value);
+        if (index) {
+          this.activeAlgIndex = index;
+          this.activeAlg = value;
+          // @ts-ignore
+          this!.algorithmsItems[this.activeAlgIndex[0]].items[this.activeAlgIndex[1]].style = {'background-color': '#4d9aff'};
+        }
+      })
+    );
+    // On can reset algorithm
+    this.subscriptions.add(
+      this.stateService.canResetAlgorithm$.subscribe((value) => {
+        this.canReset = value;
+      })
+    );
+    // On reset algorithm
+    this.subscriptions.add(
+      this.stateService.callResetAlgorithm$.subscribe((value) => {
+        if (this.canReset) {
+          this.onResetButton();
+        }
+      })
+    );
   }
 
   onToggleAddVertexButton() {
@@ -463,6 +581,14 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Open export sub menu.
+   */
+  openExportItemsSubMenu(event: MouseEvent, exportSubMenu: Menu) {
+    event.stopPropagation();
+    exportSubMenu.toggle(event);
+  }
+
+  /**
    * Open algorithms sub menu in settings menu.
    * Only for mobile version.
    */
@@ -477,108 +603,8 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  private initSubscriptions() {
-    this.subscriptions = new Subscription();
-    // Cursor coordinates
-    this.subscriptions.add(this.stateService.currentCursorX.subscribe(state => this.xCursor = state));
-    this.subscriptions.add(this.stateService.currentCursorY.subscribe(state => this.yCursor = state));
-    // Undo/Redo buttons
-    this.subscriptions.add(this.stateService.canUndo$.subscribe(state => this.canUndo = state));
-    this.subscriptions.add(this.stateService.canRedo$.subscribe(state => this.canRedo = state));
-    // Zooming button
-    this.subscriptions.add(this.stateService.zoomChanged$.subscribe(state => {
-      this.zoomPercentage = state;
-    }));
-    // Cog dropdown components
-    this.subscriptions.add(this.showGrid.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onToggleShowGrid(value);
-      }
-    }));
-    this.subscriptions.add(this.hideHelper.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onToggleAlwaysHideHelper(value);
-      }
-    }));
-    // Force options
-    this.subscriptions.add(this.enableCenterForce.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onCenterForceToggle(value);
-      }
-    }));
-    this.subscriptions.add(this.enableLinkForce.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onLinkForceToggle(value)
-      }
-    }));
-    // Graph orientation
-    this.subscriptions.add(this.selectedOrientation.valueChanges.subscribe(value => {
-      if (value !== null) {
-        this.onChoseGraphOrientation(value);
-      }
-    }));
-    this.subscriptions.add(this.stateService.graphOrientationChanged$.subscribe(state => {
-      if (state !== this.selectedOrientation.value) {
-        this.selectedOrientation.setValue(state);
-      }
-    }));
-    // Mode buttons
-    this.subscriptions.add(this.stateService.currentMode$.subscribe(state => {
-      if (this.isAddVertexButtonActive && state !== 'AddRemoveVertex') {
-        console.log("Switching add vertex button");
-        this.switchAddVertexButton(); // Turn off add vertex mode
-      }
-      if (this.isAddEdgesButtonActive && state !== 'AddRemoveEdge') {
-        console.log("Switching add edges button");
-        this.switchAddEdgesButton(); // Turn off add edges mode
-      }
-    }));
-    // On reset UI state
-    this.subscriptions.add(
-      this.stateService.resetUiState$.subscribe((value) => {
-        if (value) {
-          this.resetUiState();
-        }
-      })
-    );
-    // On enable algorithm mode
-    this.subscriptions.add(
-      this.stateService.algorithmModeStateChanged$.subscribe((value) => {
-        if (this.isAlgorithmModeActive !== value) {
-          this.toggleAlgorithmModeStyles(value);
-        }
-      })
-    );
-    // On algorithm activation
-    this.subscriptions.add(
-      this.stateService.activateAlgorithm$.subscribe((value) => {
-        if (this.activeAlgIndex) {
-          // @ts-ignore
-          this!.algorithmsItems[this.activeAlgIndex[0]].items[this.activeAlgIndex[1]].style = {'background-color': '#ffffff'};
-        }
-        const index = this.getIndexOfAlgorithm(value);
-        if (index) {
-          this.activeAlgIndex = index;
-          this.activeAlg = value;
-          // @ts-ignore
-          this!.algorithmsItems[this.activeAlgIndex[0]].items[this.activeAlgIndex[1]].style = {'background-color': '#4d9aff'};
-        }
-      })
-    );
-    // On can reset algorithm
-    this.subscriptions.add(
-      this.stateService.canResetAlgorithm$.subscribe((value) => {
-        this.canReset = value;
-      })
-    );
-    // On reset algorithm
-    this.subscriptions.add(
-      this.stateService.callResetAlgorithm$.subscribe((value) => {
-        if (this.canReset) {
-          this.onResetButton();
-        }
-      })
-    );
+  private exportAsPng() {
+    this.stateService.callExportAsPngWindow();
   }
 
   private resetUiState() {

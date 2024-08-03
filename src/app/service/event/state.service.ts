@@ -16,7 +16,6 @@ import {
 import {SetValidationResult} from "../graph/graph-set.service";
 import {CustomizationFormValues} from "../../component/tab-nav/customization-view/customization-view.component";
 import {AppData} from "../file.service";
-import {ConfService} from "../config/conf.service";
 import {GraphElement} from "../../model/graphical-model/graph-element";
 import {GenerateGraphOptions} from "../../component/tab-nav/generate-view/generate-view.component";
 import {ModeState, SubmodeState} from "../../logic/mode/mode";
@@ -26,6 +25,7 @@ import {
   AlgorithmCalculationResponse,
   ShortestPathRequest
 } from "../manager/algorithm-manager.service";
+import {ExportAsPngRequest} from "../../component/dialog/export-as-png-dialog/export-as-png-dialog.component";
 
 /**
  * Service for managing the state of the application.
@@ -44,6 +44,9 @@ export class StateService {
   private notifyErrorSource = new Subject<string>();
   public notifyError$ = this.notifyErrorSource.asObservable();
 
+  private callExportAsPngSource = new Subject<ExportAsPngRequest>();
+  public callExportAsPng$ = this.callExportAsPngSource.asObservable();
+
   // --------------------------------------------------
   // UI component states. Tool bar
   // --------------------------------------------------
@@ -59,7 +62,7 @@ export class StateService {
   private redoInvokedSource = new Subject<boolean>();
   public redoInvoked$ = this.redoInvokedSource.asObservable();
 
-  private showGridSource = new BehaviorSubject<boolean>(ConfService.SHOW_GRID);
+  private showGridSource = new Subject<boolean>();
   public showGrid$ = this.showGridSource.asObservable();
 
   // Current mode (default, add vertex, add edges etc.)
@@ -74,6 +77,9 @@ export class StateService {
 
   private loadAppSource = new Subject<AppData>();
   public loadApp$ = this.loadAppSource.asObservable();
+
+  private callExportAsPngWindowSource = new Subject<boolean>();
+  public callExportAsPngWindow$ = this.callExportAsPngWindowSource.asObservable();
 
   // --------------------------------------------------
   // UI component states. Nav bar components.
@@ -367,6 +373,13 @@ export class StateService {
    */
   notifyError(message: string) {
     this.notifyErrorSource.next(message);
+  }
+
+  /**
+   * Call export as PNG.
+   */
+  callExportAsPng(request: ExportAsPngRequest) {
+    this.callExportAsPngSource.next(request);
   }
 
   /**
@@ -936,6 +949,13 @@ export class StateService {
    */
   loadApp(appData: AppData) {
     this.loadAppSource.next(appData);
+  }
+
+  /**
+   * Call export as PNG window.
+   */
+  callExportAsPngWindow() {
+    this.callExportAsPngWindowSource.next(true);
   }
 
   /**

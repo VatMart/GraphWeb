@@ -29,18 +29,6 @@ import {StyleClassModule} from "primeng/styleclass";
     SvgIconDirective, SidebarModule, InputViewComponent, CustomizationViewComponent, GenerateViewComponent, AlgorithmsViewComponent, StyleClassModule],
   templateUrl: './tab-nav.component.html',
   styleUrl: './tab-nav.component.css',
-  animations: [
-    trigger('slideInOut', [
-      state('void', style({ transform: 'translateX(calc(-100%))' })), // Adjusted starting position
-      state('*', style({ transform: 'translateX(0)' })),
-      transition(':enter', [
-        animate('0.3s ease-in')
-      ]),
-      transition(':leave', [
-        animate('0.15s ease-out', style({ transform: 'translateX(calc(-100%))' })) // Adjusted ending position
-      ])
-    ])
-  ]
 })
 export class TabNavComponent implements OnInit, OnDestroy {
   private subscriptions!: Subscription;
@@ -113,14 +101,15 @@ export class TabNavComponent implements OnInit, OnDestroy {
   onCloseLeftSideContainer() {
     this.activeIndex = null;
     this.useCloseButtonGradient = false;
-    this.stateService.changedOutputViewVisibility(false); // TODO change when more components will be added
-    // Resize canvas on UI changes
+    this.stateService.changedOutputViewVisibility(false);
     this.cdr.detectChanges();
+    this.stateService.needResizeCanvas();
   }
 
   onToggleExpandVerticalNav($event: MouseEvent) {
     this.verticalNavExpanded = !this.verticalNavExpanded;
     this.cdr.detectChanges();
+    this.stateService.needResizeCanvas();
   }
 
   onDesktopNavItemClick(index: number) {
@@ -129,6 +118,7 @@ export class TabNavComponent implements OnInit, OnDestroy {
     // Resize canvas on UI changes
     this.cdr.detectChanges();
     this.setDesktopSidebarContentHeight();
+    this.stateService.needResizeCanvas();
   }
 
   private toggleAlgorithmModeStyles(value: boolean) {
@@ -147,6 +137,8 @@ export class TabNavComponent implements OnInit, OnDestroy {
     this.items?.filter(item => item.id !== 'algorithms').forEach(item => {
       item.visible = !value
     });
+    this.cdr.detectChanges();
+    this.stateService.needResizeCanvas();
   }
 
   // ----------------
@@ -190,7 +182,7 @@ export class TabNavComponent implements OnInit, OnDestroy {
 
   private setDesktopSidebarContentHeight() {
     const headerHeight = this.desktopHeader.nativeElement.offsetHeight;
-    const toolbarHeight = document.getElementById('toolbar')!.offsetHeight; // TODO get from toolbar
+    const toolbarHeight = document.getElementById('toolbar')!.offsetHeight;
     const windowHeight = window.innerHeight;
     const contentHeight = windowHeight - headerHeight - toolbarHeight - 32;
     this.renderer.setStyle(this.desktopSidebarContent.nativeElement, 'max-height', `${contentHeight}px`);

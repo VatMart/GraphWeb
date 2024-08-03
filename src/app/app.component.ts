@@ -1,8 +1,6 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ToolBarComponent} from "./component/tool-bar/tool-bar.component";
 import {CanvasComponent} from "./component/canvas/canvas.component";
-import {ModeManagerService} from "./service/manager/mode-manager.service";
-import {GraphStateManagerService} from "./service/manager/graph-state-manager.service";
 import {TabNavComponent} from "./component/tab-nav/tab-nav.component";
 import {EnvironmentService} from "./service/config/environment.service";
 import {NgClass, NgIf} from "@angular/common";
@@ -13,8 +11,6 @@ import {
   FloatEdgeWeightInputComponent
 } from "./component/canvas/float-edge-weight-input/float-edge-weight-input.component";
 import {Subscription} from "rxjs";
-import {GraphSetViewManagerService} from "./service/manager/graph-set-view-manager.service";
-import {GraphMatrixViewStateManagerService} from "./service/manager/graph-matrix-view-state-manager.service";
 import {ConfService} from "./service/config/conf.service";
 import {PixiManagerService} from "./service/manager/pixi-manager.service";
 import {ImportService} from "./service/import.service";
@@ -25,6 +21,7 @@ import {GraphViewService} from "./service/graph/graph-view.service";
 import {
   FloatAnimationToolbarComponent
 } from "./component/canvas/float-animation-toolbar/float-animation-toolbar.component";
+import {ApplicationManagerService} from "./service/manager/application-manager.service";
 
 /**
  * Main component of the application.
@@ -49,10 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
   showFloatEditorPanel: boolean = false;
   showFloatAnimationToolbar: boolean = false;
 
-  constructor(private modeManagerService: ModeManagerService,
-              private graphStateManager: GraphStateManagerService,
-              private matrixManager: GraphMatrixViewStateManagerService,
-              private graphSetManager: GraphSetViewManagerService,
+  constructor(private applicationManager: ApplicationManagerService,
               private graphService: GraphViewService,
               private importService: ImportService,
               private pixiManager: PixiManagerService,
@@ -160,10 +154,12 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       })
     );
+    this.applicationManager.initSubscriptions();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+    this.applicationManager.destroySubscriptions();
   }
 
   private notifyError(value: string) {
