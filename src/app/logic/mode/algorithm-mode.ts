@@ -1,6 +1,6 @@
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {NodeView} from "../../model/graphical-model/node/node-view";
-import {AlgorithmSubmode, BaseMode, Mode, ModeState, Submode} from "./mode";
+import {AlgorithmSubmode, BaseMode, Mode, ModeState} from "./mode";
 import {PixiService} from "../../service/pixi.service";
 import {EventBusService} from "../../service/event/event-bus.service";
 import {StateService} from "../../service/event/state.service";
@@ -27,10 +27,10 @@ export class AlgorithmMode extends BaseMode implements Mode {
     this.stateService.algorithmModeEnabled(true);
   }
 
-  modeOff(): void {
+  async modeOff(): Promise<void> {
     console.log("AlgorithmMode OFF"); // TODO remove
     if (this.submode?.isActive()) {
-      this.submodeOff();
+      await this.submodeOff();
     }
     this.stateService.algorithmModeEnabled(false);
   }

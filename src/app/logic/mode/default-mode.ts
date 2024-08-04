@@ -5,8 +5,9 @@ import {EventBusService, HandlerNames} from "../../service/event/event-bus.servi
 import {HistoryService} from "../../service/history.service";
 import {EdgeView} from "../../model/graphical-model/edge/edge-view";
 import {StateService} from "../../service/event/state.service";
-import {BaseMode, Mode, ModeState, Submode, SubmodeState} from "./mode";
+import {BaseMode, Mode, ModeState, Submode} from "./mode";
 import {ForceSubmode} from "./force-submode";
+import {DEFAULT_HELPER_ITEM} from "../../component/canvas/float-helper/float-helper.component";
 
 /**
  * Default mode for the application
@@ -34,6 +35,7 @@ export class DefaultMode extends BaseMode implements Mode {
     this.selectableModeOn();
     this.moveableNodesOn();
     this.editableEdgesWeightOn();
+    this.stateService.changeFloatHelperItem(DEFAULT_HELPER_ITEM)
   }
 
   modeOff(): void {

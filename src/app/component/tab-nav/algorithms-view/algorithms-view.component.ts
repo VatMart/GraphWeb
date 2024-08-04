@@ -8,6 +8,8 @@ import {Subscription} from "rxjs";
 import {Button} from "primeng/button";
 import {StateService} from "../../../service/event/state.service";
 import {NgClass} from "@angular/common";
+import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import {GraphicalUtils} from "../../../utils/graphical-utils";
 
 /**
  * Component for the algorithms view.
@@ -38,7 +40,8 @@ export class AlgorithmsViewComponent implements OnInit, OnDestroy {
   // Algorithm mode state
   isAlgorithmModeActive: boolean = false;
 
-  constructor(private stateService: StateService) {
+  constructor(private stateService: StateService,
+              private sanitizer: DomSanitizer) {
   }
 
   ngOnInit(): void {
@@ -62,23 +65,70 @@ export class AlgorithmsViewComponent implements OnInit, OnDestroy {
       {
         label: 'Dijkstra\'s Algorithm',
         id: Algorithm.DIJKSTRA,
-        definition: 'TODO1',
-        image: 'TODO1',
-        description: 'TODO1'
+        definition: this.sanitizer.bypassSecurityTrustHtml('<p>Dijkstra\'s algorithm is a graph search algorithm' +
+          ' that finds <b>the shortest path</b> between a specified starting node and a target node in a weighted graph with' +
+          ' non-negative edge weights. It uses a priority queue to explore the nearest unvisited nodes,' +
+          ' updating the shortest known distances from the start node to each node until the shortest path to the' +
+          ' target node is determined.</p>'),
+        image: 'DijkstraAnimation.gif',
+        description: this.sanitizer.bypassSecurityTrustHtml('<p>The Dijkstra algorithm can be initiated by' +
+          ' <b>selecting two nodes</b> with a click or tap.' +
+          ' Once selected, you can start the algorithm calculation. Upon completion of the calculation,' +
+          ' you can control the animation playback using the player toolbar that appears.</p>' +
+          '<br>' +
+          '<b>Legend:</b>' +
+          '<br>' +
+          '<ul>' +
+          '<li><i style="color: ' + GraphicalUtils.hexNumberToString(ConfService.ALGORITHM_SELECTION_COLOR) +
+          '">Vertices/Edges</i> - Coloring of current steps of the algorithm.</li>' +
+          '<li><i style="color: ' + GraphicalUtils.hexNumberToString(ConfService.ALGORITHM_PATH_COLOR) +
+          '">Vertices/Edges</i> - Coloring of the shortest path.</li>' +
+          '<li>Labels below vertices - The minimal distance to the node,' +
+          ' calculated at each specific step of the algorithm.</li>' +
+          '</ul>')
       },
       {
         label: 'Depth First Search',
         id: Algorithm.DFS,
-        definition: 'TODO2',
-        image: 'TODO2',
-        description: 'TODO2'
+        definition: this.sanitizer.bypassSecurityTrustHtml('<p>DFS is a <b>graph traversal</b> algorithm that' +
+          ' explores as far as possible along each branch before backtracking. It starts from a given node' +
+          ' (the root in tree structures) and explores each branch of the graph thoroughly before moving' +
+          ' on to the next branch. DFS uses a stack data structure, either through recursion or an explicit' +
+          ' stack, to keep track of the vertices to visit next.</p>'),
+        image: 'DFSAnimation.gif',
+        description: this.sanitizer.bypassSecurityTrustHtml('<p>The DFS algorithm can be started by' +
+          ' <b>selecting a node</b> with a click or tap. After selecting the node, you can start the algorithm\'s' +
+          ' calculation. Once the calculation is finished, you can manage the animation playback using the' +
+          ' player toolbar that appears.</p>' +
+          '<br>' +
+          '<b>Legend:</b>' +
+          '<br>' +
+          '<ul>' +
+          '<li><i style="color: ' + GraphicalUtils.hexNumberToString(ConfService.ALGORITHM_SELECTION_COLOR) +
+          '">Vertices/Edges</i> - Coloring of current steps of the algorithm.</li>' +
+          '<li>Labels below vertices - order of node visiting.</li>' +
+          '</ul>')
       },
       {
         label: 'Breadth First Search',
         id: Algorithm.BFS,
-        definition: 'TODO3',
-        image: 'TODO3',
-        description: 'TODO3'
+        definition: this.sanitizer.bypassSecurityTrustHtml('<p>Breadth-First Search (BFS) is a <b>graph' +
+          ' traversal</b> algorithm that explores nodes level by level, starting from a given node. It visits all' +
+          ' neighbors at the present depth before moving on to nodes at the next depth level, ensuring the' +
+          ' shortest path in terms of the number of edges from the starting node to each node.</p>'),
+        image: 'BFSAnimation.gif',
+        description: this.sanitizer.bypassSecurityTrustHtml('<p>The BFS algorithm can be started by' +
+          ' <b>selecting a node</b> with a click or tap. After selecting the node, you can start the algorithm\'s' +
+          ' calculation. Once the calculation is finished, you can manage the animation playback using the' +
+          ' player toolbar that appears.</p>' +
+          '<br>' +
+          '<b>Legend:</b>' +
+          '<br>' +
+          '<ul>' +
+          '<li><i style="color: ' + GraphicalUtils.hexNumberToString(ConfService.ALGORITHM_SELECTION_COLOR) +
+          '">Vertices/Edges</i> - Coloring of current steps of the algorithm.</li>' +
+          '<li>Labels below vertices - order of node visiting.</li>' +
+          '</ul>')
       }
     ];
     this.isAlgorithmModeActive = this.stateService.isAlgorithmModeActive();
@@ -98,6 +148,12 @@ export class AlgorithmsViewComponent implements OnInit, OnDestroy {
         if (this.isAlgorithmModeActive !== value) {
           this.toggleAlgorithmModeStyles(value);
         }
+      })
+    );
+    // On algorithm activation
+    this.subscriptions.add(
+      this.stateService.activateAlgorithm$.subscribe((value) => {
+        this.selectedAlgItem = this.algorithmItems.find(item => item.id === value)!;
       })
     );
   }
@@ -122,7 +178,7 @@ export class AlgorithmsViewComponent implements OnInit, OnDestroy {
 export interface AlgorithmItem {
   label: string;
   id: string;
-  definition: string;
+  definition: SafeHtml;
   image: string;
-  description: string;
+  description: SafeHtml;
 }

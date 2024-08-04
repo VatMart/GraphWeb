@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Subject, Subscription } from "rxjs";
+import {Injectable} from '@angular/core';
+import {Subject, Subscription} from "rxjs";
 import * as PIXI from 'pixi.js';
 
 /**
@@ -13,7 +13,8 @@ export class EventBusService {
   private eventSubscriptions = new Map<string, Map<any, Subscription>>();
   private handlers = new Map<string, any>(); // Handlers storage of the application
 
-  constructor() { }
+  constructor() {
+  }
 
   /**
    * Registers an event on the specified PIXI.EventEmitter and subscribes it
@@ -252,4 +253,5 @@ export const HandlerNames = {
 
   // Algorithm handlers
   SHORTEST_PATH_SELECTION: 'shortestPathSelection', // Handler for the shortest path selection event
+  TRAVERSE_GRAPH_START_SELECTION: 'traverseGraphStartSelection', // Handler for the traverse graph start selection event
 }

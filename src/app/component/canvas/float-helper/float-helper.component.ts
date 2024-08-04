@@ -80,3 +80,5 @@ export const SELECT_MODE_HELPER_ITEM: FloatHelperItem = {htmlContent: 'You enabl
 
 export const DIJKSTRA_ALGORITHM_HELPER_ITEM: FloatHelperItem = {htmlContent: 'Select <span style="color: #FFC618; font-size: 16px">start</span> and ' +
     '<span style="color: #FF0000; font-size: 16px">end</span> vertices to find the shortest path'};
+
+export const TRAVERSE_ALGORITHM_HELPER_ITEM: FloatHelperItem = {htmlContent: 'Select <span style="color: #FFC618; font-size: 16px">start</span> vertex to start traverse algorithm'};

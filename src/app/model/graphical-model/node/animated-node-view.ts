@@ -92,13 +92,7 @@ export class AnimatedNodeView {
       this.nodeView.scale.set(this.originalScale);
       this.nodeView.texture = this._beforeAnimationTexture!;
     }
-    if (this.labelGraphics && this.text) {
-      this.nodeView.removeChild(this.labelGraphics!);
-      this.labelGraphics.destroy();
-      this.text.destroy();
-      this.labelGraphics = undefined;
-      this.text = undefined;
-    }
+    this.destroyLabel();
   }
 
   /**
@@ -114,6 +108,8 @@ export class AnimatedNodeView {
     if (this._algInitLabel !== null && this.text) {
       this.text.text = this._algInitLabel;
       this.drawLabel();
+    } else {
+      this.destroyLabel(); // Hide label if it was not initialized before
     }
   }
 
@@ -140,6 +136,9 @@ export class AnimatedNodeView {
     if (this._algFinalLabel !== null && this.text) {
       this.text.text = this._algFinalLabel;
       this.drawLabel();
+    } else if (this._algFinalLabel !== null && !this.text) {
+      this.initFinalLabel(); // Initialize label if it was not initialized before
+      this.drawLabel();
     }
     if (!this.isFinal) {
       this.nodeView.texture = this._afterAnimationTexture!;
@@ -165,6 +164,31 @@ export class AnimatedNodeView {
       this.labelGraphics.position.set(this.nodeView.width / 2, this.nodeView.height + 15);
     }
     this.initialState()
+  }
+
+  private initFinalLabel() {
+    if (this._algFinalLabel !== null) {
+      this.resetNode();
+      this.labelGraphics = new Graphics();
+      this.nodeView.addChild(this.labelGraphics);
+      this.text = new Text({text: this._algFinalLabel, style: {fill: 0x000000, fontFamily: 'Inter var',
+          fontSize: 20}});
+      this.text.anchor.set(0.5, 0.5);
+      this.labelGraphics.addChild(this.text);
+      this.drawLabel();
+      this.labelGraphics.pivot.set(0, 0);
+      this.labelGraphics.position.set(this.nodeView.width / 2, this.nodeView.height + 15);
+    }
+  }
+
+  private destroyLabel() {
+    if (this.labelGraphics && this.text) {
+      this.nodeView.removeChild(this.labelGraphics!);
+      this.labelGraphics.destroy();
+      this.text.destroy();
+      this.labelGraphics = undefined;
+      this.text = undefined;
+    }
   }
 
   private animateNode() {

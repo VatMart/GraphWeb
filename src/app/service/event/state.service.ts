@@ -23,7 +23,8 @@ import {Algorithm} from "../../model/Algorithm";
 import {
   AlgorithmCalculationRequest,
   AlgorithmCalculationResponse,
-  ShortestPathRequest
+  ShortestPathRequest,
+  TraverseRequest
 } from "../manager/algorithm-manager.service";
 import {ExportAsPngRequest} from "../../component/dialog/export-as-png-dialog/export-as-png-dialog.component";
 
@@ -177,7 +178,7 @@ export class StateService {
   private needResizeCanvasSource = new Subject<boolean>();
   public needResizeCanvas$ = this.needResizeCanvasSource.asObservable();
 
-  private rendererResizedSource = new Subject<{width: number, height: number}>();
+  private rendererResizedSource = new Subject<{ width: number, height: number }>();
   public rendererResized$ = this.rendererResizedSource.asObservable();
 
   private zoomToChangeSource = new Subject<number>();
@@ -365,11 +366,16 @@ export class StateService {
   private algorithmAnimationChangeSpeedSource = new Subject<number>();
   public algorithmAnimationChangeSpeed$ = this.algorithmAnimationChangeSpeedSource.asObservable();
 
-  // Shortest path algs related
+  // Shortest path alg request
   private shortestPathRequestSource = new Subject<ShortestPathRequest>();
   public shortestPathRequest$ = this.shortestPathRequestSource.asObservable();
 
-  constructor() { }
+  // Traverse graph alg request
+  private traverseGraphRequestSource = new Subject<TraverseRequest>();
+  public traverseGraphRequest$ = this.traverseGraphRequestSource.asObservable();
+
+  constructor() {
+  }
 
   /**
    * Notify about error.
@@ -432,8 +438,8 @@ export class StateService {
    * Notify that the graph has been cleared.
    */
   graphCleared() {
-   this.graphClearedSource.next(true);
-   this.graphChangedSource.next(true);
+    this.graphClearedSource.next(true);
+    this.graphChangedSource.next(true);
   }
 
   /**
@@ -644,6 +650,13 @@ export class StateService {
    */
   requestShortestPath(request: ShortestPathRequest) {
     this.shortestPathRequestSource.next(request);
+  }
+
+  /**
+   * Request to traverse the graph.
+   */
+  requestTraverseGraph(request: TraverseRequest) {
+    this.traverseGraphRequestSource.next(request);
   }
 
   /**

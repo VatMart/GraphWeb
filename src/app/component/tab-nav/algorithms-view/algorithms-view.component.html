@@ -1,5 +1,5 @@
 <div class="algorithms-container">
-  <div class="row-item">
+  <dfn class="row-item">
     <label [ngClass]="isAlgorithmModeActive ? 'alg-label' : 'common-label'">Algorithm:</label>
     <p-dropdown
       [options]="groupedAlgs"
@@ -14,17 +14,17 @@
         </div>
       </ng-template>
     </p-dropdown>
-  </div>
+  </dfn>
   <div class="separator"></div>
   <div class="column-item">
     <label [ngClass]="isAlgorithmModeActive ? 'alg-label' : 'common-label'">Definition:</label>
-    <p>{{ selectedAlgItem.definition }}</p>
-    TODO:Image illustration of the algorithm
+    <div [innerHTML]='selectedAlgItem.definition'></div>
+    <img [src]="'assets/gifs/' + selectedAlgItem.image" alt="Algorithm Illustration" class="algorithm-gif">
   </div>
   <div class="separator"></div>
   <div class="column-item">
     <label [ngClass]="isAlgorithmModeActive ? 'alg-label' : 'common-label'">Description:</label>
-    <p>{{ selectedAlgItem.description }}</p>
+    <div [innerHTML]='selectedAlgItem.description'></div>
   </div>
   <div class="separator"></div>
   <div class="button-panel">

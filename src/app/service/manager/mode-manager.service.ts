@@ -66,8 +66,10 @@ export class ModeManagerService implements ServiceManager {
       // Algorithm submodes
       'Dijkstra': new DijkstraSubmode(this.pixiService, this.graphViewService, this.stateService, this.eventBus,
         this.nodeFabric, this.edgeFabric),
-      'BFS': new BfsSubmode(),
-      'DFS': new DfsSubmode()
+      'BFS': new BfsSubmode(this.pixiService, this.graphViewService, this.stateService, this.eventBus,
+        this.nodeFabric, this.edgeFabric),
+      'DFS': new DfsSubmode(this.pixiService, this.graphViewService, this.stateService, this.eventBus,
+        this.nodeFabric, this.edgeFabric)
     };
     this.defaultMode = new DefaultMode(this.pixiService, this.eventBus, this.historyService, this.graphViewService,
       this.stateService, this.submodeStateActions.force); // Default mode with force submode

@@ -43,6 +43,12 @@ export class AlgorithmManagerService implements ServiceManager {
         this.onShortestPathRequest(request);
       })
     );
+    // On traverse request
+    this.subscriptions.add(
+      this.stateService.traverseGraphRequest$.subscribe((request: TraverseRequest) => {
+        this.onTraverseRequest(request);
+      })
+    );
     // On algorithm calculation request
     this.subscriptions.add(
       this.stateService.performAlgorithmCalculation$.subscribe((value: AlgorithmCalculationRequest) => {
@@ -85,10 +91,24 @@ export class AlgorithmManagerService implements ServiceManager {
     });
   }
 
+  private onTraverseRequest(request: TraverseRequest) {
+    this.dialogService.open(AlgorithmDialogComponent, {
+      header: 'Start calculating traverse algorithm?',
+      contentStyle: {overflow: 'auto'},
+      breakpoints: {'960px': '75vw', '640px': '90vw'},
+      modal: true,
+      dismissableMask: false,
+      closable: false,
+      data: {
+        request: request,
+      }
+    });
+  }
+
   private onPerformAlgorithmCalculation(value: AlgorithmCalculationRequest) {
     // Serialize the graph to JSON
     const graph = this.graphService.currentGraph.toFullJSON();
-    const request: ShortestPathRequest = value as ShortestPathRequest;
+    const request = value;
     this.showSpinnerDialog(); // Show spinner dialog while calculating algorithm
     // Send the calculation request to the web worker to calculate the algorithm on a separate thread
     this.workerService.sendMessage('algorithm', {graph, request})

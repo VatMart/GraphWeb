@@ -598,6 +598,8 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   }
 
   onActivateAlgorithm(algorithm: Algorithm) {
+    this.stateService.showAnimationToolbar(false); // Hide animation toolbar if shown
+    this.stateService.closeSidebarMenu(); // Close sidebar menu if open
     if (this.activeAlg !== algorithm) {
       this.stateService.activateAlgorithm(algorithm);
     }

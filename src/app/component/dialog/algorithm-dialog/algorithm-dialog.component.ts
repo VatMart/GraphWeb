@@ -62,7 +62,10 @@ export class AlgorithmDialogComponent {
       return;
     }
     if (request.algorithmType === AlgorithmType.TRAVERSE) {
-      // TODO
+      const traverseRequest = request as ShortestPathRequest;
+      const startLabel = this.graphService.currentGraph.getNodes().get(traverseRequest.startNodeIndex)!.label;
+      this.text = 'Traverse graph starting from node \'' + startLabel + '\' using ' + traverseRequest.algorithm +
+        ' algorithm.'
       return;
     }
   }

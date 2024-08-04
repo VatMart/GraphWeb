@@ -178,7 +178,7 @@ export class AnimatedEdgeView {
     const currentX = startX + t * (endX - startX);
     const currentY = startY + t * (endY - startY);
 
-    const widthVariation = t < 0.5 ? t * 2 : (1 - t) * 2; // Grow in the middle of the animation
+    const widthVariation = t < 0.5 ? t * 4 : (1 - t) * 4; // Grow in the middle of the animation
     const width = this.edgeView.edgeStyle.strokeWidth * (1 + widthVariation);
 
     if (this.startNodePosition === 1) {

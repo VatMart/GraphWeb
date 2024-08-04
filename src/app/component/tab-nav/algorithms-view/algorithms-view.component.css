@@ -5,6 +5,7 @@
 .algorithms-container {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .row-item {

@@ -5,13 +5,12 @@ import {StateService} from "../../../service/event/state.service";
 import {GraphViewService} from "../../../service/graph/graph-view.service";
 import {NodeViewFabricService} from "../../../service/fabric/node-view-fabric.service";
 import {EdgeViewFabricService} from "../../../service/fabric/edge-view-fabric.service";
-import {FederatedPointerEvent} from "pixi.js";
+import {FederatedPointerEvent, Text} from "pixi.js";
 import {EventUtils} from "../../../utils/event-utils";
 import {NodeView} from "../../../model/graphical-model/node/node-view";
 import {NodeStyle} from "../../../model/graphical-model/graph/graph-view-properties";
 import {ConfService} from "../../../service/config/conf.service";
 import {AlgorithmType} from "../../../model/Algorithm";
-import {Text} from "pixi.js";
 
 /**
  * Handles all events related to algorithms.
@@ -32,6 +31,7 @@ export class AlgorithmEventHandler {
   }
 
   private onShortestPathBound: (event: FederatedPointerEvent) => void;
+  private onTraverseStartBound: (event: FederatedPointerEvent) => void;
 
   // Shortest path selection
   public static startNodeStyle: NodeStyle = ConfService.START_NODE_STYLE;
@@ -48,20 +48,22 @@ export class AlgorithmEventHandler {
                       private nodeFabric: NodeViewFabricService,
                       private edgeFabric: EdgeViewFabricService) {
     this.onShortestPathBound = this.shortestPathSelect.bind(this);
+    this.onTraverseStartBound = this.traverseStartSelect.bind(this);
     // Register event handlers
     this.eventBus.registerHandler(HandlerNames.SHORTEST_PATH_SELECTION, this.onShortestPathBound);
+    this.eventBus.registerHandler(HandlerNames.TRAVERSE_GRAPH_START_SELECTION, this.onTraverseStartBound);
     // Set up texts style
     this.startText.style.fill = '#ff8c18';
     this.startText.style.fontSize = 36;
     this.startText.style.fontFamily = 'Nunito Sans';
     this.startText.style.fontWeight = 'bold';
-    this.startText.style.stroke = { color: 'black', width: 3, join: 'round' };
+    this.startText.style.stroke = {color: 'black', width: 3, join: 'round'};
     this.startText.anchor.set(0.5);
     this.endText.style.fill = '#e25d5d';
     this.endText.style.fontSize = 32;
     this.endText.style.fontFamily = 'Nunito Sans';
     this.endText.style.fontWeight = 'bold';
-    this.endText.style.stroke = { color: 'black', width: 3, join: 'round' };
+    this.endText.style.stroke = {color: 'black', width: 3, join: 'round'};
     this.endText.anchor.set(0.5);
   }
 
@@ -79,6 +81,9 @@ export class AlgorithmEventHandler {
     return this.instance;
   }
 
+  /**
+   * Handles the event of selecting nodes for the shortest path algorithm.
+   */
   private shortestPathSelect(event: FederatedPointerEvent): void {
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
@@ -110,6 +115,31 @@ export class AlgorithmEventHandler {
     }
   }
 
+  /**
+   * Handles the event of starting the traversal of the graph.
+   */
+  private traverseStartSelect(event: FederatedPointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
+    if (AlgorithmEventHandler.startNode) { // Start node already selected
+      return;
+    }
+    if (EventUtils.isNodeView(event.target)) {
+      let nodeView: NodeView = event.target as NodeView;
+      AlgorithmEventHandler.startNode = nodeView;
+      this.stateService.changeCanResetAlgorithm(true);
+      this.switchNodeStyle(nodeView, true, 'start', 'Start');
+      if (this.stateService.getActiveAlgorithm()) {
+        this.stateService.requestTraverseGraph({
+          algorithm: this.stateService.getActiveAlgorithm()!,
+          algorithmType: AlgorithmType.TRAVERSE,
+          startNodeIndex: AlgorithmEventHandler.startNode.node!.index
+        });
+      }
+    }
+  }
+
   public switchNodeStyle(nodeView: NodeView | undefined, enable: boolean, nodeType: 'start' | 'end',
                          text?: string): void {
     if (enable && nodeView) {
@@ -136,7 +166,7 @@ export class AlgorithmEventHandler {
 
   private attachTextToNodeView(nodeView: NodeView, nodeType: 'start' | 'end', value: string) {
     const width = nodeView.width;
-    const textPoint = {x: width/2, y: -20};
+    const textPoint = {x: width / 2, y: -20};
     const text: Text = nodeType === 'start' ? this.startText : this.endText
     text.x = textPoint.x;
     text.y = textPoint.y;

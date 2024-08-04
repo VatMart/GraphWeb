@@ -1,9 +1,8 @@
-import {AlgorithmAnimationResolver} from "./algorithm-animation-resolver";
+import {AlgorithmAnimationResolver, delay} from "./algorithm-animation-resolver";
 import {PixiService} from "../../../service/pixi.service";
 import {ShortPathResult} from "../algorithm-resolver";
 import {GraphViewService} from "../../../service/graph/graph-view.service";
 import {EdgeView} from "../../../model/graphical-model/edge/edge-view";
-import {EdgeIndex} from "../../../model/edge";
 import {AlgorithmCalculationResponse} from "../../../service/manager/algorithm-manager.service";
 import {NodeView} from "../../../model/graphical-model/node/node-view";
 import {AnimatedEdgeView} from "../../../model/graphical-model/edge/animated-edge-view";
@@ -12,20 +11,17 @@ import {ConfService} from "../../../service/config/conf.service";
 import {AnimatedNodeView} from "../../../model/graphical-model/node/animated-node-view";
 import {NodeViewFabricService} from "../../../service/fabric/node-view-fabric.service";
 import {EdgeViewFabricService} from "../../../service/fabric/edge-view-fabric.service";
-import {NodeStyle, WeightStyle} from "../../../model/graphical-model/graph/graph-view-properties";
+import {NodeStyle} from "../../../model/graphical-model/graph/graph-view-properties";
 import {GraphicalUtils} from "../../../utils/graphical-utils";
 import {Texture} from "pixi.js";
 
 /**
  * Short path animation resolver class.
  */
-export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
+export class DijkstraAnimationResolver extends AlgorithmAnimationResolver {
 
   private shortestPathResult: ShortPathResult; // Incoming data from the algorithm resolver
   private readonly finalNode: number; // End node index
-  public readonly totalSteps: number; // Total steps of the algorithm
-  private currentStep: number = 0; // Current step of the algorithm
-  private currentSpeed: number = 1; // Current speed of the animation
 
   // Affected edges by the algorithm
   // It is list which contains all steps of the algorithm
@@ -39,10 +35,11 @@ export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
 
   constructor(private pixiService: PixiService,
               private stateService: StateService,
-              private graphService: GraphViewService,
-              private nodeFabric: NodeViewFabricService,
-              private edgeFabric: EdgeViewFabricService,
+              graphService: GraphViewService,
+              nodeFabric: NodeViewFabricService,
+              edgeFabric: EdgeViewFabricService,
               private data: AlgorithmCalculationResponse) {
+    super(graphService, nodeFabric, edgeFabric);
     this.shortestPathResult = data.result as ShortPathResult;
     this.totalSteps = this.shortestPathResult.checkedPaths.length;
     this.finalNode = this.shortestPathResult.endNode;
@@ -99,19 +96,10 @@ export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
     this.allSteps.forEach(checkedPath => {
       // Nodes
       const node: MultiVisitedAnimatedNode = checkedPath.path.secondNode;
-      this.prepareAnimatedNodeView(node, nodesIndexes);
+      this.prepareMultiVisitedAnimatedNodeView(node, nodesIndexes);
       // Edges
       const edge = checkedPath.path.edge;
-      const weightStyle: WeightStyle = Object.assign({}, edge.getEdgeView().weightView.weightStyle);
-      const weightTextStyle = Object.assign({}, edge.getEdgeView().weightView.weightStyle.text);
-      const stringEdgeColor = GraphicalUtils.hexNumberToString(edge.color);
-      weightTextStyle.labelColor = stringEdgeColor
-      weightStyle.strokeColor = stringEdgeColor;
-      weightStyle.text = weightTextStyle;
-      const oldWeightTexture = edge.getEdgeView().weightView.texture;
-      const newWeightTexture = this.edgeFabric.createWeightTexture(edge.getEdgeView().weightView.text,
-        weightStyle);
-      edge.initTexturesAndGraphics(oldWeightTexture, newWeightTexture);
+      this.prepareAnimatedEdgeView(edge);
     });
   }
 
@@ -123,7 +111,7 @@ export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
     for (let i = this.currentStep; i < this.allSteps.length; i++) {
       if (this.paused) break; // Exit if paused
       await this.performStepForward();
-      await delay(200/this.currentSpeed); // Add delay between steps
+      await delay(200 / this.currentSpeed); // Add delay between steps
     }
   }
 
@@ -214,7 +202,7 @@ export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
     });
   }
 
-  private prepareAnimatedNodeView(node: MultiVisitedAnimatedNode, nodesIndexes: number[]) {
+  private prepareMultiVisitedAnimatedNodeView(node: MultiVisitedAnimatedNode, nodesIndexes: number[]) {
     const nodeStyle: NodeStyle = Object.assign({}, node.animatedNode.nodeView.nodeStyle);
     const stringColor = GraphicalUtils.hexNumberToString(node.animatedNode.color);
     nodeStyle.fillNode = stringColor;
@@ -281,14 +269,6 @@ export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
     this.isAnimationRun = false;
   }
 
-  private getEdgeViewFromNodes(from: number, to: number): EdgeView {
-    let edge = this.graphService.edgeViews.get(new EdgeIndex(from, to).value);
-    if (!edge) {
-      edge = this.graphService.edgeViews.get(new EdgeIndex(to, from).value)!;
-    }
-    return edge;
-  }
-
   private async animateEdgePath(edge: AnimatedEdgeView): Promise<void> {
     await edge.startAnimation();
   }
@@ -296,10 +276,6 @@ export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
   private async animateNode(node: MultiVisitedAnimatedNode): Promise<void> {
     node.setInitialStateByStep(this.currentStep);
     await node.animatedNode.startAnimation();
-  }
-
-  private getSecondNode(startNode: NodeView, edge: EdgeView): NodeView {
-    return edge.startNode === startNode ? edge.endNode : edge.startNode;
   }
 
   isFirstStep(): boolean {
@@ -325,22 +301,13 @@ export class DijkstraAnimationResolver implements AlgorithmAnimationResolver {
  */
 export interface CheckedPath {
   index: string; // Edge index
-  path: Path;
+  path: ShortPath;
 }
 
-export interface Path {
+export interface ShortPath {
   firstNode: NodeView;
   secondNode: MultiVisitedAnimatedNode; // Animate only the end node
   edge: AnimatedEdgeView;
-}
-
-/**
- * Delay function to introduce a pause between steps.
- * @param ms - The duration in milliseconds to wait.
- * @returns {Promise<void>}
- */
-function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
