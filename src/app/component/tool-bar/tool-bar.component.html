@@ -10,7 +10,9 @@
     </defs>
   </svg>
 
-  <span class="logo-container" [ngClass]="isAlgorithmModeActive ? 'alg-background' : ''">
+  <p-menu #websiteMenu [model]="websiteMenuItems" [popup]="true"></p-menu>
+  <span class="logo-container" [ngClass]="isAlgorithmModeActive ? 'alg-background logo-container-alg' : ''"
+        (click)="websiteMenu.toggle($event)">
     <span class="image-container" [ngClass]="isAlgorithmModeActive ? 'image-container-alg' : ''">
       <img [ngSrc]="isAlgorithmModeActive ? 'assets/logo.png' : 'assets/logo_white.png'" alt="Graph Web Logo"
            class="logo-toolbar" height="251" width="249"/>
@@ -19,8 +21,10 @@
     <label class="logo-label" *ngIf="!isMobileDevice">GraphWeb</label>
   </span>
 
-  <!-- For debugging. TODO hide on prod -->
-  <span *ngIf="!isMobileDevice" class="coordinates-panel" [ngClass]="isAlgorithmModeActive ? 'alg-background' : ''">
+  <div class="alg-separator"></div>
+
+  <!-- For debugging -->
+  <span *ngIf="!isMobileDevice && false"  class="coordinates-panel" [ngClass]="isAlgorithmModeActive ? 'alg-background' : ''">
     <span>X: <span>{{ xCursor | number:'1.0-0' }}</span></span>
     <span>Y: <span>{{ yCursor | number:'1.0-0' }}</span></span>
   </span>

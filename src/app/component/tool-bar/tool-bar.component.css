@@ -24,7 +24,23 @@
   display: flex;
   align-items: center;
   padding-inline: 10px;
-  border-right: var(--main-border-color) 1px solid;
+  border-radius: 10px;
+}
+
+.logo-container:hover {
+  background-color: var(--main-hover-color);
+}
+
+.logo-container:active {
+  background-color: var(--alg-hover-color);
+}
+
+.logo-container-alg:hover {
+  background-color: var(--alg-hover-color) !important;
+}
+
+.logo-container-alg:active {
+  background-color: #949494 !important;
 }
 
 .image-container {

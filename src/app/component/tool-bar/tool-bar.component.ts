@@ -21,6 +21,8 @@ import {LocalStorageService} from "../../service/local-storage.service";
 import {Algorithm} from "../../model/Algorithm";
 import {SvgIconService} from "../../service/svg-icon.service";
 import {SvgIconDirective} from "../../directive/svg-icon.directive";
+import {DialogService} from "primeng/dynamicdialog";
+import {AboutPageDialogComponent} from "../dialog/about-page-dialog/about-page-dialog.component";
 
 /**
  * Toolbar component.
@@ -35,21 +37,7 @@ import {SvgIconDirective} from "../../directive/svg-icon.directive";
 })
 export class ToolBarComponent implements OnInit, OnDestroy {
   private subscriptions!: Subscription;
-
   isMobileDevice: boolean;
-
-  // Buttons states
-  isAddVertexButtonActive: boolean = false;
-  isAddVertexButtonPressed: boolean = false;
-  isAddEdgesButtonActive: boolean = false;
-  isAddEdgesButtonPressed: boolean = false;
-
-  // Gradient state
-  useAddVertexGradient: boolean = false;
-  useAddEdgesGradient: boolean = false;
-  useUndoGradient: boolean = false;
-  useRedoGradient: boolean = false;
-  useClearGradient: boolean = false;
 
   // Undo/Redo buttons
   canUndo: boolean = false;
@@ -58,6 +46,9 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   // Cursor coordinates on canvas
   xCursor: number = 0;
   yCursor: number = 0;
+
+  // Website menu items
+  websiteMenuItems: MenuItem[] | undefined;
 
   // Algorithm dropdown button (only for desktop version)
   algorithmsItems: MenuItem[] | undefined;
@@ -86,6 +77,18 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   // Gradient colors
   gradientColorStart: string = '#FFC618';
   gradientColorEnd: string = '#ff0000';
+  // Buttons states
+  isAddVertexButtonActive: boolean = false;
+  isAddVertexButtonPressed: boolean = false;
+  isAddEdgesButtonActive: boolean = false;
+  isAddEdgesButtonPressed: boolean = false;
+
+  // Gradient state
+  useAddVertexGradient: boolean = false;
+  useAddEdgesGradient: boolean = false;
+  useUndoGradient: boolean = false;
+  useRedoGradient: boolean = false;
+  useClearGradient: boolean = false;
 
   // Algorithm mode state
   isAlgorithmModeActive: boolean = false;
@@ -101,6 +104,7 @@ export class ToolBarComponent implements OnInit, OnDestroy {
               private fileService: FileService,
               private localStorageService: LocalStorageService,
               private primengConfig: PrimeNGConfig,
+              private dialogService: DialogService,
               protected svgIconService: SvgIconService,
               protected cdr: ChangeDetectorRef) {
     this.isMobileDevice = this.environmentService.isMobile();
@@ -113,6 +117,27 @@ export class ToolBarComponent implements OnInit, OnDestroy {
     this.svgIconService.addIcon('step-back-icon', '<svg xmlns="http://www.w3.org/2000/svg" height="38" viewBox="100 -850 750 750" width="38" fill="currentColor"><path d="M220-240v-480h66.67v480zm520 0L389.33-480 740-720zm-66.67-126.67v-226.66L507.33-480z"/></svg>');
 
     this.initSubscriptions();
+    // Init website menu items
+    this.websiteMenuItems = [
+      {
+        label: 'GraphWeb',
+        items: [
+          {
+            label: 'Welcome Page',
+            command: () => {
+              this.openWelcomePage();
+            }
+          },
+          {
+            label: 'About',
+            command: () => {
+              this.openAboutDialog();
+            }
+          }
+        ]
+      }
+    ];
+
     // Init algorithm dropdown items
     this.algorithmsItems = [
       {
@@ -386,6 +411,31 @@ export class ToolBarComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  private openAboutDialog() {
+    this.dialogService.open(AboutPageDialogComponent, {
+      contentStyle: {
+        overflow: 'auto',
+        ['background-image']: 'url(\'../../../../assets/img/AboutPageBackground.webp\')',
+        ['background-size']: 'cover',
+        ['background-repeat']: 'no-repeat',
+        ['background-position']: 'center',
+        ['align-content']: 'center',
+        padding: '2% 5%'
+  },
+      width: '95vw',
+      height: '95vh',
+      modal: true,
+      focusOnShow: false,
+      dismissableMask: true,
+      showHeader: false,
+    });
+  }
+
+  private openWelcomePage() {
+    console.log("Welcome page opened"); // TODO remove
+    // TODO
   }
 
   onToggleAddVertexButton() {

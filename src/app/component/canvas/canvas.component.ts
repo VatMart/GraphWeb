@@ -6,6 +6,7 @@ import {GraphViewService} from "../../service/graph/graph-view.service";
 import {PixiManagerService} from "../../service/manager/pixi-manager.service";
 import {LocalStorageService} from "../../service/local-storage.service";
 import {FileService} from "../../service/file.service";
+import {ConfService} from "../../service/config/conf.service";
 
 /**
  * Component for the main canvas.
@@ -45,6 +46,8 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     if (this.localStorageService.isAppDataSaved()) {
       this.localStorageService.loadAppData(); // Initialize app data from local storage
     }
+    // Set default grid
+    this.stateService.changeShowGrid(ConfService.SHOW_GRID);
 
     // ----------------- TODO Remove below -----------------
     (window as any).__PIXI_DEVTOOLS__ = { // TODO remove in production

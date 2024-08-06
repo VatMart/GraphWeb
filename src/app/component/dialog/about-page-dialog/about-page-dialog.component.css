@@ -1,0 +1,33 @@
+.about-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 95%;
+  background-color: white;
+  border-radius: 25px;
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-weight: 200;
+}
+
+.about-page-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: auto;
+  padding: 20px;
+}
+
