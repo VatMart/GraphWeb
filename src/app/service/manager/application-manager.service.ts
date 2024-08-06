@@ -5,6 +5,8 @@ import {ExportService} from "../export.service";
 import {StateService} from "../event/state.service";
 import {DialogService} from "primeng/dynamicdialog";
 import {ExportAsPngDialogComponent} from "../../component/dialog/export-as-png-dialog/export-as-png-dialog.component";
+import {AboutPageDialogComponent} from "../../component/dialog/about-page-dialog/about-page-dialog.component";
+import {WelcomePageDialogComponent} from "../../component/dialog/welcome-page-dialog/welcome-page-dialog.component";
 
 /**
  * Service for managing the application state.
@@ -33,6 +35,22 @@ export class ApplicationManagerService implements ServiceManager {
         this.exportService.exportAsPng(value);
       })
     );
+    // On show welcome page dialog
+    this.subscriptions.add(
+      this.stateService.showWelcomeDialog$.subscribe((value) => {
+        if (value){
+          this.showWelcomePageDialog();
+        }
+      })
+    );
+    // On show about page dialog
+    this.subscriptions.add(
+      this.stateService.showAboutDialog$.subscribe((value) => {
+        if (value){
+          this.showAboutPageDialog();
+        }
+      })
+    );
   }
 
   destroySubscriptions(): void {
@@ -49,6 +67,46 @@ export class ApplicationManagerService implements ServiceManager {
       focusTrap: true,
       dismissableMask: true,
       closable: true,
+    });
+  }
+
+  private showWelcomePageDialog() {
+    this.dialogService.open(WelcomePageDialogComponent, {
+      contentStyle: {
+        overflow: 'auto',
+        ['background-image']: 'url(\'../../../../assets/img/AboutPageBackground.webp\')',
+        ['background-size']: 'cover',
+        ['background-repeat']: 'no-repeat',
+        ['background-position']: 'center',
+        ['align-content']: 'center',
+        padding: '2% 5%'
+      },
+      width: '95vw',
+      height: '95vh',
+      modal: true,
+      focusOnShow: false,
+      dismissableMask: true,
+      showHeader: false,
+    });
+  }
+
+  private showAboutPageDialog() {
+    this.dialogService.open(AboutPageDialogComponent, {
+      contentStyle: {
+        overflow: 'auto',
+        ['background-image']: 'url(\'../../../../assets/img/AboutPageBackground.webp\')',
+        ['background-size']: 'cover',
+        ['background-repeat']: 'no-repeat',
+        ['background-position']: 'center',
+        ['align-content']: 'center',
+        padding: '2% 5%'
+      },
+      width: '95vw',
+      height: '95vh',
+      modal: true,
+      focusOnShow: false,
+      dismissableMask: true,
+      showHeader: false,
     });
   }
 }

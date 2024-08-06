@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ToolBarComponent} from "./component/tool-bar/tool-bar.component";
 import {CanvasComponent} from "./component/canvas/canvas.component";
 import {TabNavComponent} from "./component/tab-nav/tab-nav.component";
@@ -22,6 +22,7 @@ import {
   FloatAnimationToolbarComponent
 } from "./component/canvas/float-animation-toolbar/float-animation-toolbar.component";
 import {ApplicationManagerService} from "./service/manager/application-manager.service";
+import {LocalStorageService} from "./service/local-storage.service";
 
 /**
  * Main component of the application.
@@ -35,7 +36,7 @@ import {ApplicationManagerService} from "./service/manager/application-manager.s
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscriptions!: Subscription;
   @ViewChild('floatingEdgeWeightInput') floatingEdgeWeightInput!: FloatEdgeWeightInputComponent;
   title = 'GraphWeb';
@@ -48,6 +49,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(private applicationManager: ApplicationManagerService,
               private graphService: GraphViewService,
+              private localStorageService: LocalStorageService,
               private importService: ImportService,
               private pixiManager: PixiManagerService,
               private environmentService: EnvironmentService,
@@ -58,6 +60,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Initialize subscriptions
     this.subscriptions = new Subscription();
     // On notify error event
     this.subscriptions.add(
@@ -157,9 +160,39 @@ export class AppComponent implements OnInit, OnDestroy {
     this.applicationManager.initSubscriptions();
   }
 
+  ngAfterViewInit(): void {
+    this.onAppInit();
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     this.applicationManager.destroySubscriptions();
+  }
+
+  private onAppInit() {
+    // Show welcome dialog if needed
+    const lastAppUpload = this.localStorageService.getLastUploadAppTime();
+    const currentTime = Date.now();
+    if (lastAppUpload !== 0) {
+      // Check if the app was uploaded today
+      const lastAppUploadDate = new Date(lastAppUpload);
+      const currentUploadDate = new Date(currentTime);
+      // Difference in milliseconds
+      const differenceInMilliseconds = currentUploadDate.getTime() - lastAppUploadDate.getTime();
+      // Milliseconds in one day (24 hours)
+      const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+      // Check if the difference is greater than one day
+      const isMoreThanOneDay = differenceInMilliseconds > millisecondsInOneDay;
+      if (isMoreThanOneDay) {
+        // Show welcome dialog
+        this.stateService.showWelcomeDialog();
+      }
+    } else { // First time app upload
+      // Show welcome dialog
+      this.stateService.showWelcomeDialog();
+    }
+    // Save current time
+    this.localStorageService.saveLastUploadAppTime(currentTime);
   }
 
   private notifyError(value: string) {

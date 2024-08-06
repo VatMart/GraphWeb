@@ -1,0 +1,75 @@
+<div class="welcome-page">
+  <header class="header-container">
+    <span class="logo-container">
+      <span class="image-container">
+        <img [ngSrc]="'assets/logo_white.png'" alt="Logo"
+             class="logo" height="251" width="249"/>
+      </span>
+    <h1 class="logo-label">GraphWeb</h1>
+  </span>
+    <p-button icon="pi pi-times" class="move-right" [rounded]="true" [text]="true" severity="danger"
+              (onClick)="ref.close();"/>
+  </header>
+
+  <div class="welcome-page-content">
+    <div class="subheader-container">
+      <h2>Visualize algorithms</h2>
+    </div>
+    <div class="demo-container">
+      <div class="demo-image-container">
+        <label class="demo-label">See full animation of algorithm</label>
+        <img [src]="'assets/gifs/DFSAnimation.gif'" alt="DFSAlgorithm" class="demo-image">
+      </div>
+      <div class="demo-image-container">
+        <label class="demo-label">...Or control animation with player</label>
+        <img [src]="'assets/gifs/ManageAnimationWithPlayer.gif'" alt="ManageAnimationWithPlayer" class="demo-image">
+      </div>
+    </div>
+    <div class="subheader-container">
+      <h2>Force Layout</h2>
+    </div>
+    <div class="demo-container">
+      <div class="demo-image-container">
+        <label class="demo-label">Enable Force layout to improve graph readability</label>
+        <img [src]="'assets/gifs/ForceLayoutDemo.gif'" alt="ForceLayoutDemo" class="demo-image">
+      </div>
+    </div>
+    <div class="subheader-container">
+      <h2>Create graph</h2>
+    </div>
+    <div class="demo-container">
+      <div class="demo-image-container">
+        <label class="demo-label">Generate huge trees with different n-arity</label>
+        <img [src]="'assets/img/HugeBinaryTree.png'" alt="HugeBinaryTree" class="demo-image">
+      </div>
+      <div class="demo-image-container">
+        <label class="demo-label">...Or graph with different options</label>
+        <img [src]="'assets/gifs/GenerateGraph.gif'" alt="GenerateGraphWithOptions" class="demo-image">
+      </div>
+      <div class="demo-image-container">
+        <label class="demo-label">... Or draw graph as you like</label>
+        <img [src]="'assets/gifs/DrawGraph.gif'" alt="DrawGraph" class="demo-image">
+      </div>
+    </div>
+    <div class="subheader-container">
+      <h2>Customize graph</h2>
+    </div>
+    <div class="demo-container">
+      <div class="demo-image-container">
+        <label class="demo-label">Change colors, sizes, or apply ready-made style template</label>
+        <img [src]="'assets/img/CustomisationExample.png'" alt="CustomizeGraph" class="demo-image">
+      </div>
+    </div>
+    <div class="subheader-container">
+      <h2>More features</h2>
+      <ul>
+        <li>Save and load graphs</li>
+        <li>Export graph as image</li>
+        <li>Export graph as JSON</li>
+        <li>Import graph as JSON, matrix, set of vertices and edges</li>
+        <li>Matrices representations of graph (ability to save matrix)</li>
+        <li>And new features are coming soon!</li>
+      </ul>
+    </div>
+  </div>
+</div>

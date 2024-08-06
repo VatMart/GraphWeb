@@ -1,0 +1,100 @@
+.welcome-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 95%;
+  background-color: white;
+  border-radius: 25px;
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+  overflow: hidden;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px 20px 0 20px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  padding-inline: 10px;
+  border-radius: 10px;
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  padding: 10px;
+  background-color: var(--main-button-color);
+}
+
+.logo {
+  max-width: 40px;
+  max-height: 40px;
+}
+
+h1 {
+  margin-left: 8px;
+  text-align: center;
+}
+
+.welcome-page-content {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 20px;
+}
+
+h2 {
+  font-weight: 300;
+}
+
+.demo-container {
+  display: flex;
+  flex-direction: row;
+  max-width: 1600px;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.demo-image-container {
+  flex: 1 1 300px;
+  max-width: 45%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-inline: 8px;
+}
+
+.demo-label {
+  font-weight: bold;
+  margin-block: 16px;
+}
+
+.demo-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 15px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 18px 50px -10px;
+  overflow: hidden;
+}
+
+.demo-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the entire container */
+  border-radius: inherit;
+}
+
+@media (max-width: 600px) {
+  .demo-image-container {
+    flex: 1 1 80%; /* Make images larger on smaller screens */
+    max-width: 80%; /* Allow images to take more space */
+  }
+}

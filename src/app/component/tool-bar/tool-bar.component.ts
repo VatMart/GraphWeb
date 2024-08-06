@@ -414,28 +414,11 @@ export class ToolBarComponent implements OnInit, OnDestroy {
   }
 
   private openAboutDialog() {
-    this.dialogService.open(AboutPageDialogComponent, {
-      contentStyle: {
-        overflow: 'auto',
-        ['background-image']: 'url(\'../../../../assets/img/AboutPageBackground.webp\')',
-        ['background-size']: 'cover',
-        ['background-repeat']: 'no-repeat',
-        ['background-position']: 'center',
-        ['align-content']: 'center',
-        padding: '2% 5%'
-  },
-      width: '95vw',
-      height: '95vh',
-      modal: true,
-      focusOnShow: false,
-      dismissableMask: true,
-      showHeader: false,
-    });
+    this.stateService.showAboutDialog();
   }
 
   private openWelcomePage() {
-    console.log("Welcome page opened"); // TODO remove
-    // TODO
+    this.stateService.showWelcomeDialog();
   }
 
   onToggleAddVertexButton() {

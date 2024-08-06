@@ -132,7 +132,6 @@ export class AlgorithmsViewComponent implements OnInit, OnDestroy {
       }
     ];
     this.isAlgorithmModeActive = this.stateService.isAlgorithmModeActive();
-    console.log('Algorithm mode active:', this.isAlgorithmModeActive);
     this.selectedAlgItem = this.algorithmItems.find(item => item.id === this.selectedAlg.value)!;
 
     // Init subscriptions

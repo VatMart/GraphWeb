@@ -48,6 +48,12 @@ export class StateService {
   private callExportAsPngSource = new Subject<ExportAsPngRequest>();
   public callExportAsPng$ = this.callExportAsPngSource.asObservable();
 
+  private showWelcomeDialogSource = new Subject<boolean>();
+  public showWelcomeDialog$ = this.showWelcomeDialogSource.asObservable();
+
+  private showAboutDialogSource = new Subject<boolean>();
+  public showAboutDialog$ = this.showAboutDialogSource.asObservable();
+
   // --------------------------------------------------
   // UI component states. Tool bar
   // --------------------------------------------------
@@ -389,6 +395,20 @@ export class StateService {
    */
   callExportAsPng(request: ExportAsPngRequest) {
     this.callExportAsPngSource.next(request);
+  }
+
+  /**
+   * Show the welcome dialog.
+   */
+  showWelcomeDialog() {
+    this.showWelcomeDialogSource.next(true);
+  }
+
+  /**
+   * Show the about page dialog.
+   */
+  showAboutDialog() {
+    this.showAboutDialogSource.next(true);
   }
 
   /**
