@@ -67,4 +67,9 @@ GraphWeb is built using such frameworks and libraries:
 ## Contributing
 
 Contributions are welcome! Please fork the repository, commit your changes, and open a pull request if you wish to improve the project.
-   
+
+## License
+
+The project is licensed under the GraphWeb License. Public deployment, hosting, or commercial use is not permitted without prior written consent from the copyright holder.
+
+See the [LICENSE.md](LICENSE.md) file for details.
