@@ -248,4 +248,32 @@
 }
 
 /* Styling when alg mode is on */
-c
+:host {
+  /* Mobile tab nav */
+  ::ng-deep .alg-background .p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {
+    background-color: var(--alg-bg-color) !important;
+    color: var(--alg-button-color) !important;
+    border-color: var(--alg-hover-color) !important;
+  }
+  ::ng-deep .alg-background .p-tabmenu-nav-content {
+    background-color: var(--alg-bg-color) !important;
+    color: var(--alg-button-color) !important;
+    border-color: var(--alg-hover-color) !important;
+  }
+  ::ng-deep .alg-background .p-tabmenu .p-tabmenu-nav {
+    background-color: var(--alg-bg-color) !important;
+    color: var(--alg-button-color) !important;
+    border-color: var(--alg-hover-color) !important;
+  }
+  ::ng-deep .alg-background .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link {
+    background-color: var(--alg-bg-color) !important;
+    color: var(--main-blue-light-color) !important;
+    border-color: var(--main-blue-light-color) !important;
+  }
+  /* Mobile sidebar */
+  ::ng-deep .alg-background {
+    background-color: var(--alg-bg-color) !important;
+    color: var(--alg-button-color) !important;
+    border-color: var(--alg-hover-color) !important;
+  }
+}
