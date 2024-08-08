@@ -1,27 +1,70 @@
-# GraphWeb
+GraphWeb — App for visualization of Graphs and Algorithms
+=============
+![GraphWeb](https://github.com/user-attachments/assets/1a116d62-f3bd-4d17-96d9-08346b2d79c9)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.0.
+# Description
+The application provides a user-friendly interface for creating, editing, and analyzing
+graphs. Users can create graphs in several ways; customize the appearanceof the graph.
+The application also provides a set of algorithms that can be applied to the graph.
 
-## Development server
+The goal of GraphWeb is to simplify the process of graph and algorithms visualization
+and manipulation for users ranging from students and educators to researchers and
+developers. The application provides a comprehensive platform for graph creation and
+analysis, enabling users to visualize and understand graph structures with ease.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+**See official site [graphweb.io](https://graphweb.io) for a live demonstration**
 
-## Code scaffolding
+# Features
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **Graph Visualization:** Dynamic and interactive graph visualizations.
+- **Graph Creation:** Create graphs using various methods: generation from options, manual drawing, importing from different inputs.
+- **Graph Customization:** Modify graph styles, colors, and layouts.
+- **Force Layout:** Automatically arrange graphs for optimal readability.
+- **Algorithm Visualization:** Animate and visualize graph algorithms with step-by-step playback.
+- **Export as PNG:** Save graphs as PNG images.
+- **Export Graph Data:** Export graphs as matrices or sets of vertices and edges.
+- **Export Graph Output:** See generated matrices/sets of built graph and export them as text.
 
-## Build
+**GraphWeb adopted for desktops and mobile devices**
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Desktop version:
+![image](https://github.com/user-attachments/assets/e88319a1-6209-4c6e-9829-1ba36af7d747)
 
-## Running unit tests
+## Mobile version:
+![IMG_3083](https://github.com/user-attachments/assets/a6c3c376-8a3f-4715-9800-8f8441072cb4)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Technologies
 
-## Running end-to-end tests
+GraphWeb is built using such frameworks and libraries:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+- **Angular** To build app architecture
+- **PrimeNG** To simplify UI designing 
+- **PixiJS** For efficient graph rendering
 
-## Further help
+# Installation
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+1. **Clone the repository:**
+
+    ```sh
+    git clone https://github.com/VatMart/GraphWeb.git
+    cd GraphWeb
+    ```
+
+2. **Install dependencies:**
+
+    ```sh
+    npm install
+    ```
+
+3. **Run the application:**
+
+    ```sh
+    ng serve
+    ```
+
+    The application will be available at `http://localhost:4200`.
+
+## Contributing
+
+Contributions are welcome! Please fork the repository, commit your changes, and open a pull request if you wish to improve the project.
+   
